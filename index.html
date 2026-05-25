@@ -3,64 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PopkinDom</title>
+  <title>PopkinDom — Summer Season 4</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<header class="navbar">
-  <div class="logo">PopkinDom</div>
-  <nav>
-    <a href="#">Главная</a>
+<header class="header">
+  <a href="#" class="brand">
+    <span class="brand-icon">♛</span>
+    <span>POPKIN<span>DOM</span></span>
+  </a>
+
+  <nav class="nav">
+    <a href="#" class="active">Главная</a>
     <a href="#">Правила</a>
     <a href="#">Моды</a>
     <a href="#">Гайды</a>
-    <a href="#" class="nav-button">Регистрация</a>
+    <a href="#">О сервере</a>
   </nav>
+
+  <a href="#" class="register-btn">
+    <span>♙</span>
+    Регистрация
+  </a>
 </header>
 
-<section class="hero">
-  <div class="overlay"></div>
+<main class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-dark"></div>
 
-  <div class="hero-content">
-    <span class="season">Летний сезон 4</span>
-
-    <h1>PopkinDom</h1>
-    <p>Ламповый Vanilla+ Minecraft сервер для друзей, приключений и уютного выживания</p>
-
-    <div class="server-box">
-    <span>Открытие сервера</span>
-    <strong>Скоро...</strong>
-	</div>
-
-    <div class="hero-buttons">
-      <a href="#" class="btn primary">Начать играть</a>
-      <a href="#" class="btn secondary">Узнать правила</a>
+  <section class="hero-content">
+    <div class="logo-image">
+      <img src="banner.png" alt="PopkinDom Summer Season 4">
     </div>
-  </div>
-</section>
 
-<section class="cards">
-  <div class="card">
-    <h3>Правила</h3>
-    <p>Ознакомься с правилами сервера перед началом игры.</p>
-  </div>
+    <p class="subtitle">
+      Ламповый Vanilla+ Minecraft сервер для друзей,<br>
+      приключений и уютного выживания
+    </p>
 
-  <div class="card">
-    <h3>Моды</h3>
-    <p>Список разрешённых модов и инструкция по установке.</p>
-  </div>
+    <div class="soon-box">
+      <span class="clock">◷</span>
+      <span>Скоро</span>
+    </div>
 
-  <div class="card">
-    <h3>Гайды</h3>
-    <p>Помощь новичкам: как зайти, установить моды и начать играть.</p>
-  </div>
+    <div class="main-buttons">
+      <a href="#" class="btn btn-green">
+        <span>⚔</span>
+        Начать игру
+      </a>
 
-  <div class="card">
-    <h3>Регистрация</h3>
-    <p>Зарегистрируй ник и привяжи аккаунт к серверу.</p>
-  </div>
-</section>
+      <a href="#" class="btn btn-dark">
+        <span>▣</span>
+        Узнать правила
+      </a>
+    </div>
+
+    <div class="cards">
+      <a href="#" class="card">
+        <div class="card-icon">🗡️</div>
+        <div>
+          <h3>Правила</h3>
+          <p>Ознакомься с правилами сервера перед началом игры.</p>
+        </div>
+      </a>
+
+      <a href="#" class="card">
+        <div class="card-icon">🟩</div>
+        <div>
+          <h3>Моды</h3>
+          <p>Список разрешённых модов и инструкция по установке.</p>
+        </div>
+      </a>
+
+      <a href="#" class="card">
+        <div class="card-icon">📔</div>
+        <div>
+          <h3>Гайды</h3>
+          <p>Помощь новичкам: как зайти, установить моды и начать играть.</p>
+        </div>
+      </a>
+
+      <a href="#" class="card">
+        <div class="card-icon">👑</div>
+        <div>
+          <h3>Регистрация</h3>
+          <p>Зарегистрируй ник и привяжи аккаунт к серверу.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+</main>
 
 <script src="script.js"></script>
 </body>

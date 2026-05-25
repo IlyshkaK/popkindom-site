@@ -1,7 +1,5 @@
-function copyIp() {
-  const ip = document.getElementById("serverIp").innerText;
-
-  navigator.clipboard.writeText(ip).then(() => {
-    alert("IP сервера скопирован: " + ip);
+document.querySelectorAll("a[href='#']").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
   });
-}
+});
