@@ -1,23 +1,68 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PopkinDom</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PopkinDom</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div class="hero">
+<header class="navbar">
+  <div class="logo">PopkinDom</div>
+  <nav>
+    <a href="#">Главная</a>
+    <a href="#">Правила</a>
+    <a href="#">Моды</a>
+    <a href="#">Гайды</a>
+    <a href="#" class="nav-button">Регистрация</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="overlay"></div>
+
+  <div class="hero-content">
+    <span class="season">Летний сезон 4</span>
+
     <h1>PopkinDom</h1>
-    <p>Ламповый Minecraft сервер</p>
+    <p>Ламповый Vanilla+ Minecraft сервер для друзей, приключений и уютного выживания</p>
 
-    <div class="buttons">
-        <button>Начать играть</button>
-        <button>Правила</button>
-        <button>Моды</button>
+    <div class="server-box">
+      <span>IP сервера</span>
+      <strong id="serverIp">play.popkindom.ru</strong>
+      <button onclick="copyIp()">Скопировать IP</button>
     </div>
-</div>
 
+    <div class="hero-buttons">
+      <a href="#" class="btn primary">Начать играть</a>
+      <a href="#" class="btn secondary">Узнать правила</a>
+    </div>
+  </div>
+</section>
+
+<section class="cards">
+  <div class="card">
+    <h3>Правила</h3>
+    <p>Ознакомься с правилами сервера перед началом игры.</p>
+  </div>
+
+  <div class="card">
+    <h3>Моды</h3>
+    <p>Список разрешённых модов и инструкция по установке.</p>
+  </div>
+
+  <div class="card">
+    <h3>Гайды</h3>
+    <p>Помощь новичкам: как зайти, установить моды и начать играть.</p>
+  </div>
+
+  <div class="card">
+    <h3>Регистрация</h3>
+    <p>Зарегистрируй ник и привяжи аккаунт к серверу.</p>
+  </div>
+</section>
+
+<script src="script.js"></script>
 </body>
 </html>
