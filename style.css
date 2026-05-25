@@ -362,7 +362,7 @@ body {
   }
 
   .logo-image {
-    width: min(720px, 104vw);
+  width: 100%;
   }
 
   .subtitle {
@@ -798,5 +798,16 @@ body {
 
   .register-btn {
     display: none;
+  }
+  .logo-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 12px;
+  }
+
+  .logo-image img {
+  width: 92%;
+  max-width: 650px;
   }
 }
