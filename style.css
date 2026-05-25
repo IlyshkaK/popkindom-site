@@ -154,13 +154,11 @@ body {
 }
 
 .logo-image {
-  width: min(1350px, 98vw);
+  width: min(900px, 88vw);
   margin: 0 auto;
   filter:
     drop-shadow(0 25px 45px rgba(0, 0, 0, 0.85))
     drop-shadow(0 0 35px rgba(255, 190, 50, 0.18));
-    
-  animation: logoFloat 4s ease-in-out infinite;
 }
 
 .logo-image img {
@@ -578,5 +576,135 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ===== MAIN PAGE ANIMATIONS ===== */
+
+.hero-bg {
+  animation: bgMove 18s ease-in-out infinite alternate;
+}
+
+.logo-image {
+  opacity: 0;
+  animation:
+    logoAppear 0.9s ease forwards,
+    logoFloat 4s ease-in-out infinite 1s;
+}
+
+.subtitle {
+  opacity: 0;
+  animation: fadeUp 0.7s ease forwards 0.25s;
+}
+
+.soon-box {
+  opacity: 0;
+  animation: fadeUp 0.7s ease forwards 0.45s, pulseGlow 2.4s ease-in-out infinite 1.2s;
+}
+
+.main-buttons {
+  opacity: 0;
+  animation: fadeUp 0.7s ease forwards 0.65s;
+}
+
+.cards .card {
+  opacity: 0;
+  transform: translateY(25px);
+  animation: cardAppear 0.65s ease forwards;
+}
+
+.cards .card:nth-child(1) { animation-delay: 0.80s; }
+.cards .card:nth-child(2) { animation-delay: 0.95s; }
+.cards .card:nth-child(3) { animation-delay: 1.10s; }
+.cards .card:nth-child(4) { animation-delay: 1.25s; }
+
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+}
+
+.btn:hover::after {
+  animation: shine 0.75s ease;
+}
+
+@keyframes logoAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardAppear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bgMove {
+  from {
+    transform: scale(1.08) translateX(-12px) translateY(-8px);
+  }
+
+  to {
+    transform: scale(1.12) translateX(12px) translateY(8px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 22px rgba(126, 226, 60, 0.08),
+      0 12px 35px rgba(0, 0, 0, 0.45);
+  }
+
+  50% {
+    box-shadow:
+      inset 0 0 28px rgba(126, 226, 60, 0.2),
+      0 0 28px rgba(126, 226, 60, 0.28),
+      0 12px 35px rgba(0, 0, 0, 0.45);
+  }
+}
+
+@keyframes shine {
+  from {
+    left: -120%;
+  }
+
+  to {
+    left: 140%;
   }
 }
