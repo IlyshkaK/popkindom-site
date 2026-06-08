@@ -470,15 +470,36 @@ function renderAccountData(data) {
   const crafts = data.crafts || [];
   const blocksTotal = blocks.reduce((sum, block) => sum + Number(block.amount || 0), 0);
 
-  setText("profileUsername", data.user?.username || "Игрок");
+  const username = data.user?.username || player.nickname || "Игрок";
+
+  setText("profileUsername", username);
   setText("profileUuid", `UUID: ${player.uuid || data.user?.last_uuid || "—"}`);
-  setText("profileServerInfo", `Сервер: ${player.server_id || "—"}`);
-  setText("profileUpdatedAt", player.updated_at ? `Обновлено: ${formatDate(player.updated_at)}` : "—");
 
   const status = document.getElementById("profileOnlineStatus");
   if (status) {
-    status.textContent = player.online ? "Онлайн" : "Оффлайн";
-    status.className = player.online ? "status" : "status red-text";
+    const online = player.online === true;
+    status.textContent = online ? "Онлайн" : "Оффлайн";
+    status.className = online ? "status online" : "status offline";
+  }
+
+  const playerHead = document.getElementById("playerHead");
+  if (playerHead) {
+    playerHead.src = `https://minotar.net/helm/${encodeURIComponent(username)}/120.png`;
+    playerHead.onerror = () => {
+      playerHead.src = `https://minotar.net/helm/Steve/120.png`;
+    };
+  }
+
+  const xpLevel = Number(player.xp_level || 0);
+  const totalXp = Number(player.total_experience || 0);
+  const xpProgress = Math.max(0, Math.min(100, Math.round(Number(player.exp_progress || 0) * 100)));
+
+  setText("profileXpText", `XP: уровень ${xpLevel}`);
+  setText("profileXpProgress", `${xpProgress}% / всего ${formatNumber(totalXp)} XP`);
+
+  const progressLine = document.querySelector(".profile-hero .progress i");
+  if (progressLine) {
+    progressLine.style.width = `${xpProgress}%`;
   }
 
   setText("quickPlaytime", formatTicks(stats.play_time_ticks || player.play_time_ticks));
@@ -538,6 +559,17 @@ if (playBtn) {
   });
 }
 
+async function refreshAccountRealtime() {
+  if (!document.querySelector(".account-page")) return;
+
+  const data = await loadMe();
+  refreshAuthUI();
+
+  if (data) {
+    renderAccountData(data);
+  }
+}
+
 (async function init() {
   const data = await loadMe();
   refreshAuthUI();
@@ -548,4 +580,8 @@ if (playBtn) {
   }
 
   if (data) renderAccountData(data);
+
+  if (document.querySelector(".account-page")) {
+    setInterval(refreshAccountRealtime, 10000);
+  }
 })();

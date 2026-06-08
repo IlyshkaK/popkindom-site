@@ -1811,3 +1811,29 @@ body.is-auth .auth-action-mobile::after {
   color: #ffffff;
   text-shadow: 0 1px 4px rgba(0,0,0,.9);
 }
+
+/* ===== REAL PLAYER PROFILE ===== */
+.skin-head img {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-model {
+  display: none !important;
+}
+
+.status.online {
+  color: #8ef052;
+  background: rgba(126, 226, 60, 0.14);
+  border-color: rgba(126, 226, 60, 0.35);
+}
+
+.status.offline {
+  color: #ff5b6b;
+  background: rgba(255, 70, 90, 0.14);
+  border-color: rgba(255, 70, 90, 0.35);
+}
