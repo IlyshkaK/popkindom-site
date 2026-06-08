@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Личный кабинет — PopkinDom</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=profile-role-xp-2" />
 </head>
 <body>
 <header class="header">
@@ -74,12 +74,12 @@
       <div class="server-box">
         <span>IP адрес сервера</span>
         <strong>MC.POPKINDOM.RU</strong>
-        <span>Уровень игрока</span>
-        <strong class="green" id="sidebarPlayerLevel">—</strong>
-        <span>XP до следующего уровня</span>
-        <strong class="green" id="sidebarPlayerXp">—</strong>
-        <span>Версия</span>
-        <strong class="green">1.21.10</strong>
+        <span>Онлайн</span>
+        <strong class="green" id="serverOnlineCount">—</strong>
+        <span>Уровень</span>
+        <strong class="green" id="serverXpLevel">—</strong>
+        <span>Всего XP</span>
+        <strong class="green" id="serverXpTotal">—</strong>
       </div>
     </aside>
 
@@ -91,7 +91,7 @@
             <h1 id="profileUsername">Игрок</h1>
             <span class="status" id="profileOnlineStatus">—</span>
           </div>
-          <p id="profileUuid">UUID: —</p>
+          <p id="profileRole">Роль: —</p>
           <div class="level-line"><span id="profileXpText">Уровень: —</span><b id="profileXpProgress">— / — XP</b></div>
           <div class="progress"><i style="width: 52%"></i></div>
         </div>
@@ -172,6 +172,6 @@
     <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
   </div>
 </footer>
-<script src="script.js"></script>
+<script src="script.js?v=profile-role-xp-2"></script>
 </body>
 </html>

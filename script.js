@@ -265,18 +265,6 @@ function cmToKm(value) {
   return `${(Number(value || 0) / 100000).toFixed(1)} км`;
 }
 
-function xpToNextLevel(level) {
-  const lvl = Math.max(0, Number(level || 0));
-  if (lvl >= 30) return 112 + (lvl - 30) * 9;
-  if (lvl >= 15) return 37 + (lvl - 15) * 5;
-  return 7 + lvl * 2;
-}
-
-function getSkinHeadUrl(username, uuid) {
-  const value = (username || uuid || "Steve").toString();
-  return `https://minotar.net/helm/${encodeURIComponent(value)}/120.png`;
-}
-
 function formatDate(value) {
   if (!value) return "—";
   return new Date(value).toLocaleString("ru-RU", {
@@ -473,6 +461,19 @@ function renderOnlinePlayers(players) {
   }).join("");
 }
 
+function xpRequiredForNextLevel(level) {
+  const lvl = Math.max(0, Number(level || 0));
+  if (lvl <= 15) return 2 * lvl + 7;
+  if (lvl <= 30) return 5 * lvl - 38;
+  return 9 * lvl - 158;
+}
+
+function currentLevelXpFromProgress(level, progress) {
+  const required = xpRequiredForNextLevel(level);
+  const normalized = Math.max(0, Math.min(1, Number(progress || 0)));
+  return Math.round(required * normalized);
+}
+
 function renderAccountData(data) {
   if (!data) return;
 
@@ -485,7 +486,15 @@ function renderAccountData(data) {
   const username = data.user?.username || player.nickname || "Игрок";
 
   setText("profileUsername", username);
-  setText("profileUuid", `UUID: ${player.uuid || data.user?.last_uuid || "—"}`);
+
+  const roleMap = {
+    PLAYER: "Игрок",
+    MODERATOR: "Модератор",
+    ADMIN: "Администратор",
+    OWNER: "Владелец"
+  };
+  const roleRaw = String(data.user?.role || player.role || "PLAYER").toUpperCase();
+  setText("profileRole", `Роль: ${roleMap[roleRaw] || roleRaw}`);
 
   const status = document.getElementById("profileOnlineStatus");
   if (status) {
@@ -496,28 +505,27 @@ function renderAccountData(data) {
 
   const playerHead = document.getElementById("playerHead");
   if (playerHead) {
-    playerHead.src = getSkinHeadUrl(username, player.uuid);
+    playerHead.src = `https://minotar.net/helm/${encodeURIComponent(username)}/120.png`;
     playerHead.onerror = () => {
-      playerHead.src = getSkinHeadUrl("Steve");
+      playerHead.src = `https://minotar.net/helm/Steve/120.png`;
     };
   }
 
   const xpLevel = Number(player.xp_level || 0);
   const totalXp = Number(player.total_experience || 0);
-  const nextLevelXp = xpToNextLevel(xpLevel);
-  const rawProgress = Math.max(0, Math.min(1, Number(player.exp_progress || 0)));
-  const currentLevelXp = Math.floor(rawProgress * nextLevelXp);
-  const xpProgress = Math.round(rawProgress * 100);
+  const expProgressRaw = Math.max(0, Math.min(1, Number(player.exp_progress || 0)));
+  const xpProgress = Math.round(expProgressRaw * 100);
+  const xpNeed = xpRequiredForNextLevel(xpLevel);
+  const xpCurrent = currentLevelXpFromProgress(xpLevel, expProgressRaw);
 
   setText("profileXpText", `Уровень: ${xpLevel}`);
-  setText("profileXpProgress", `${formatNumber(currentLevelXp)} / ${formatNumber(nextLevelXp)} XP`);
-  setText("sidebarPlayerLevel", `${xpLevel}`);
-  setText("sidebarPlayerXp", `${formatNumber(currentLevelXp)} / ${formatNumber(nextLevelXp)} XP`);
+  setText("profileXpProgress", `${formatNumber(xpCurrent)} / ${formatNumber(xpNeed)} XP`);
+  setText("serverXpLevel", `${xpLevel} уровень`);
+  setText("serverXpTotal", `${formatNumber(totalXp)} XP`);
 
   const progressLine = document.querySelector(".profile-hero .progress i");
   if (progressLine) {
     progressLine.style.width = `${xpProgress}%`;
-    progressLine.title = `${formatNumber(currentLevelXp)} / ${formatNumber(nextLevelXp)} XP`;
   }
 
   setText("quickPlaytime", formatTicks(stats.play_time_ticks || player.play_time_ticks));
@@ -600,6 +608,6 @@ async function refreshAccountRealtime() {
   if (data) renderAccountData(data);
 
   if (document.querySelector(".account-page")) {
-    setInterval(refreshAccountRealtime, 5000);
+    setInterval(refreshAccountRealtime, 3000);
   }
 })();

@@ -1839,46 +1839,15 @@ body.is-auth .auth-action-mobile::after {
 }
 
 
-/* ===== PROFILE REAL DATA PATCH ===== */
-.profile-hero {
-  grid-template-columns: 130px 1fr !important;
+/* ===== PROFILE ROLE / FAST STATUS PATCH ===== */
+#profileRole {
+  margin: 8px 0 14px;
+  color: rgba(255,255,255,.78);
+  font-size: 17px;
+  word-break: break-word;
 }
 
-.skin-head {
-  overflow: hidden;
-  background: rgba(0,0,0,0.32);
-}
-
-.skin-head img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  image-rendering: pixelated;
-  border-radius: 12px;
-}
-
-.profile-model {
-  display: none !important;
-}
-
-.status.online {
+#serverXpLevel,
+#serverXpTotal {
   color: #8ef052;
-  background: rgba(126, 226, 60, 0.14);
-  border-color: rgba(126, 226, 60, 0.35);
-}
-
-.status.offline {
-  color: #ff5b6b;
-  background: rgba(255, 70, 90, 0.14);
-  border-color: rgba(255, 70, 90, 0.35);
-}
-
-#profileUuid {
-  word-break: break-all;
-}
-
-#profileXpProgress,
-#sidebarPlayerXp {
-  white-space: nowrap;
 }
