@@ -69,7 +69,21 @@
       <p><span>Статус</span><b class="green-text">Авторизован</b></p>
     </div>
 
-    <button class="auth-submit" type="button" data-logout>Выйти из аккаунта</button>
+    <div class="security-actions">
+  <button class="auth-submit security-action-btn" type="button" id="disableAutoLoginBtn">
+    Отключить автовход
+  </button>
+
+  <button class="auth-submit security-action-btn" type="button" id="logoutAllBtn">
+    Завершить все сессии
+  </button>
+
+  <button class="auth-submit security-action-btn danger" type="button" data-logout>
+    Выйти из аккаунта
+  </button>
+</div>
+
+<p class="auth-message" id="securityMessage"></p>
   </section>
 </main>
 

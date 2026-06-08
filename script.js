@@ -329,4 +329,46 @@ async function initAuth() {
   }
 }
 
+const securityMessage = document.getElementById("securityMessage");
+
+async function securityPost(url, successText) {
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      credentials: "include"
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      setAuthMessage(securityMessage, data.error || "Ошибка выполнения действия.", "error");
+      return;
+    }
+
+    setAuthMessage(securityMessage, successText, "success");
+
+    if (data.logout) {
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 900);
+    }
+  } catch {
+    setAuthMessage(securityMessage, "Сервер недоступен.", "error");
+  }
+}
+
+const disableAutoLoginBtn = document.getElementById("disableAutoLoginBtn");
+if (disableAutoLoginBtn) {
+  disableAutoLoginBtn.addEventListener("click", () => {
+    securityPost("/api/disable-autologin", "Автовход в игре отключён.");
+  });
+}
+
+const logoutAllBtn = document.getElementById("logoutAllBtn");
+if (logoutAllBtn) {
+  logoutAllBtn.addEventListener("click", () => {
+    securityPost("/api/logout-all", "Все сессии завершены.", true);
+  });
+}
+
 initAuth();
