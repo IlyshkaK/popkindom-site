@@ -1822,3 +1822,7 @@ body.is-auth .auth-action-mobile::after {
     flex-direction: column;
   }
 }
+
+.red-text {
+  color: #ff5b5b !important;
+}

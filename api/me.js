@@ -34,11 +34,14 @@ module.exports = async function handler(req, res) {
     );
 
     return sendJson(res, 200, {
-      user: publicUser(user),
-      player: playerResult.rows[0] || null,
-      stats: statsResult.rows[0] || null,
-      securityLogs: logsResult.rows,
-    });
+	user: {
+    ...publicUser(user),
+    autoLoginEnabled: user.auto_login_enabled !== false
+	},
+	player: playerResult.rows[0] || null,
+	stats: statsResult.rows[0] || null,
+	securityLogs: logsResult.rows,
+	});
   } catch (error) {
     console.error(error);
     return sendJson(res, 500, { message: 'Ошибка получения аккаунта.' });

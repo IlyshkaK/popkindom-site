@@ -165,6 +165,23 @@ function refreshAuthUI(user = currentSession) {
   if (securityUsername && user) {
     securityUsername.textContent = user.username;
   }
+  
+  const autoLoginStatus = document.getElementById("autoLoginStatus");
+
+	if (autoLoginStatus) {
+  fetch("/api/me", { credentials: "include" })
+    .then((response) => response.json())
+    .then((data) => {
+      const enabled = data?.user?.autoLoginEnabled;
+
+      autoLoginStatus.textContent = enabled ? "Включён" : "Отключён";
+      autoLoginStatus.className = enabled ? "green-text" : "red-text";
+    })
+    .catch(() => {
+      autoLoginStatus.textContent = "Ошибка";
+      autoLoginStatus.className = "red-text";
+    });
+}
 }
 
 function applyAccountData(data) {
