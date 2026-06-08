@@ -265,6 +265,18 @@ function cmToKm(value) {
   return `${(Number(value || 0) / 100000).toFixed(1)} км`;
 }
 
+function xpToNextLevel(level) {
+  const lvl = Math.max(0, Number(level || 0));
+  if (lvl >= 30) return 112 + (lvl - 30) * 9;
+  if (lvl >= 15) return 37 + (lvl - 15) * 5;
+  return 7 + lvl * 2;
+}
+
+function getSkinHeadUrl(username, uuid) {
+  const value = (username || uuid || "Steve").toString();
+  return `https://minotar.net/helm/${encodeURIComponent(value)}/120.png`;
+}
+
 function formatDate(value) {
   if (!value) return "—";
   return new Date(value).toLocaleString("ru-RU", {
@@ -484,22 +496,28 @@ function renderAccountData(data) {
 
   const playerHead = document.getElementById("playerHead");
   if (playerHead) {
-    playerHead.src = `https://minotar.net/helm/${encodeURIComponent(username)}/120.png`;
+    playerHead.src = getSkinHeadUrl(username, player.uuid);
     playerHead.onerror = () => {
-      playerHead.src = `https://minotar.net/helm/Steve/120.png`;
+      playerHead.src = getSkinHeadUrl("Steve");
     };
   }
 
   const xpLevel = Number(player.xp_level || 0);
   const totalXp = Number(player.total_experience || 0);
-  const xpProgress = Math.max(0, Math.min(100, Math.round(Number(player.exp_progress || 0) * 100)));
+  const nextLevelXp = xpToNextLevel(xpLevel);
+  const rawProgress = Math.max(0, Math.min(1, Number(player.exp_progress || 0)));
+  const currentLevelXp = Math.floor(rawProgress * nextLevelXp);
+  const xpProgress = Math.round(rawProgress * 100);
 
-  setText("profileXpText", `XP: уровень ${xpLevel}`);
-  setText("profileXpProgress", `${xpProgress}% / всего ${formatNumber(totalXp)} XP`);
+  setText("profileXpText", `Уровень: ${xpLevel}`);
+  setText("profileXpProgress", `${formatNumber(currentLevelXp)} / ${formatNumber(nextLevelXp)} XP`);
+  setText("sidebarPlayerLevel", `${xpLevel}`);
+  setText("sidebarPlayerXp", `${formatNumber(currentLevelXp)} / ${formatNumber(nextLevelXp)} XP`);
 
   const progressLine = document.querySelector(".profile-hero .progress i");
   if (progressLine) {
     progressLine.style.width = `${xpProgress}%`;
+    progressLine.title = `${formatNumber(currentLevelXp)} / ${formatNumber(nextLevelXp)} XP`;
   }
 
   setText("quickPlaytime", formatTicks(stats.play_time_ticks || player.play_time_ticks));
@@ -582,6 +600,6 @@ async function refreshAccountRealtime() {
   if (data) renderAccountData(data);
 
   if (document.querySelector(".account-page")) {
-    setInterval(refreshAccountRealtime, 10000);
+    setInterval(refreshAccountRealtime, 5000);
   }
 })();
