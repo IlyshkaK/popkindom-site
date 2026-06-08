@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Личный кабинет — PopkinDom</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="header">
+  <a href="index.html" class="brand">
+    <span class="brand-icon">♛</span>
+    <span>POPKIN<span>DOM</span></span>
+  </a>
+
+  <nav class="nav">
+    <a href="index.html">Главная</a>
+    <a href="rules.html">Правила</a>
+    <a href="#">Моды</a>
+    <a href="#">Гайды</a>
+    <a href="#">О сервере</a>
+  </nav>
+
+  <div class="auth-menu-wrap">
+    <a href="login.html" class="register-btn auth-action-btn" id="authMenuBtn">
+      <span class="auth-action-icon">👥</span>
+      <b class="auth-action-text">Войти</b>
+    </a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="account.html"><span>👤</span><b>Кабинет</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <a href="security.html"><span>🛡️</span><b>Безопасность</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" data-logout><span>🚪</span><b>Выход</b></button>
+    </div>
+  </div>
+  
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Главная</a>
+  <a href="rules.html">Правила</a>
+  <a href="#">Моды</a>
+  <a href="#">Гайды</a>
+  <a href="#">О сервере</a>
+  <a href="login.html" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="account.html" class="mobile-auth-link auth-only">👤 Кабинет</a>
+  <a href="security.html" class="mobile-auth-link auth-only">🛡️ Безопасность</a>
+  <button type="button" class="mobile-auth-link auth-only" data-logout>🚪 Выход</button>
+</div>
+
+<main class="account-page protected-page">
+  <div class="account-bg"></div>
+  <div class="account-dark"></div>
+
+  <section class="account-layout">
+    <aside class="account-sidebar glass-card">
+      <div class="account-mini-logo"><span>👤</span> Личный кабинет</div>
+      <a class="side-link active" href="#overview">🏠 Главная</a>
+      <a class="side-link" href="#stats">📊 Статистика</a>
+      <a class="side-link" href="#blocks">⛏ Добытые блоки</a>
+      <a class="side-link" href="#crafts">🔨 Крафты</a>
+      <a class="side-link" href="#enchants">✨ Зачарования</a>
+      <a class="side-link" href="#inventory">🎒 Инвентарь</a>
+      <a class="side-link" href="#deaths">💀 История смертей</a>
+      <a class="side-link" href="#achievements">🏆 Достижения</a>
+      <a class="side-link" href="#community">👥 Сообщество</a>
+      <button class="logout-btn" id="logoutBtn">Выйти из аккаунта</button>
+      <div class="server-box">
+        <span>IP адрес сервера</span>
+        <strong>MC.POPKINDOM.RU</strong>
+        <span>Онлайн</span>
+        <strong class="green">12 / 20</strong>
+        <span>Версия</span>
+        <strong class="green">1.20.4</strong>
+      </div>
+    </aside>
+
+    <section class="account-content">
+      <div class="profile-hero glass-card" id="overview">
+        <div class="skin-head">🧑</div>
+        <div class="profile-info">
+          <div class="profile-title">
+            <h1 id="profileUsername">Игрок</h1>
+            <span class="status">Онлайн</span>
+          </div>
+          <p>UUID: 5f3c2e1d-3a7b-4d6a-9e2f-1c8b9e7d4a2f</p>
+          <div class="level-line"><span>Уровень: 24</span><b>48 / 96 EXP</b></div>
+          <div class="progress"><i style="width: 52%"></i></div>
+        </div>
+        <div class="profile-model">⛏️</div>
+      </div>
+
+      <div class="quick-grid">
+        <div class="stat-card glass-card"><span>⏱</span><b>96 ч.</b><p>Время в игре</p></div>
+        <div class="stat-card glass-card"><span>🏆</span><b>28 / 126</b><p>Достижения</p></div>
+        <div class="stat-card glass-card"><span>💀</span><b>14</b><p>Смерти</p></div>
+        <div class="stat-card glass-card"><span>⚔</span><b>312</b><p>Убийства мобов</p></div>
+      </div>
+
+      <div class="dashboard-grid">
+        <section class="panel glass-card large" id="stats">
+          <h2>📊 Подробная статистика</h2>
+          <div class="stats-list two-cols">
+            <p><span>Пройдено пешком</span><b>128.7 км</b></p>
+            <p><span>Проплыто</span><b>8.4 км</b></p>
+            <p><span>Полетено на элитрах</span><b>42.6 км</b></p>
+            <p><span>Сломано блоков</span><b>124 568</b></p>
+            <p><span>Поставлено блоков</span><b>98 342</b></p>
+            <p><span>Получено урона</span><b>24 581</b></p>
+            <p><span>Нанесено урона</span><b>18 942</b></p>
+            <p><span>Прыжки</span><b>45 128</b></p>
+            <p><span>Раз поспал в кровати</span><b>89</b></p>
+            <p><span>Съедено еды</span><b>1 842</b></p>
+          </div>
+        </section>
+
+        <section class="panel glass-card" id="community">
+          <h2>👥 Кто онлайн</h2>
+          <div class="player-list">
+            <p><span>StevePro</span><b>Онлайн</b></p>
+            <p><span>AlexGood</span><b>Онлайн</b></p>
+            <p><span>KillerBoss</span><b>Онлайн</b></p>
+            <p><span>MineMaster</span><b>7 мин. назад</b></p>
+            <p><span>BuilderXD</span><b>2 ч. назад</b></p>
+          </div>
+        </section>
+
+        <section class="panel glass-card" id="blocks">
+          <h2>⛏ Добытые блоки</h2>
+          <div class="bar-list">
+            <p><span>Камень</span><i><em style="width:90%"></em></i><b>12 430</b></p>
+            <p><span>Угольная руда</span><i><em style="width:64%"></em></i><b>842</b></p>
+            <p><span>Железная руда</span><i><em style="width:48%"></em></i><b>391</b></p>
+            <p><span>Алмазная руда</span><i><em style="width:28%"></em></i><b>42</b></p>
+            <p><span>Древние обломки</span><i><em style="width:18%"></em></i><b>8</b></p>
+            <p><span>Дубовые брёвна</span><i><em style="width:72%"></em></i><b>1 250</b></p>
+          </div>
+        </section>
+
+        <section class="panel glass-card" id="crafts">
+          <h2>🔨 Скрафченные предметы</h2>
+          <div class="stats-list">
+            <p><span>Верстак</span><b>12</b></p>
+            <p><span>Печка</span><b>18</b></p>
+            <p><span>Факел</span><b>2 840</b></p>
+            <p><span>Хлеб</span><b>320</b></p>
+            <p><span>Железная кирка</span><b>31</b></p>
+            <p><span>Алмазная кирка</span><b>4</b></p>
+            <p><span>Незеритовый меч</span><b>1</b></p>
+          </div>
+        </section>
+
+        <section class="panel glass-card" id="enchants">
+          <h2>✨ Зачарования</h2>
+          <div class="stats-list">
+            <p><span>Потрачено уровней</span><b>186</b></p>
+            <p><span>Всего зачарований</span><b>24</b></p>
+            <p><span>Самое частое</span><b>Эффективность</b></p>
+            <p><span>Лучшее зачарование</span><b>Прочность III</b></p>
+          </div>
+        </section>
+
+        <section class="panel glass-card wide" id="inventory">
+          <h2>🎒 Инвентарь</h2>
+          <div class="inventory-wrap">
+            <div class="armor-column"><span>💎</span><span>🛡️</span><span>👖</span><span>🥾</span></div>
+            <div class="inventory-grid" id="inventoryGrid"></div>
+          </div>
+        </section>
+
+        <section class="panel glass-card" id="deaths">
+          <h2>💀 История смертей</h2>
+          <div class="death-list">
+            <article><b>Убит крипером</b><span>02.06.2026 · X: 120 Y: 64 Z: -543</span></article>
+            <article><b>Упал с высоты</b><span>31.05.2026 · X: -80 Y: 112 Z: 320</span></article>
+            <article><b>Утонул</b><span>28.05.2026 · X: 250 Y: 62 Z: 14</span></article>
+          </div>
+        </section>
+
+        <section class="panel glass-card" id="achievements">
+          <h2>🏆 Последние достижения</h2>
+          <div class="achievement-list">
+            <p><span>⚔️ Охотник на монстров</span><b>02.06.2026</b></p>
+            <p><span>💎 Алмазы!</span><b>30.05.2026</b></p>
+            <p><span>🛡️ Куй железо...</span><b>29.05.2026</b></p>
+            <p><span>🟪 Две стихии</span><b>28.05.2026</b></p>
+          </div>
+        </section>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo">♛ POPKINDOM</div>
+    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
+  </div>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>

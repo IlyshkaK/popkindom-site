@@ -22,12 +22,21 @@
     <a href="#">О сервере</a>
   </nav>
 
-  <a href="#" class="register-btn">
-    <span>👥</span>
-    Регистрация
-  </a>
+  <div class="auth-menu-wrap">
+    <a href="login.html" class="register-btn auth-action-btn" id="authMenuBtn">
+      <span class="auth-action-icon">👥</span>
+      <b class="auth-action-text">Войти</b>
+    </a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="account.html"><span>👤</span><b>Кабинет</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <a href="security.html"><span>🛡️</span><b>Безопасность</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" data-logout><span>🚪</span><b>Выход</b></button>
+    </div>
+  </div>
   
-   <button class="burger" id="burgerBtn" aria-label="Открыть меню">
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
     <span></span>
     <span></span>
     <span></span>
@@ -40,9 +49,11 @@
   <a href="#">Моды</a>
   <a href="#">Гайды</a>
   <a href="#">О сервере</a>
-  <a href="#" class="mobile-register">Регистрация</a>
+  <a href="login.html" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="account.html" class="mobile-auth-link auth-only">👤 Кабинет</a>
+  <a href="security.html" class="mobile-auth-link auth-only">🛡️ Безопасность</a>
+  <button type="button" class="mobile-auth-link auth-only" data-logout>🚪 Выход</button>
 </div>
-</header>
 
 <main class="rules-page">
   <div class="rules-bg"></div>

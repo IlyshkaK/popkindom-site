@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Регистрация — PopkinDom</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="header">
+  <a href="index.html" class="brand"><span class="brand-icon">♛</span><span>POPKIN<span>DOM</span></span></a>
+  <nav class="nav">
+    <a href="index.html">Главная</a>
+    <a href="rules.html">Правила</a>
+    <a href="#">Моды</a>
+    <a href="#">Гайды</a>
+    <a href="#">О сервере</a>
+  </nav>
+
+  <div class="auth-menu-wrap">
+    <a href="login.html" class="register-btn auth-action-btn" id="authMenuBtn">
+      <span class="auth-action-icon">👥</span>
+      <b class="auth-action-text">Войти</b>
+    </a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="account.html"><span>👤</span><b>Кабинет</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <a href="security.html"><span>🛡️</span><b>Безопасность</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" data-logout><span>🚪</span><b>Выход</b></button>
+    </div>
+  </div>
+  
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Главная</a>
+  <a href="rules.html">Правила</a>
+  <a href="#">Моды</a>
+  <a href="#">Гайды</a>
+  <a href="#">О сервере</a>
+  <a href="login.html" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="account.html" class="mobile-auth-link auth-only">👤 Кабинет</a>
+  <a href="security.html" class="mobile-auth-link auth-only">🛡️ Безопасность</a>
+  <button type="button" class="mobile-auth-link auth-only" data-logout>🚪 Выход</button>
+</div>
+
+<main class="auth-page">
+  <div class="auth-bg"></div><div class="auth-dark"></div>
+  <section class="auth-card glass-card">
+    <div class="auth-logo"><img src="logo.png" alt="PopkinDom"></div>
+    <h1>Создание аккаунта</h1>
+    <p class="auth-subtitle">Зарегистрируй ник, который потом будет использоваться для входа на сервер.</p>
+    <form class="auth-form" id="registerForm">
+      <label>Ник в Minecraft<input type="text" id="registerUsername" placeholder="Например: Popkin" minlength="3" maxlength="16" required></label>
+      <label>Пароль<input type="password" id="registerPassword" placeholder="Придумай пароль" minlength="8" required></label>
+      <label>Повтор пароля<input type="password" id="registerPasswordRepeat" placeholder="Повтори пароль" minlength="8" required></label>
+      <button type="submit" class="auth-submit">Создать аккаунт</button>
+      <p class="auth-message" id="registerMessage"></p>
+    </form>
+    <div class="auth-bottom">
+      <p>Уже есть аккаунт?</p>
+      <a href="login.html" class="auth-second-btn">Войти</a>
+    </div>
+  </section>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
