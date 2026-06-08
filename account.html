@@ -75,9 +75,9 @@
         <span>IP адрес сервера</span>
         <strong>MC.POPKINDOM.RU</strong>
         <span>Онлайн</span>
-        <strong class="green">12 / 20</strong>
+        <strong class="green" id="serverOnlineCount">—</strong>
         <span>Версия</span>
-        <strong class="green">1.20.4</strong>
+        <strong class="green">1.21.10</strong>
       </div>
     </aside>
 
@@ -87,109 +87,77 @@
         <div class="profile-info">
           <div class="profile-title">
             <h1 id="profileUsername">Игрок</h1>
-            <span class="status">Онлайн</span>
+            <span class="status" id="profileOnlineStatus">—</span>
           </div>
-          <p>UUID: 5f3c2e1d-3a7b-4d6a-9e2f-1c8b9e7d4a2f</p>
-          <div class="level-line"><span>Уровень: 24</span><b>48 / 96 EXP</b></div>
+          <p id="profileUuid">UUID: —</p>
+          <div class="level-line"><span id="profileServerInfo">Сервер: —</span><b id="profileUpdatedAt">—</b></div>
           <div class="progress"><i style="width: 52%"></i></div>
         </div>
         <div class="profile-model">⛏️</div>
       </div>
 
       <div class="quick-grid">
-        <div class="stat-card glass-card"><span>⏱</span><b>96 ч.</b><p>Время в игре</p></div>
-        <div class="stat-card glass-card"><span>🏆</span><b>28 / 126</b><p>Достижения</p></div>
-        <div class="stat-card glass-card"><span>💀</span><b>14</b><p>Смерти</p></div>
-        <div class="stat-card glass-card"><span>⚔</span><b>312</b><p>Убийства мобов</p></div>
+        <div class="stat-card glass-card"><span>⏱</span><b id="quickPlaytime">—</b><p>Время в игре</p></div>
+        <div class="stat-card glass-card"><span>⛏</span><b id="quickBlocks">—</b><p>Добыто блоков</p></div>
+        <div class="stat-card glass-card"><span>💀</span><b id="quickDeaths">—</b><p>Смерти</p></div>
+        <div class="stat-card glass-card"><span>⚔</span><b id="quickMobKills">—</b><p>Убийства мобов</p></div>
       </div>
 
       <div class="dashboard-grid">
         <section class="panel glass-card large" id="stats">
           <h2>📊 Подробная статистика</h2>
-          <div class="stats-list two-cols">
-            <p><span>Пройдено пешком</span><b>128.7 км</b></p>
-            <p><span>Проплыто</span><b>8.4 км</b></p>
-            <p><span>Полетено на элитрах</span><b>42.6 км</b></p>
-            <p><span>Сломано блоков</span><b>124 568</b></p>
-            <p><span>Поставлено блоков</span><b>98 342</b></p>
-            <p><span>Получено урона</span><b>24 581</b></p>
-            <p><span>Нанесено урона</span><b>18 942</b></p>
-            <p><span>Прыжки</span><b>45 128</b></p>
-            <p><span>Раз поспал в кровати</span><b>89</b></p>
-            <p><span>Съедено еды</span><b>1 842</b></p>
+          <div class="stats-list two-cols" id="detailedStatsList">
+            <p><span>Загрузка...</span><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="community">
           <h2>👥 Кто онлайн</h2>
-          <div class="player-list">
-            <p><span>StevePro</span><b>Онлайн</b></p>
-            <p><span>AlexGood</span><b>Онлайн</b></p>
-            <p><span>KillerBoss</span><b>Онлайн</b></p>
-            <p><span>MineMaster</span><b>7 мин. назад</b></p>
-            <p><span>BuilderXD</span><b>2 ч. назад</b></p>
+          <div class="player-list" id="onlinePlayersList">
+            <p><span>Загрузка...</span><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="blocks">
           <h2>⛏ Добытые блоки</h2>
-          <div class="bar-list">
-            <p><span>Камень</span><i><em style="width:90%"></em></i><b>12 430</b></p>
-            <p><span>Угольная руда</span><i><em style="width:64%"></em></i><b>842</b></p>
-            <p><span>Железная руда</span><i><em style="width:48%"></em></i><b>391</b></p>
-            <p><span>Алмазная руда</span><i><em style="width:28%"></em></i><b>42</b></p>
-            <p><span>Древние обломки</span><i><em style="width:18%"></em></i><b>8</b></p>
-            <p><span>Дубовые брёвна</span><i><em style="width:72%"></em></i><b>1 250</b></p>
+          <div class="bar-list" id="blocksList">
+            <p><span>Загрузка...</span><i><em style="width:0%"></em></i><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="crafts">
           <h2>🔨 Скрафченные предметы</h2>
-          <div class="stats-list">
-            <p><span>Верстак</span><b>12</b></p>
-            <p><span>Печка</span><b>18</b></p>
-            <p><span>Факел</span><b>2 840</b></p>
-            <p><span>Хлеб</span><b>320</b></p>
-            <p><span>Железная кирка</span><b>31</b></p>
-            <p><span>Алмазная кирка</span><b>4</b></p>
-            <p><span>Незеритовый меч</span><b>1</b></p>
+          <div class="stats-list" id="craftsList">
+            <p><span>Загрузка...</span><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="enchants">
           <h2>✨ Зачарования</h2>
-          <div class="stats-list">
-            <p><span>Потрачено уровней</span><b>186</b></p>
-            <p><span>Всего зачарований</span><b>24</b></p>
-            <p><span>Самое частое</span><b>Эффективность</b></p>
-            <p><span>Лучшее зачарование</span><b>Прочность III</b></p>
+          <div class="stats-list" id="enchantsList">
+            <p><span>Загрузка...</span><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card wide" id="inventory">
           <h2>🎒 Инвентарь</h2>
           <div class="inventory-wrap">
-            <div class="armor-column"><span>💎</span><span>🛡️</span><span>👖</span><span>🥾</span></div>
+            <div class="armor-column" id="armorColumn"><span>—</span><span>—</span><span>—</span><span>—</span></div>
             <div class="inventory-grid" id="inventoryGrid"></div>
           </div>
         </section>
 
         <section class="panel glass-card" id="deaths">
           <h2>💀 История смертей</h2>
-          <div class="death-list">
-            <article><b>Убит крипером</b><span>02.06.2026 · X: 120 Y: 64 Z: -543</span></article>
-            <article><b>Упал с высоты</b><span>31.05.2026 · X: -80 Y: 112 Z: 320</span></article>
-            <article><b>Утонул</b><span>28.05.2026 · X: 250 Y: 62 Z: 14</span></article>
+          <div class="death-list" id="deathList">
+            <article><b>Пока нет данных</b><span>Историю смертей добавим отдельным модулем WebBridge.</span></article>
           </div>
         </section>
 
         <section class="panel glass-card" id="achievements">
           <h2>🏆 Последние достижения</h2>
-          <div class="achievement-list">
-            <p><span>⚔️ Охотник на монстров</span><b>02.06.2026</b></p>
-            <p><span>💎 Алмазы!</span><b>30.05.2026</b></p>
-            <p><span>🛡️ Куй железо...</span><b>29.05.2026</b></p>
-            <p><span>🟪 Две стихии</span><b>28.05.2026</b></p>
+          <div class="achievement-list" id="achievementList">
+            <p><span>🏆 Пока нет данных</span><b>—</b></p>
           </div>
         </section>
       </div>

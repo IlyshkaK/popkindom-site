@@ -1,55 +1,30 @@
-# PopkinDom Site для Vercel
+# PopkinDom account real WebBridge data patch
 
-Это версия сайта PopkinDom, переделанная под Vercel Serverless API.
+Замени файлы в корне сайта:
 
-## Что внутри
+- account.html
+- script.js
+- style.css
+- api/me.js
 
-- HTML/CSS/JS лежат в корне проекта.
-- API лежит в папке `api/`:
-  - `POST /api/register`
-  - `POST /api/login`
-  - `POST /api/logout`
-  - `GET /api/me`
-- API работает с той же PostgreSQL/Supabase базой, что PopkinAuth и WebBridge.
+После замены:
 
-## Переменные окружения для Vercel
-
-В Vercel открой Project Settings → Environment Variables и добавь:
-
-```env
-DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
-COOKIE_NAME=pd_session
-COOKIE_SECURE=true
-SESSION_HOURS=48
-BCRYPT_ROUNDS=12
+```bash
+git add .
+git commit -m "Connect account page to WebBridge data"
+git push origin main
 ```
 
-Если не используешь `DATABASE_URL`, можно указать отдельно:
+Vercel сам выполнит новый deploy.
 
-```env
-DB_HOST=your-db-host
-DB_PORT=5432
-DB_NAME=postgres
-DB_USER=postgres
-DB_PASSWORD=your-password
-DB_SSL=true
-COOKIE_NAME=pd_session
-COOKIE_SECURE=true
-SESSION_HOURS=48
-BCRYPT_ROUNDS=12
-```
+Что теперь берётся из WebBridge:
 
-## Проверка
+- players
+- player_stats
+- player_blocks
+- player_crafts
+- player_enchantments
+- player_inventory
+- список онлайна из players
 
-1. Залей проект на GitHub.
-2. Импортируй репозиторий в Vercel.
-3. Добавь переменные окружения.
-4. Deploy.
-5. Открой `https://твой-домен/register.html`.
-6. Создай аккаунт.
-7. Проверь, что в таблице `pd_users` появился пользователь.
-8. Зайди на сервер Minecraft под этим ником — PopkinAuth должен попросить `/l пароль`.
-
-## Важно
-
-Minecraft-плагины PopkinAuth и WebBridge остаются на Minecraft-сервере. Vercel хранит только сайт и API, которые подключаются к общей базе.
+История смертей и достижения пока остаются заглушкой, потому что WebBridge ещё не пишет отдельные таблицы для смертей и достижений.

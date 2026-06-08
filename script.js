@@ -1,7 +1,5 @@
 document.querySelectorAll("a[href='#']").forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-  });
+  link.addEventListener("click", (event) => event.preventDefault());
 });
 
 const burgerBtn = document.getElementById("burgerBtn");
@@ -14,10 +12,182 @@ if (burgerBtn && mobileMenu) {
   });
 }
 
-const inventoryGrid = document.getElementById("inventoryGrid");
-if (inventoryGrid) {
-  const items = ["🪵","🪨","⛏️","💎","🔥","🍞","🧪","🌱","🍎","🗡️","🛡️","🏹","🕯️","🧱","🪙","🪣","🧭","📕","","","","","","","","",""];
-  inventoryGrid.innerHTML = items.map((item) => `<span>${item}</span>`).join("");
+let currentUser = null;
+let currentAccountData = null;
+
+function setAuthMessage(element, text, type) {
+  if (!element) return;
+  element.className = `auth-message ${type}`;
+  element.textContent = text;
+}
+
+function isValidMinecraftNick(username) {
+  return /^[a-zA-Z0-9_]{3,16}$/.test(username);
+}
+
+async function apiRequest(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    },
+    ...options
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.message || data.error || "Ошибка запроса.");
+  }
+
+  return data;
+}
+
+async function loadMe() {
+  try {
+    const data = await apiRequest("/api/me");
+    currentUser = data.user;
+    currentAccountData = data;
+    return data;
+  } catch {
+    currentUser = null;
+    currentAccountData = null;
+    return null;
+  }
+}
+
+function refreshAuthUI() {
+  const isAuth = Boolean(currentUser);
+  document.body.classList.toggle("is-auth", isAuth);
+
+  document.querySelectorAll(".auth-action-btn").forEach((button) => {
+    const text = button.querySelector(".auth-action-text");
+    const icon = button.querySelector(".auth-action-icon");
+
+    if (isAuth) {
+      button.href = "#";
+      if (text) text.textContent = currentUser.username;
+      if (icon) icon.textContent = "👤";
+    } else {
+      button.href = "login.html";
+      if (text) text.textContent = "Войти";
+      if (icon) icon.textContent = "👥";
+    }
+  });
+
+  document.querySelectorAll(".auth-action-mobile").forEach((button) => {
+    if (isAuth) {
+      button.href = "#";
+      button.textContent = `👤 ${currentUser.username}`;
+    } else {
+      button.href = "login.html";
+      button.textContent = "Войти";
+    }
+  });
+
+  const profileUsername = document.getElementById("profileUsername");
+  if (profileUsername && isAuth) profileUsername.textContent = currentUser.username;
+
+  const securityUsername = document.getElementById("securityUsername");
+  if (securityUsername && isAuth) securityUsername.textContent = currentUser.username;
+
+  const autoLoginStatus = document.getElementById("autoLoginStatus");
+  if (autoLoginStatus && isAuth) {
+    const enabled = currentUser.autoLoginEnabled !== false;
+    autoLoginStatus.textContent = enabled ? "Включён" : "Отключён";
+    autoLoginStatus.className = enabled ? "green-text" : "red-text";
+  }
+}
+
+const authMenuBtn = document.getElementById("authMenuBtn");
+const authDropdown = document.getElementById("authDropdown");
+
+if (authMenuBtn && authDropdown) {
+  authMenuBtn.addEventListener("click", (event) => {
+    if (!currentUser) return;
+    event.preventDefault();
+    authDropdown.classList.toggle("open");
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!authDropdown.classList.contains("open")) return;
+    if (event.target.closest(".auth-menu-wrap")) return;
+    authDropdown.classList.remove("open");
+  });
+}
+
+async function logoutCurrentSession() {
+  try {
+    await apiRequest("/api/logout", { method: "POST" });
+  } catch {}
+  window.location.href = "login.html";
+}
+
+document.querySelectorAll("[data-logout], #logoutBtn").forEach((button) => {
+  button.addEventListener("click", logoutCurrentSession);
+});
+
+const registerForm = document.getElementById("registerForm");
+if (registerForm) {
+  registerForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const username = document.getElementById("registerUsername").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const passwordRepeat = document.getElementById("registerPasswordRepeat").value;
+    const message = document.getElementById("registerMessage");
+
+    if (!isValidMinecraftNick(username)) {
+      setAuthMessage(message, "Ник должен быть 3–16 символов: буквы, цифры и _", "error");
+      return;
+    }
+
+    if (password.length < 6) {
+      setAuthMessage(message, "Пароль должен быть минимум 6 символов.", "error");
+      return;
+    }
+
+    if (password !== passwordRepeat) {
+      setAuthMessage(message, "Пароли не совпадают.", "error");
+      return;
+    }
+
+    try {
+      await apiRequest("/api/register", {
+        method: "POST",
+        body: JSON.stringify({ username, password, passwordRepeat })
+      });
+
+      setAuthMessage(message, "Аккаунт создан. Открываем кабинет...", "success");
+      setTimeout(() => window.location.href = "account.html", 800);
+    } catch (error) {
+      setAuthMessage(message, error.message, "error");
+    }
+  });
+}
+
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("loginMessage");
+
+    try {
+      await apiRequest("/api/login", {
+        method: "POST",
+        body: JSON.stringify({ username, password })
+      });
+
+      setAuthMessage(message, "Вход выполнен. Открываем кабинет...", "success");
+      setTimeout(() => window.location.href = "account.html", 600);
+    } catch (error) {
+      setAuthMessage(message, error.message, "error");
+    }
+  });
 }
 
 /* ===== ACCOUNT SIDEBAR SCROLL SPY ===== */
@@ -57,9 +227,7 @@ accountLinks.forEach((link) => {
     section.scrollIntoView({ behavior: "smooth", block: "start" });
     setActiveAccountSection(sectionId, true);
 
-    if (history.pushState) {
-      history.pushState(null, "", `#${sectionId}`);
-    }
+    if (history.pushState) history.pushState(null, "", `#${sectionId}`);
   });
 });
 
@@ -69,9 +237,7 @@ if (accountSections.length) {
       .filter((entry) => entry.isIntersecting)
       .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
 
-    if (visibleEntries[0]) {
-      setActiveAccountSection(visibleEntries[0].target.id);
-    }
+    if (visibleEntries[0]) setActiveAccountSection(visibleEntries[0].target.id);
   }, {
     root: null,
     rootMargin: "-22% 0px -58% 0px",
@@ -81,296 +247,271 @@ if (accountSections.length) {
   accountSections.forEach((section) => observer.observe(section));
 }
 
-/* ===== REAL BACKEND AUTH ===== */
-let currentSession = null;
+/* ===== REAL ACCOUNT DATA FROM WEBBRIDGE ===== */
+function formatNumber(value) {
+  const number = Number(value || 0);
+  return number.toLocaleString("ru-RU");
+}
 
-async function apiRequest(url, options = {}) {
-  const response = await fetch(url, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    },
-    ...options
+function formatTicks(ticks) {
+  const seconds = Math.floor(Number(ticks || 0) / 20);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (hours > 0) return `${hours} ч. ${minutes} мин.`;
+  return `${minutes} мин.`;
+}
+
+function cmToKm(value) {
+  return `${(Number(value || 0) / 100000).toFixed(1)} км`;
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+  return new Date(value).toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
   });
+}
 
-  let data = null;
+function prettyMaterial(type) {
+  if (!type) return "—";
+  const map = {
+    STONE: "Камень",
+    COBBLESTONE: "Булыжник",
+    DIRT: "Земля",
+    GRASS_BLOCK: "Дёрн",
+    OAK_LOG: "Дубовое бревно",
+    SPRUCE_LOG: "Еловое бревно",
+    BIRCH_LOG: "Берёзовое бревно",
+    COAL_ORE: "Угольная руда",
+    IRON_ORE: "Железная руда",
+    COPPER_ORE: "Медная руда",
+    GOLD_ORE: "Золотая руда",
+    DIAMOND_ORE: "Алмазная руда",
+    ANCIENT_DEBRIS: "Древние обломки",
+    CRAFTING_TABLE: "Верстак",
+    FURNACE: "Печь",
+    TORCH: "Факел",
+    BREAD: "Хлеб",
+    IRON_PICKAXE: "Железная кирка",
+    DIAMOND_PICKAXE: "Алмазная кирка",
+    NETHERITE_SWORD: "Незеритовый меч"
+  };
+  return map[type] || type.toLowerCase().split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}
+
+function itemIcon(type) {
+  if (!type || type === "AIR") return "";
+  if (type.includes("DIAMOND")) return "💎";
+  if (type.includes("EMERALD")) return "🟩";
+  if (type.includes("GOLD")) return "🟨";
+  if (type.includes("IRON")) return "⛓️";
+  if (type.includes("NETHERITE")) return "⬛";
+  if (type.includes("SWORD")) return "🗡️";
+  if (type.includes("PICKAXE")) return "⛏️";
+  if (type.includes("AXE")) return "🪓";
+  if (type.includes("SHOVEL")) return "🥄";
+  if (type.includes("BOW")) return "🏹";
+  if (type.includes("SHIELD")) return "🛡️";
+  if (type.includes("HELMET")) return "⛑️";
+  if (type.includes("CHESTPLATE")) return "🛡️";
+  if (type.includes("LEGGINGS")) return "👖";
+  if (type.includes("BOOTS")) return "🥾";
+  if (type.includes("LOG") || type.includes("WOOD")) return "🪵";
+  if (type.includes("STONE") || type.includes("DEEPSLATE")) return "🪨";
+  if (type.includes("BREAD")) return "🍞";
+  if (type.includes("APPLE")) return "🍎";
+  if (type.includes("POTION")) return "🧪";
+  if (type.includes("TORCH")) return "🕯️";
+  if (type.includes("BRICK")) return "🧱";
+  if (type.includes("BUCKET")) return "🪣";
+  if (type.includes("BOOK")) return "📕";
+  return "▣";
+}
+
+function parseInventoryJson(value) {
+  if (!value) return [];
   try {
-    data = await response.json();
+    const parsed = typeof value === "string" ? JSON.parse(value) : value;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    data = null;
-  }
-
-  if (!response.ok) {
-    const message = data?.message || "Ошибка запроса к серверу.";
-    throw new Error(message);
-  }
-
-  return data;
-}
-
-async function getSession() {
-  try {
-    const data = await apiRequest("/api/me");
-    return data.user || null;
-  } catch {
-    return null;
+    return [];
   }
 }
 
-function setAuthMessage(element, text, type) {
-  if (!element) return;
-  element.className = `auth-message ${type}`;
-  element.textContent = text;
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value;
 }
 
-function isValidMinecraftNick(username) {
-  return /^[a-zA-Z0-9_]{3,16}$/.test(username);
+function renderStatsList(stats, blocksTotal) {
+  const list = document.getElementById("detailedStatsList");
+  if (!list) return;
+
+  const rows = [
+    ["Время в игре", formatTicks(stats?.play_time_ticks)],
+    ["Пройдено пешком", cmToKm(stats?.walk_distance)],
+    ["Полетено", cmToKm(stats?.fly_distance)],
+    ["Сломано блоков", formatNumber(blocksTotal)],
+    ["Смерти", formatNumber(stats?.deaths)],
+    ["Убийства мобов", formatNumber(stats?.mob_kills)],
+    ["Получено урона", formatNumber(stats?.damage_taken)],
+    ["Нанесено урона", formatNumber(stats?.damage_dealt)],
+    ["Прыжки", formatNumber(stats?.jump_count)],
+    ["Раз поспал в кровати", formatNumber(stats?.sleep_count)],
+    ["Открыто сундуков", formatNumber(stats?.open_chest)]
+  ];
+
+  list.innerHTML = rows.map(([label, value]) => `<p><span>${label}</span><b>${value}</b></p>`).join("");
 }
 
-function refreshAuthUI(user = currentSession) {
-  document.body.classList.toggle("is-auth", Boolean(user));
+function renderBarList(id, rows, typeKey, amountKey) {
+  const list = document.getElementById(id);
+  if (!list) return;
 
-  document.querySelectorAll(".auth-action-btn").forEach((button) => {
-    const text = button.querySelector(".auth-action-text");
-    const icon = button.querySelector(".auth-action-icon");
-
-    if (user) {
-      button.href = "#";
-      if (text) text.textContent = user.username;
-      if (icon) icon.textContent = "👤";
-    } else {
-      button.href = "login.html";
-      if (text) text.textContent = "Войти";
-      if (icon) icon.textContent = "👥";
-    }
-  });
-
-  document.querySelectorAll(".auth-action-mobile").forEach((button) => {
-    if (user) {
-      button.href = "#";
-      button.textContent = `👤 ${user.username}`;
-    } else {
-      button.href = "login.html";
-      button.textContent = "Войти";
-    }
-  });
-
-  const profileUsername = document.getElementById("profileUsername");
-  if (profileUsername && user) {
-    profileUsername.textContent = user.username;
-  }
-
-  const securityUsername = document.getElementById("securityUsername");
-  if (securityUsername && user) {
-    securityUsername.textContent = user.username;
-  }
-  
-  const autoLoginStatus = document.getElementById("autoLoginStatus");
-
-	if (autoLoginStatus) {
-  fetch("/api/me", { credentials: "include" })
-    .then((response) => response.json())
-    .then((data) => {
-      const enabled = data?.user?.autoLoginEnabled;
-
-      autoLoginStatus.textContent = enabled ? "Включён" : "Отключён";
-      autoLoginStatus.className = enabled ? "green-text" : "red-text";
-    })
-    .catch(() => {
-      autoLoginStatus.textContent = "Ошибка";
-      autoLoginStatus.className = "red-text";
-    });
-}
-}
-
-function applyAccountData(data) {
-  if (!data) return;
-
-  const user = data.user;
-  const player = data.player;
-  const stats = data.stats;
-
-  const profileUsername = document.getElementById("profileUsername");
-  if (profileUsername && user) profileUsername.textContent = user.username;
-
-  const profileUuid = document.querySelector(".profile-info p");
-  if (profileUuid && player?.uuid) profileUuid.textContent = `UUID: ${player.uuid}`;
-
-  const status = document.querySelector(".profile-title .status");
-  if (status && player) status.textContent = player.online ? "Онлайн" : "Оффлайн";
-
-  const quickCards = document.querySelectorAll(".quick-grid .stat-card b");
-  if (quickCards.length >= 4 && stats) {
-    quickCards[0].textContent = `${Math.floor((stats.play_time_ticks || 0) / 20 / 60 / 60)} ч.`;
-    quickCards[1].textContent = "—";
-    quickCards[2].textContent = stats.deaths ?? 0;
-    quickCards[3].textContent = stats.mob_kills ?? 0;
-  }
-}
-
-const authMenuBtn = document.getElementById("authMenuBtn");
-const authDropdown = document.getElementById("authDropdown");
-
-if (authMenuBtn && authDropdown) {
-  authMenuBtn.addEventListener("click", (event) => {
-    if (!currentSession) return;
-
-    event.preventDefault();
-    authDropdown.classList.toggle("open");
-  });
-
-  document.addEventListener("click", (event) => {
-    if (!authDropdown.classList.contains("open")) return;
-    if (event.target.closest(".auth-menu-wrap")) return;
-    authDropdown.classList.remove("open");
-  });
-}
-
-document.querySelectorAll("[data-logout], #logoutBtn").forEach((button) => {
-  button.addEventListener("click", async () => {
-    try {
-      await apiRequest("/api/logout", { method: "POST", body: "{}" });
-    } catch {}
-
-    currentSession = null;
-    window.location.href = "login.html";
-  });
-});
-
-const registerForm = document.getElementById("registerForm");
-if (registerForm) {
-  registerForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const username = document.getElementById("registerUsername").value.trim();
-    const password = document.getElementById("registerPassword").value;
-    const passwordRepeat = document.getElementById("registerPasswordRepeat").value;
-    const message = document.getElementById("registerMessage");
-
-    if (!isValidMinecraftNick(username)) {
-      setAuthMessage(message, "Ник должен быть 3–16 символов: буквы, цифры и _", "error");
-      return;
-    }
-
-    if (password.length < 8) {
-      setAuthMessage(message, "Пароль должен быть минимум 8 символов.", "error");
-      return;
-    }
-
-    if (password !== passwordRepeat) {
-      setAuthMessage(message, "Пароли не совпадают.", "error");
-      return;
-    }
-
-    try {
-      const data = await apiRequest("/api/register", {
-        method: "POST",
-        body: JSON.stringify({ username, password })
-      });
-
-      currentSession = data.user;
-      refreshAuthUI(currentSession);
-      setAuthMessage(message, "Аккаунт создан. Открываем кабинет...", "success");
-
-      setTimeout(() => {
-        window.location.href = "account.html";
-      }, 800);
-    } catch (error) {
-      setAuthMessage(message, error.message, "error");
-    }
-  });
-}
-
-const loginForm = document.getElementById("loginForm");
-if (loginForm) {
-  loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const username = document.getElementById("loginUsername").value.trim();
-    const password = document.getElementById("loginPassword").value;
-    const message = document.getElementById("loginMessage");
-
-    try {
-      const data = await apiRequest("/api/login", {
-        method: "POST",
-        body: JSON.stringify({ username, password })
-      });
-
-      currentSession = data.user;
-      refreshAuthUI(currentSession);
-      setAuthMessage(message, "Вход выполнен. Открываем кабинет...", "success");
-
-      setTimeout(() => {
-        window.location.href = "account.html";
-      }, 700);
-    } catch (error) {
-      setAuthMessage(message, error.message, "error");
-    }
-  });
-}
-
-/* ===== PLAY BUTTON AUTH REDIRECT ===== */
-const playBtn = document.getElementById("playBtn");
-if (playBtn) {
-  playBtn.addEventListener("click", (event) => {
-    event.preventDefault();
-
-    if (currentSession) {
-      window.location.href = "account.html";
-    } else {
-      window.location.href = "login.html";
-    }
-  });
-}
-
-async function initAuth() {
-  const data = await (async () => {
-    try {
-      return await apiRequest("/api/me");
-    } catch {
-      return null;
-    }
-  })();
-
-  currentSession = data?.user || null;
-  refreshAuthUI(currentSession);
-
-  if (document.querySelector(".protected-page") && !currentSession) {
-    window.location.href = "login.html";
+  if (!rows || rows.length === 0) {
+    list.innerHTML = `<p><span>Пока нет данных</span><i><em style="width:0%"></em></i><b>—</b></p>`;
     return;
   }
 
-  if (document.querySelector(".account-page") && data) {
-    applyAccountData(data);
+  const max = Math.max(...rows.map((row) => Number(row[amountKey] || 0)), 1);
+  list.innerHTML = rows.map((row) => {
+    const amount = Number(row[amountKey] || 0);
+    const width = Math.max(8, Math.round((amount / max) * 100));
+    return `<p><span>${prettyMaterial(row[typeKey])}</span><i><em style="width:${width}%"></em></i><b>${formatNumber(amount)}</b></p>`;
+  }).join("");
+}
+
+function renderSimpleList(id, rows, typeKey, amountKey) {
+  const list = document.getElementById(id);
+  if (!list) return;
+
+  if (!rows || rows.length === 0) {
+    list.innerHTML = `<p><span>Пока нет данных</span><b>—</b></p>`;
+    return;
+  }
+
+  list.innerHTML = rows.map((row) => {
+    return `<p><span>${prettyMaterial(row[typeKey])}</span><b>${formatNumber(row[amountKey])}</b></p>`;
+  }).join("");
+}
+
+function renderEnchantments(enchantments) {
+  const list = document.getElementById("enchantsList");
+  if (!list) return;
+
+  if (!enchantments) {
+    list.innerHTML = `<p><span>Пока нет данных</span><b>—</b></p>`;
+    return;
+  }
+
+  list.innerHTML = `
+    <p><span>Потрачено уровней</span><b>${formatNumber(enchantments.levels_spent)}</b></p>
+    <p><span>Всего зачарований</span><b>${formatNumber(enchantments.enchant_count)}</b></p>
+    <p><span>Последнее обновление</span><b>${formatDate(enchantments.updated_at)}</b></p>
+  `;
+}
+
+function renderInventory(inventory) {
+  const grid = document.getElementById("inventoryGrid");
+  const armor = document.getElementById("armorColumn");
+  if (!grid) return;
+
+  const items = parseInventoryJson(inventory?.inventory_json);
+  const armorItems = parseInventoryJson(inventory?.armor_json);
+
+  const slots = Array.from({ length: 36 }, (_, index) => {
+    const item = items.find((entry) => Number(entry.slot) === index);
+    if (!item || item.type === "AIR" || Number(item.amount || 0) <= 0) return `<span title="Пусто"></span>`;
+    const title = `${prettyMaterial(item.type)} x${item.amount}`;
+    const amount = Number(item.amount || 0) > 1 ? `<small>${item.amount}</small>` : "";
+    return `<span title="${title}">${itemIcon(item.type)}${amount}</span>`;
+  });
+
+  grid.innerHTML = slots.join("");
+
+  if (armor) {
+    armor.innerHTML = [3, 2, 1, 0].map((index) => {
+      const item = armorItems[index];
+      if (!item || item.type === "AIR") return `<span title="Пусто">—</span>`;
+      return `<span title="${prettyMaterial(item.type)}">${itemIcon(item.type)}</span>`;
+    }).join("");
   }
 }
 
+function renderOnlinePlayers(players) {
+  const list = document.getElementById("onlinePlayersList");
+  const count = document.getElementById("serverOnlineCount");
+  if (!list) return;
+
+  const onlineCount = (players || []).filter((player) => player.online).length;
+  if (count) count.textContent = `${onlineCount} онлайн`;
+
+  if (!players || players.length === 0) {
+    list.innerHTML = `<p><span>Пока никого нет</span><b>—</b></p>`;
+    return;
+  }
+
+  list.innerHTML = players.map((player) => {
+    const label = player.online ? "Онлайн" : formatDate(player.updated_at);
+    return `<p><span>${player.nickname}</span><b>${label}</b></p>`;
+  }).join("");
+}
+
+function renderAccountData(data) {
+  if (!data) return;
+
+  const player = data.player || {};
+  const stats = data.stats || data.player || {};
+  const blocks = data.blocks || [];
+  const crafts = data.crafts || [];
+  const blocksTotal = blocks.reduce((sum, block) => sum + Number(block.amount || 0), 0);
+
+  setText("profileUsername", data.user?.username || "Игрок");
+  setText("profileUuid", `UUID: ${player.uuid || data.user?.last_uuid || "—"}`);
+  setText("profileServerInfo", `Сервер: ${player.server_id || "—"}`);
+  setText("profileUpdatedAt", player.updated_at ? `Обновлено: ${formatDate(player.updated_at)}` : "—");
+
+  const status = document.getElementById("profileOnlineStatus");
+  if (status) {
+    status.textContent = player.online ? "Онлайн" : "Оффлайн";
+    status.className = player.online ? "status" : "status red-text";
+  }
+
+  setText("quickPlaytime", formatTicks(stats.play_time_ticks || player.play_time_ticks));
+  setText("quickBlocks", formatNumber(blocksTotal));
+  setText("quickDeaths", formatNumber(stats.deaths || player.deaths));
+  setText("quickMobKills", formatNumber(stats.mob_kills || player.mob_kills));
+
+  renderStatsList(stats, blocksTotal);
+  renderOnlinePlayers(data.onlinePlayers || []);
+  renderBarList("blocksList", blocks, "block_type", "amount");
+  renderSimpleList("craftsList", crafts, "item_type", "amount");
+  renderEnchantments(data.enchantments);
+  renderInventory(data.inventory);
+}
+
+/* ===== SECURITY PAGE ACTIONS ===== */
 const securityMessage = document.getElementById("securityMessage");
 
 async function securityPost(url, successText) {
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      credentials: "include"
-    });
-
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      setAuthMessage(securityMessage, data.error || "Ошибка выполнения действия.", "error");
-      return;
-    }
-
+    const data = await apiRequest(url, { method: "POST" });
     setAuthMessage(securityMessage, successText, "success");
 
     if (data.logout) {
-      setTimeout(() => {
-        window.location.href = "login.html";
-      }, 900);
+      setTimeout(() => window.location.href = "login.html", 900);
+      return;
     }
-  } catch {
-    setAuthMessage(securityMessage, "Сервер недоступен.", "error");
+
+    const refreshed = await loadMe();
+    refreshAuthUI();
+    if (refreshed) renderAccountData(refreshed);
+  } catch (error) {
+    setAuthMessage(securityMessage, error.message || "Ошибка выполнения действия.", "error");
   }
 }
 
@@ -384,8 +525,27 @@ if (disableAutoLoginBtn) {
 const logoutAllBtn = document.getElementById("logoutAllBtn");
 if (logoutAllBtn) {
   logoutAllBtn.addEventListener("click", () => {
-    securityPost("/api/logout-all", "Все сессии завершены.", true);
+    securityPost("/api/logout-all", "Все сессии завершены.");
   });
 }
 
-initAuth();
+/* ===== PLAY BUTTON AUTH REDIRECT ===== */
+const playBtn = document.getElementById("playBtn");
+if (playBtn) {
+  playBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.location.href = currentUser ? "account.html" : "login.html";
+  });
+}
+
+(async function init() {
+  const data = await loadMe();
+  refreshAuthUI();
+
+  if (document.querySelector(".protected-page") && !currentUser) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (data) renderAccountData(data);
+})();
