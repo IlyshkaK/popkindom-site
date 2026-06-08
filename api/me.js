@@ -15,12 +15,20 @@ module.exports = async function handler(req, res) {
     }
 
     const playerResult = await query(
-      `SELECT * FROM players WHERE auth_user_id = $1 ORDER BY updated_at DESC LIMIT 1;`,
+      `SELECT *
+       FROM players
+       WHERE auth_user_id = $1
+       ORDER BY online DESC, updated_at DESC
+       LIMIT 1;`,
       [user.id]
     );
 
     const statsResult = await query(
-      `SELECT * FROM player_stats WHERE auth_user_id = $1 ORDER BY updated_at DESC LIMIT 1;`,
+      `SELECT *
+       FROM player_stats
+       WHERE auth_user_id = $1
+       ORDER BY updated_at DESC
+       LIMIT 1;`,
       [user.id]
     );
 
@@ -76,12 +84,14 @@ module.exports = async function handler(req, res) {
       [user.id]
     );
 
+    const player = playerResult.rows[0] || null;
+
     return sendJson(res, 200, {
       user: {
         ...publicUser(user),
         autoLoginEnabled: user.auto_login_enabled !== false,
       },
-      player: playerResult.rows[0] || null,
+      player,
       stats: statsResult.rows[0] || null,
       blocks: blocksResult.rows,
       crafts: craftsResult.rows,
@@ -89,6 +99,10 @@ module.exports = async function handler(req, res) {
       inventory: inventoryResult.rows[0] || null,
       onlinePlayers: onlineResult.rows,
       securityLogs: logsResult.rows,
+      meta: {
+        isOnline: Boolean(player && player.online === true),
+        updatedAt: player?.updated_at || null,
+      },
     });
   } catch (error) {
     console.error(error);
