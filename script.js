@@ -544,7 +544,7 @@ function prettyMaterial(type) {
     BUTTON: "кнопка", PRESSURE: "нажимная", PLATE: "плита", SWORD: "меч", PICKAXE: "кирка",
     AXE: "топор", SHOVEL: "лопата", HOE: "мотыга", HELMET: "шлем", CHESTPLATE: "нагрудник",
     LEGGINGS: "поножи", BOOTS: "ботинки", IRON: "железный", GOLDEN: "золотой", DIAMOND: "алмазный",
-    NETHERITE: "незеритовый", WOODEN: "деревянный"
+    NETHERITE: "незеритовый", WOODEN: "деревянный", COPPER: "медный"
   };
 
   return normalized
@@ -573,9 +573,11 @@ function materialIconBase(item) {
   return materialName(item?.type).toLowerCase();
 }
 
+const LOCAL_ITEM_ICONS = new Set(["copper_chestplate"]);
+
 function localMaterialIconUrl(item) {
   const base = materialIconBase(item);
-  if (!base || base === "air") return "";
+  if (!base || base === "air" || !LOCAL_ITEM_ICONS.has(base)) return "";
   return `/minecraft/items/${encodeURIComponent(base)}.png`;
 }
 
@@ -616,15 +618,23 @@ function itemIcon(type) {
 }
 
 function renderItemIcon(item) {
+  const localUrl = localMaterialIconUrl(item);
   const remoteUrl = remoteMaterialIconUrl(item);
   const fallback = escapeHtml(itemIcon(item?.type));
 
-  if (!remoteUrl) return `<i class="mc-item-fallback">${fallback}</i>`;
+  if (!localUrl && !remoteUrl) return `<i class="mc-item-fallback">${fallback}</i>`;
 
-  return `<img class="mc-item-icon" src="${remoteUrl}" alt="${escapeHtml(prettyMaterial(item.type))}" loading="eager" decoding="async" data-fallback-text="${fallback}" onerror="handleItemIconError(this)">`;
+  return `<img class="mc-item-icon" src="${localUrl || remoteUrl}" alt="${escapeHtml(prettyMaterial(item.type))}" loading="eager" decoding="async" data-remote-src="${remoteUrl}" data-fallback-text="${fallback}" onerror="handleItemIconError(this)">`;
 }
 
 function handleItemIconError(img) {
+  const remoteSrc = img.getAttribute("data-remote-src");
+  if (remoteSrc && img.src !== remoteSrc && !img.dataset.remoteTried) {
+    img.dataset.remoteTried = "1";
+    img.src = remoteSrc;
+    return;
+  }
+
   const fallbackText = img.getAttribute("data-fallback-text") || "▣";
   const icon = document.createElement("i");
   icon.className = "mc-item-fallback";
@@ -743,18 +753,52 @@ function itemTooltip(item) {
   return `<div class="mc-tooltip">${lines.join("")}</div>`;
 }
 
+
+function itemDetailsHtml(item) {
+  if (!item || item.type === "AIR" || item.empty || Number(item.amount || 0) <= 0) {
+    return `<div class="inventory-details-empty">Наведи на предмет, чтобы посмотреть описание</div>`;
+  }
+
+  const lines = [];
+  lines.push(`<div class="inventory-details-icon">${renderItemIcon(item)}</div>`);
+  lines.push(`<b>${escapeHtml(item.name || prettyMaterial(item.type))}</b>`);
+  lines.push(`<span>${escapeHtml(materialName(item.type))}</span>`);
+
+  if (Number(item.amount || 0) > 1) lines.push(`<p>Количество: <strong>${escapeHtml(item.amount)}</strong></p>`);
+  if (Number(item.max_durability || 0) > 0) lines.push(`<p>Прочность: <strong>${escapeHtml(item.durability_left ?? 0)} / ${escapeHtml(item.max_durability)}</strong></p>`);
+
+  if (Array.isArray(item.enchantments) && item.enchantments.length) {
+    lines.push(`<em>Зачарования</em>`);
+    item.enchantments.slice(0, 8).forEach((enchant) => {
+      lines.push(`<p class="enchanted">${escapeHtml(prettyMaterial(enchant.name || enchant.key))} ${escapeHtml(enchant.level || "")}</p>`);
+    });
+  }
+
+  if (Array.isArray(item.lore) && item.lore.length) {
+    item.lore.slice(0, 7).forEach((line) => lines.push(`<small>${escapeHtml(line)}</small>`));
+  }
+
+  return lines.join("");
+}
+
+function setInventoryDetails(item) {
+  const details = document.getElementById("inventoryDetails");
+  if (details) details.innerHTML = itemDetailsHtml(item);
+}
+
 function renderInventorySlot(item, options = {}) {
   const empty = !item || item.type === "AIR" || item.empty || Number(item.amount || 0) <= 0;
   const slotClass = ["mc-slot", options.className || "", options.active ? "active" : "", empty ? "empty" : ""].filter(Boolean).join(" ");
   const label = options.label ? `<span class="mc-slot-label">${escapeHtml(options.label)}</span>` : "";
 
   if (empty) {
-    return `<span class="${slotClass}" title="Пусто">${label}</span>`;
+    return `<span class="${slotClass}" title="Пусто" tabindex="0">${label}</span>`;
   }
 
   const amount = Number(item.amount || 0) > 1 ? `<small>${escapeHtml(item.amount)}</small>` : "";
   const title = `${prettyMaterial(item.type)} x${item.amount}`;
-  return `<span class="${slotClass}" title="${escapeHtml(title)}">${label}${renderItemIcon(item)}${amount}${itemTooltip(item)}</span>`;
+  const dataItem = escapeHtml(JSON.stringify(item));
+  return `<span class="${slotClass}" title="${escapeHtml(title)}" tabindex="0" data-item="${dataItem}">${label}${renderItemIcon(item)}${amount}${itemTooltip(item)}</span>`;
 }
 
 function renderInventory(inventory) {
@@ -788,6 +832,34 @@ function renderInventory(inventory) {
     ];
 
     armor.innerHTML = armorSlots.map(({ item, label }) => renderInventorySlot(item, { label })).join("");
+  }
+
+  const inventoryRoot = document.getElementById("inventory");
+  if (inventoryRoot) {
+    const filledSlots = inventoryRoot.querySelectorAll(".mc-slot[data-item]");
+    filledSlots.forEach((slot) => {
+      const show = () => {
+        try {
+          setInventoryDetails(JSON.parse(slot.dataset.item || "{}"));
+        } catch {
+          setInventoryDetails(null);
+        }
+      };
+      slot.addEventListener("mouseenter", show);
+      slot.addEventListener("focus", show);
+      slot.addEventListener("click", show);
+    });
+
+    const firstItem = filledSlots[0];
+    if (firstItem) {
+      try {
+        setInventoryDetails(JSON.parse(firstItem.dataset.item || "{}"));
+      } catch {
+        setInventoryDetails(null);
+      }
+    } else {
+      setInventoryDetails(null);
+    }
   }
 }
 function renderOnlinePlayers(players) {

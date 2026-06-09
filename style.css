@@ -2610,3 +2610,188 @@ body.is-auth .auth-action-mobile::after {
     gap: 6px !important;
   }
 }
+
+/* Inventory final layout fix: bigger, no horizontal scroll, with description panel */
+#inventory.panel.wide,
+#inventory {
+  grid-column: 1 / -1 !important;
+  overflow: visible !important;
+}
+
+#inventory .inventory-wrap,
+#inventory .inventory-wrap-fixed {
+  --inv-slot: clamp(54px, 4.45vw, 62px);
+  display: grid !important;
+  grid-template-columns: var(--inv-slot) max-content minmax(250px, 320px) !important;
+  align-items: start !important;
+  gap: 18px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  scrollbar-width: none !important;
+}
+
+#inventory .inventory-wrap::-webkit-scrollbar,
+#inventory .inventory-wrap-fixed::-webkit-scrollbar {
+  display: none !important;
+}
+
+#inventory .armor-column {
+  display: grid !important;
+  grid-template-columns: var(--inv-slot) !important;
+  grid-template-rows: repeat(5, var(--inv-slot)) !important;
+  gap: 10px !important;
+  width: var(--inv-slot) !important;
+  min-width: var(--inv-slot) !important;
+}
+
+#inventory .inventory-grid {
+  display: grid !important;
+  grid-template-columns: repeat(9, var(--inv-slot)) !important;
+  grid-template-rows: repeat(4, var(--inv-slot)) !important;
+  grid-auto-rows: var(--inv-slot) !important;
+  gap: 10px !important;
+  width: max-content !important;
+  max-width: none !important;
+  overflow: visible !important;
+}
+
+#inventory .armor-column > .mc-slot,
+#inventory .inventory-grid > .mc-slot {
+  width: var(--inv-slot) !important;
+  height: var(--inv-slot) !important;
+  border-radius: 10px !important;
+}
+
+#inventory .mc-item-icon {
+  width: calc(var(--inv-slot) - 14px) !important;
+  height: calc(var(--inv-slot) - 14px) !important;
+  max-width: 50px !important;
+  max-height: 50px !important;
+}
+
+#inventory .mc-slot-label {
+  left: 6px !important;
+  top: 5px !important;
+  font-size: 10px !important;
+}
+
+#inventory .mc-slot > small {
+  right: 6px !important;
+  bottom: 5px !important;
+  font-size: 15px !important;
+}
+
+#inventory .mc-tooltip {
+  display: none !important;
+}
+
+#inventory .inventory-details {
+  min-height: 260px;
+  padding: 20px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(0,0,0,.28)), rgba(4, 7, 8, .72);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.34);
+  color: rgba(255,255,255,.84);
+  overflow-wrap: anywhere;
+}
+
+#inventory .inventory-details-empty {
+  color: rgba(255,255,255,.48);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+#inventory .inventory-details-icon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.32);
+  border: 1px solid rgba(255,255,255,.1);
+}
+
+#inventory .inventory-details-icon .mc-item-icon {
+  width: 58px !important;
+  height: 58px !important;
+  max-width: 58px !important;
+  max-height: 58px !important;
+}
+
+#inventory .inventory-details b {
+  display: block;
+  color: #ff884a;
+  font-size: 18px;
+  line-height: 1.25;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+#inventory .inventory-details > span,
+#inventory .inventory-details small {
+  display: block;
+  color: rgba(255,255,255,.48);
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+#inventory .inventory-details p {
+  margin: 8px 0;
+  color: rgba(255,255,255,.86);
+  line-height: 1.35;
+}
+
+#inventory .inventory-details strong {
+  color: #fff;
+}
+
+#inventory .inventory-details em {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  color: rgba(255,255,255,.74);
+  font-style: normal;
+  font-weight: 900;
+}
+
+#inventory .inventory-details .enchanted {
+  color: #6f86ff;
+  font-weight: 800;
+}
+
+@media (max-width: 1180px) {
+  #inventory .inventory-wrap,
+  #inventory .inventory-wrap-fixed {
+    --inv-slot: clamp(46px, 5vw, 56px);
+    grid-template-columns: var(--inv-slot) max-content !important;
+  }
+
+  #inventory .inventory-details {
+    grid-column: 1 / -1;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  #inventory .inventory-wrap,
+  #inventory .inventory-wrap-fixed {
+    --inv-slot: clamp(34px, 9vw, 44px);
+    grid-template-columns: 1fr !important;
+  }
+
+  #inventory .armor-column {
+    grid-template-columns: repeat(5, var(--inv-slot)) !important;
+    grid-template-rows: var(--inv-slot) !important;
+    width: max-content !important;
+  }
+
+  #inventory .inventory-grid {
+    grid-template-columns: repeat(9, var(--inv-slot)) !important;
+    gap: 6px !important;
+  }
+}
