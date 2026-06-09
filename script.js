@@ -853,7 +853,7 @@ function renderInventorySlot(item, options = {}) {
   const amount = Number(item.amount || 0) > 1 ? `<small>${escapeHtml(item.amount)}</small>` : "";
   const title = `${prettyMaterial(item.type)} x${item.amount}`;
   const detailId = registerInventoryDetailItem(item);
-  return `<span class="${slotClass}" tabindex="0" data-detail-id="${detailId}" title="${escapeHtml(title)}">${label}${renderItemIcon(item)}${amount}${itemTooltip(item)}</span>`;
+  return `<span class="${slotClass}" tabindex="0" data-detail-id="${detailId}" title="${escapeHtml(title)}">${label}${renderItemIcon(item)}${amount}</span>`;
 }
 
 function renderInventory(inventory) {

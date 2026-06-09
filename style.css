@@ -2867,3 +2867,142 @@ body.is-auth .auth-action-mobile::after {
     min-height: 150px !important;
   }
 }
+
+
+/* ===== INVENTORY COMPACT LAYOUT + NO SLOT POPUP FIX v5 ===== */
+#inventory.panel,
+#inventory.panel.wide {
+  grid-column: span 8 !important;
+  padding: 24px !important;
+  overflow: hidden !important;
+}
+
+#deaths,
+#achievements {
+  grid-column: span 4 !important;
+}
+
+#inventory .inventory-wrap {
+  --inv-slot: clamp(42px, 3.45vw, 50px);
+  display: grid !important;
+  grid-template-columns: var(--inv-slot) max-content minmax(205px, 1fr) !important;
+  align-items: start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  padding: 2px 0 0 !important;
+}
+
+#inventory .armor-column {
+  grid-template-columns: var(--inv-slot) !important;
+  grid-template-rows: repeat(5, var(--inv-slot)) !important;
+  gap: 8px !important;
+  width: var(--inv-slot) !important;
+  min-width: var(--inv-slot) !important;
+}
+
+#inventory .inventory-grid {
+  grid-template-columns: repeat(9, var(--inv-slot)) !important;
+  grid-auto-rows: var(--inv-slot) !important;
+  gap: 8px !important;
+  width: max-content !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+#inventory .armor-column > .mc-slot,
+#inventory .inventory-grid > .mc-slot {
+  width: var(--inv-slot) !important;
+  height: var(--inv-slot) !important;
+}
+
+#inventory .mc-item-icon,
+#inventory .mc-item-lucide {
+  width: calc(var(--inv-slot) - 14px) !important;
+  height: calc(var(--inv-slot) - 14px) !important;
+  max-width: 40px !important;
+  max-height: 40px !important;
+}
+
+#inventory .mc-tooltip,
+#inventory .mc-slot:hover .mc-tooltip,
+#inventory .mc-slot:focus .mc-tooltip {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#inventory .inventory-details {
+  min-width: 0 !important;
+  min-height: calc((var(--inv-slot) * 5) + 32px) !important;
+  padding: 16px !important;
+  overflow: hidden !important;
+}
+
+#inventory .inventory-details-icon {
+  width: 58px !important;
+  height: 58px !important;
+  margin-bottom: 10px !important;
+}
+
+#inventory .inventory-details-icon .mc-item-icon,
+#inventory .inventory-details-icon .mc-item-lucide {
+  width: 52px !important;
+  height: 52px !important;
+  max-width: 52px !important;
+  max-height: 52px !important;
+}
+
+#inventory .inventory-details h3 {
+  font-size: 16px !important;
+  margin-bottom: 6px !important;
+}
+
+#inventory .inventory-details-material {
+  font-size: 11px !important;
+  margin-bottom: 12px !important;
+}
+
+#inventory .inventory-details-list p {
+  font-size: 13px !important;
+  margin: 6px 0 !important;
+}
+
+#inventory .inventory-details-list h4 {
+  font-size: 12px !important;
+  margin: 12px 0 7px !important;
+}
+
+@media (max-width: 1380px) {
+  #inventory .inventory-wrap {
+    --inv-slot: 44px;
+    grid-template-columns: var(--inv-slot) max-content minmax(190px, 1fr) !important;
+    gap: 10px !important;
+  }
+  #inventory .armor-column,
+  #inventory .inventory-grid { gap: 7px !important; }
+}
+
+@media (max-width: 1180px) {
+  #inventory.panel,
+  #inventory.panel.wide,
+  #deaths,
+  #achievements {
+    grid-column: span 12 !important;
+  }
+  #inventory .inventory-wrap {
+    --inv-slot: 46px;
+    grid-template-columns: var(--inv-slot) max-content minmax(210px, 1fr) !important;
+  }
+}
+
+@media (max-width: 920px) {
+  #inventory .inventory-wrap {
+    grid-template-columns: 1fr !important;
+    overflow: visible !important;
+  }
+  #inventory.panel,
+  #inventory.panel.wide { overflow: visible !important; }
+}
