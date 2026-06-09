@@ -1,5 +1,204 @@
-<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>PopkinDom 4</title><link rel="stylesheet" href="style.css"><link rel="icon" href="favicon.png"><script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script></head><body>
-<header class="header"><a href="index.html" class="brand"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
-<nav class="nav"><a href="index.html">Главная</a><a href="rules.html">Правила</a><a href="about.html" class="active">Подробней</a></nav></header>
-<main class="hero"><div class="hero-bg"></div><div class="hero-dark"></div><section class="hero-content"><h1>ПОДРОБНЕЙ О СЕРВЕРЕ</h1><p class="subtitle">PopkinDom Summer Season 4 — Vanilla+ сервер для друзей.</p></section></main>
-<footer class="footer"><div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div></footer><script>lucide.createIcons()</script></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Подробней — PopkinDom</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
+
+  <nav class="nav">
+    <a href="index.html">Главная</a>
+    <a href="rules.html">Правила</a>
+    <a href="about.html" class="active">Подробней</a>
+  </nav>
+
+  <div class="auth-menu-wrap">
+    <a href="login.html" class="register-btn auth-action-btn" id="authMenuBtn">
+      <span class="auth-action-icon"><i data-lucide="log-in"></i></span>
+      <b class="auth-action-text">Войти</b>
+    </a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="account.html"><i data-lucide="user-round"></i><b>Кабинет</b></a>
+      <a href="security.html"><i data-lucide="shield"></i><b>Безопасность</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
+    </div>
+  </div>
+
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Главная</a>
+  <a href="rules.html">Правила</a>
+  <a href="about.html">Подробней</a>
+  <a href="login.html" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="account.html" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
+  <a href="security.html" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
+  <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
+</div>
+
+<main class="about-page">
+  <div class="rules-bg"></div>
+  <div class="rules-dark"></div>
+
+  <section class="about-content">
+    <div class="about-hero glass-card">
+      <div class="about-hero-text">
+        <span class="about-kicker"><i data-lucide="sparkles"></i> Summer Season 4</span>
+        <h1>PopkinDom Craft</h1>
+        <p>Каждый сезон PopkinDom - это не просто мир Minecraft, а история, которую создают сами игроки.</p>
+        
+      </div>
+      <div class="about-hero-badge">
+        <i data-lucide="tree-pine"></i>
+        <b>Vanilla+</b>
+        <span>без обязательных модов</span>
+      </div>
+    </div>
+
+    <section class="about-section about-intro glass-card">
+      <h2><i data-lucide="home"></i> Что такое PopkinDom</h2>
+      <p>
+        PopkinDom Craft - это сезонный Minecraft-сервер, основанный на дружеском сообществе игроков.
+        Здесь каждый может найти своё место: строить города, исследовать мир, участвовать в приключениях,
+        создавать масштабные проекты или просто отдыхать после тяжёлого дня.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <div class="about-section-title">
+        <h2><i data-lucide="star"></i> Особенности сервера</h2>
+        <p>То, из чего складывается атмосфера PopkinDom.</p>
+      </div>
+
+      <div class="about-feature-grid">
+        <article class="about-feature glass-card">
+          <i data-lucide="map"></i>
+          <h3>Огромный мир</h3>
+          <p>Исследуй территории, находи красивые места и открывай новые приключения.</p>
+        </article>
+        <article class="about-feature glass-card">
+          <i data-lucide="swords"></i>
+          <h3>Данжи</h3>
+          <p>Дополнительные приключения для тех, кому хочется больше событий в выживании.</p>
+        </article>
+        <article class="about-feature glass-card">
+          <i data-lucide="landmark"></i>
+          <h3>Постройки игроков</h3>
+          <p>Дома, склады, города, небоскрёбы и проекты, которые становятся частью истории.</p>
+        </article>
+        <article class="about-feature glass-card">
+          <i data-lucide="users-round"></i>
+          <h3>Дружное сообщество</h3>
+          <p>Главная ценность сервера — игроки, общение и общий вайб сезона.</p>
+        </article>
+        <article class="about-feature glass-card">
+          <i data-lucide="chart-column"></i>
+          <h3>Личный кабинет</h3>
+          <p>Статистика, профиль, инвентарь и данные игрока прямо на сайте.</p>
+        </article>
+        <article class="about-feature glass-card">
+          <i data-lucide="trophy"></i>
+          <h3>Достижения</h3>
+          <p>Отслеживай прогресс, собирай достижения и оставляй свой след в сезоне.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="about-section admin-words">
+      <div class="about-section-title">
+        <h2><i data-lucide="message-circle-heart"></i> Слова администрации</h2>
+        <p>Мы все одна команда, и у каждого есть свои воспоминания о PopkinDom.</p>
+      </div>
+
+      <div class="admin-dialogs">
+        <article class="admin-dialog glass-card">
+          <div class="admin-person">
+            <img src="https://minotar.net/helm/Philinos/80.png" alt="Philinos" onerror="this.src='https://minotar.net/helm/Steve/80.png'">
+            <b>Philinos</b>
+          </div>
+          <div class="admin-bubble">
+            <p>Не помню какой сезон, но был ебейший вайб сервера в майне, когда играла ебать как много народу, цветочек строил огромный склад, деревня нубиков была от Ани и Питсы, Настя с Любой ебейше варили чето и строили огромный небоскреб, а я, а я не помню что я делал, я был везде почуть-чуть и наслаждался игрой.</p>
+            <p>Вайб хз какой сезон, но с новыми данжами, пытался строить ебейшую империю бизнеса и вайбовал от исследования мира, пиглины с элитрами и лагающий ад в сердечке!</p>
+            <p>Вайб последнего сезона для меня был релакс тайм, я фармил ресурсы, Оля ебашила красоту, я фармил ачивки, Оля ебашила красоту, я страдал хуйней, Оля ебашила красоту, я ебашил красоту, Оля ебашила красоту.</p>
+          </div>
+        </article>
+
+        <article class="admin-dialog glass-card">
+          <div class="admin-person">
+            <img src="https://minotar.net/helm/justthefox/80.png" alt="justthefox" onerror="this.src='https://minotar.net/helm/Steve/80.png'">
+            <b>justthefox</b>
+          </div>
+          <div class="admin-bubble">
+            <p>Лично для меня сервер PopkinDomCraft показал что такое настоящий Minecraft и научил с нуля искусству землекопания :)</p>
+            <p>И еще, на одном из сезонов, Настюшка и мои друзьяшки организовали мне целый праздник в честь моего др. Это было неожиданно, круто, весело и нереально приятно.</p>
+          </div>
+        </article>
+
+        <article class="admin-dialog glass-card">
+          <div class="admin-person">
+            <img src="https://minotar.net/helm/Ilolka/80.png" alt="Ilolka" onerror="this.src='https://minotar.net/helm/Steve/80.png'">
+            <b>Ilolka</b>
+          </div>
+          <div class="admin-bubble">
+            <p>Для меня сервер PopkinDom стал открытием нового. Я благодарен ребятам выше и всем игрокам за возможность участвовать в разработке и жизни сервера. Желаю в новом сезоне побольше земли и поменьше алмазов. Откройте в себе талант вместе с нами!</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="about-section start-section glass-card">
+      <h2><i data-lucide="rocket"></i> Как начать играть</h2>
+      <div class="start-steps">
+        <div><b>01</b><span>Зарегистрируйся на сайте</span></div>
+        <div><b>02</b><span>Зайди на сервер</span></div>
+        <div><b>03</b><span>Найди своё место в мире</span></div>
+        <div><b>04</b><span>Стань частью нового сезона</span></div>
+      </div>
+    </section>
+
+    <section class="about-final glass-card">
+      <p>История сервера продолжается. Возможно, следующий сезон запомнится именно твоими постройками, открытиями и приключениями.</p>
+      <a href="#" class="btn btn-green" id="aboutFinalPlayBtn"><i data-lucide="pickaxe"></i> Начать новую историю</a>
+    </section>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
+    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
+    <div class="footer-links">
+      <a href="rules.html">Правила</a>
+      <a href="https://discord.gg/88e2Rsp8GT" target="_blank">Discord</a>
+      <a href="https://t.me/popkindomcraft" target="_blank">Telegram</a>
+    </div>
+    <div class="footer-small">
+      Minecraft является товарным знаком Mojang Studios. PopkinDom не связан с Mojang Studios.
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>
+  document.querySelectorAll('#aboutPlayBtn, #aboutFinalPlayBtn').forEach((btn) => {
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      const session = localStorage.getItem('popkinUserSession');
+      window.location.href = session ? 'account.html' : 'login.html';
+    });
+  });
+</script>
+</body>
+</html>
