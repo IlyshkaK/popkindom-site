@@ -21,6 +21,20 @@ function refreshLucideIcons() {
   }
 }
 
+function minecraftHeadUrl(username, size = 36) {
+  const safeName = encodeURIComponent(username || "Steve");
+  return `https://minotar.net/helm/${safeName}/${size}.png`;
+}
+
+function setAuthButtonIcon(iconElement, username) {
+  if (!iconElement) return;
+  if (username) {
+    iconElement.innerHTML = `<img class="auth-player-head" src="${minecraftHeadUrl(username, 36)}" alt="Голова игрока" onerror="this.src='https://minotar.net/helm/Steve/36.png'">`;
+  } else {
+    iconElement.innerHTML = `<i data-lucide="users-round"></i>`;
+  }
+}
+
 function setAuthMessage(element, text, type) {
   if (!element) return;
   element.className = `auth-message ${type}`;
@@ -74,18 +88,18 @@ function refreshAuthUI() {
     if (isAuth) {
       button.href = "#";
       if (text) text.textContent = currentUser.username;
-      if (icon) icon.textContent = "👤";
+      setAuthButtonIcon(icon, currentUser.username);
     } else {
       button.href = "login.html";
       if (text) text.textContent = "Войти";
-      if (icon) icon.textContent = "👥";
+      setAuthButtonIcon(icon, null);
     }
   });
 
   document.querySelectorAll(".auth-action-mobile").forEach((button) => {
     if (isAuth) {
       button.href = "#";
-      button.textContent = `👤 ${currentUser.username}`;
+      button.innerHTML = `<img class="mobile-auth-head" src="${minecraftHeadUrl(currentUser.username, 28)}" alt="Голова игрока"> ${currentUser.username}`;
     } else {
       button.href = "login.html";
       button.textContent = "Войти";
@@ -97,6 +111,8 @@ function refreshAuthUI() {
 
   const securityUsername = document.getElementById("securityUsername");
   if (securityUsername && isAuth) securityUsername.textContent = currentUser.username;
+
+  refreshLucideIcons();
 
   const autoLoginStatus = document.getElementById("autoLoginStatus");
   if (autoLoginStatus && isAuth) {
