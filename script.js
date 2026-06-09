@@ -616,29 +616,20 @@ function itemIcon(type) {
 }
 
 function renderItemIcon(item) {
-  const localUrl = localMaterialIconUrl(item);
   const remoteUrl = remoteMaterialIconUrl(item);
   const fallback = escapeHtml(itemIcon(item?.type));
 
-  if (!localUrl) return fallback;
+  if (!remoteUrl) return `<i class="mc-item-fallback">${fallback}</i>`;
 
-  return `<img class="mc-item-icon" src="${localUrl}" alt="${escapeHtml(prettyMaterial(item.type))}" loading="lazy" data-fallback-src="${remoteUrl}" data-fallback-text="${fallback}" onerror="handleItemIconError(this)">`;
+  return `<img class="mc-item-icon" src="${remoteUrl}" alt="${escapeHtml(prettyMaterial(item.type))}" loading="eager" decoding="async" data-fallback-text="${fallback}" onerror="handleItemIconError(this)">`;
 }
 
 function handleItemIconError(img) {
-  const fallbackSrc = img.getAttribute("data-fallback-src");
   const fallbackText = img.getAttribute("data-fallback-text") || "▣";
-
-  if (fallbackSrc && img.src !== fallbackSrc) {
-    img.removeAttribute("data-fallback-src");
-    img.src = fallbackSrc;
-    return;
-  }
-
-  const span = document.createElement("span");
-  span.className = "mc-item-fallback";
-  span.textContent = fallbackText;
-  img.replaceWith(span);
+  const icon = document.createElement("i");
+  icon.className = "mc-item-fallback";
+  icon.textContent = fallbackText;
+  img.replaceWith(icon);
 }
 function parseInventoryJson(value) {
   if (!value) return [];
