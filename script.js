@@ -554,35 +554,92 @@ function prettyMaterial(type) {
     .replace(/^./, (letter) => letter.toUpperCase());
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function materialName(type) {
+  return String(type || "AIR").toUpperCase().replace(/^MINECRAFT:/, "");
+}
+
+function materialIconBase(item) {
+  const fromIcon = String(item?.icon || "").trim().replace(/^\/+/, "");
+  if (fromIcon && fromIcon.endsWith(".png")) return fromIcon.replace(/\.png$/i, "");
+  return materialName(item?.type).toLowerCase();
+}
+
+function localMaterialIconUrl(item) {
+  const base = materialIconBase(item);
+  if (!base || base === "air") return "";
+  return `/minecraft/items/${encodeURIComponent(base)}.png`;
+}
+
+function remoteMaterialIconUrl(item) {
+  const base = materialIconBase(item);
+  if (!base || base === "air") return "";
+  return `https://mc.nerothe.com/img/1.21.4/minecraft_${encodeURIComponent(base)}.png`;
+}
+
 function itemIcon(type) {
-  if (!type || type === "AIR") return "";
-  if (type.includes("DIAMOND")) return "💎";
-  if (type.includes("EMERALD")) return "🟩";
-  if (type.includes("GOLD")) return "🟨";
-  if (type.includes("IRON")) return "⛓️";
-  if (type.includes("NETHERITE")) return "⬛";
-  if (type.includes("SWORD")) return "🗡️";
-  if (type.includes("PICKAXE")) return "⛏️";
-  if (type.includes("AXE")) return "🪓";
-  if (type.includes("SHOVEL")) return "🥄";
-  if (type.includes("BOW")) return "🏹";
-  if (type.includes("SHIELD")) return "🛡️";
-  if (type.includes("HELMET")) return "⛑️";
-  if (type.includes("CHESTPLATE")) return "🛡️";
-  if (type.includes("LEGGINGS")) return "👖";
-  if (type.includes("BOOTS")) return "🥾";
-  if (type.includes("LOG") || type.includes("WOOD")) return "🪵";
-  if (type.includes("STONE") || type.includes("DEEPSLATE")) return "🪨";
-  if (type.includes("BREAD")) return "🍞";
-  if (type.includes("APPLE")) return "🍎";
-  if (type.includes("POTION")) return "🧪";
-  if (type.includes("TORCH")) return "🕯️";
-  if (type.includes("BRICK")) return "🧱";
-  if (type.includes("BUCKET")) return "🪣";
-  if (type.includes("BOOK")) return "📕";
+  const normalized = materialName(type);
+  if (!normalized || normalized === "AIR") return "";
+  if (normalized.includes("DIAMOND")) return "💎";
+  if (normalized.includes("EMERALD")) return "🟩";
+  if (normalized.includes("GOLD")) return "🟨";
+  if (normalized.includes("IRON")) return "⛓️";
+  if (normalized.includes("NETHERITE")) return "⬛";
+  if (normalized.includes("SWORD")) return "🗡️";
+  if (normalized.includes("PICKAXE")) return "⛏️";
+  if (normalized.includes("AXE")) return "🪓";
+  if (normalized.includes("SHOVEL")) return "🥄";
+  if (normalized.includes("BOW")) return "🏹";
+  if (normalized.includes("SHIELD")) return "🛡️";
+  if (normalized.includes("HELMET")) return "⛑️";
+  if (normalized.includes("CHESTPLATE")) return "🛡️";
+  if (normalized.includes("LEGGINGS")) return "👖";
+  if (normalized.includes("BOOTS")) return "🥾";
+  if (normalized.includes("LOG") || normalized.includes("WOOD")) return "🪵";
+  if (normalized.includes("STONE") || normalized.includes("DEEPSLATE")) return "🪨";
+  if (normalized.includes("BREAD")) return "🍞";
+  if (normalized.includes("APPLE")) return "🍎";
+  if (normalized.includes("POTION")) return "🧪";
+  if (normalized.includes("TORCH")) return "🕯️";
+  if (normalized.includes("BRICK")) return "🧱";
+  if (normalized.includes("BUCKET")) return "🪣";
+  if (normalized.includes("BOOK")) return "📕";
   return "▣";
 }
 
+function renderItemIcon(item) {
+  const localUrl = localMaterialIconUrl(item);
+  const remoteUrl = remoteMaterialIconUrl(item);
+  const fallback = escapeHtml(itemIcon(item?.type));
+
+  if (!localUrl) return fallback;
+
+  return `<img class="mc-item-icon" src="${localUrl}" alt="${escapeHtml(prettyMaterial(item.type))}" loading="lazy" data-fallback-src="${remoteUrl}" data-fallback-text="${fallback}" onerror="handleItemIconError(this)">`;
+}
+
+function handleItemIconError(img) {
+  const fallbackSrc = img.getAttribute("data-fallback-src");
+  const fallbackText = img.getAttribute("data-fallback-text") || "▣";
+
+  if (fallbackSrc && img.src !== fallbackSrc) {
+    img.removeAttribute("data-fallback-src");
+    img.src = fallbackSrc;
+    return;
+  }
+
+  const span = document.createElement("span");
+  span.className = "mc-item-fallback";
+  span.textContent = fallbackText;
+  img.replaceWith(span);
+}
 function parseInventoryJson(value) {
   if (!value) return [];
   try {
@@ -665,6 +722,50 @@ function renderEnchantments(enchantments) {
   `;
 }
 
+function getItemBySlot(items, slot) {
+  return (items || []).find((entry) => Number(entry.slot) === Number(slot));
+}
+
+function itemTooltip(item) {
+  if (!item || item.type === "AIR" || item.empty) return "";
+
+  const displayName = item.name || prettyMaterial(item.type);
+  const lines = [`<b>${escapeHtml(displayName)}</b>`, `<span>${escapeHtml(materialName(item.type))}</span>`];
+
+  if (Number(item.amount || 0) > 1) lines.push(`<span>Количество: ${escapeHtml(item.amount)}</span>`);
+
+  if (Array.isArray(item.enchantments) && item.enchantments.length) {
+    lines.push(`<em>Зачарования</em>`);
+    item.enchantments.slice(0, 6).forEach((enchant) => {
+      lines.push(`<span>${escapeHtml(prettyMaterial(enchant.name || enchant.key))} ${escapeHtml(enchant.level || "")}</span>`);
+    });
+  }
+
+  if (Number(item.max_durability || 0) > 0) {
+    lines.push(`<span>Прочность: ${escapeHtml(item.durability_left ?? 0)} / ${escapeHtml(item.max_durability)}</span>`);
+  }
+
+  if (Array.isArray(item.lore) && item.lore.length) {
+    item.lore.slice(0, 4).forEach((line) => lines.push(`<small>${escapeHtml(line)}</small>`));
+  }
+
+  return `<div class="mc-tooltip">${lines.join("")}</div>`;
+}
+
+function renderInventorySlot(item, options = {}) {
+  const empty = !item || item.type === "AIR" || item.empty || Number(item.amount || 0) <= 0;
+  const slotClass = ["mc-slot", options.className || "", options.active ? "active" : "", empty ? "empty" : ""].filter(Boolean).join(" ");
+  const label = options.label ? `<span class="mc-slot-label">${escapeHtml(options.label)}</span>` : "";
+
+  if (empty) {
+    return `<span class="${slotClass}" title="Пусто">${label}</span>`;
+  }
+
+  const amount = Number(item.amount || 0) > 1 ? `<small>${escapeHtml(item.amount)}</small>` : "";
+  const title = `${prettyMaterial(item.type)} x${item.amount}`;
+  return `<span class="${slotClass}" title="${escapeHtml(title)}">${label}${renderItemIcon(item)}${amount}${itemTooltip(item)}</span>`;
+}
+
 function renderInventory(inventory) {
   const grid = document.getElementById("inventoryGrid");
   const armor = document.getElementById("armorColumn");
@@ -672,26 +773,32 @@ function renderInventory(inventory) {
 
   const items = parseInventoryJson(inventory?.inventory_json);
   const armorItems = parseInventoryJson(inventory?.armor_json);
+  const offhandItems = parseInventoryJson(inventory?.offhand_json);
+  const selectedHotbarSlot = Number(inventory?.selected_hotbar_slot ?? -1);
 
-  const slots = Array.from({ length: 36 }, (_, index) => {
-    const item = items.find((entry) => Number(entry.slot) === index);
-    if (!item || item.type === "AIR" || Number(item.amount || 0) <= 0) return `<span title="Пусто"></span>`;
-    const title = `${prettyMaterial(item.type)} x${item.amount}`;
-    const amount = Number(item.amount || 0) > 1 ? `<small>${item.amount}</small>` : "";
-    return `<span title="${title}">${itemIcon(item.type)}${amount}</span>`;
-  });
+  const orderedSlots = [
+    ...Array.from({ length: 27 }, (_, index) => index + 9),
+    ...Array.from({ length: 9 }, (_, index) => index)
+  ];
 
-  grid.innerHTML = slots.join("");
+  grid.innerHTML = orderedSlots.map((slot) => {
+    const item = getItemBySlot(items, slot);
+    return renderInventorySlot(item, { active: slot === selectedHotbarSlot, className: slot <= 8 ? "hotbar" : "" });
+  }).join("");
 
   if (armor) {
-    armor.innerHTML = [3, 2, 1, 0].map((index) => {
-      const item = armorItems[index];
-      if (!item || item.type === "AIR") return `<span title="Пусто">—</span>`;
-      return `<span title="${prettyMaterial(item.type)}">${itemIcon(item.type)}</span>`;
-    }).join("");
+    const offhand = offhandItems[0] || getItemBySlot(offhandItems, 0);
+    const armorSlots = [
+      { item: armorItems[3], label: "Ш" },
+      { item: armorItems[2], label: "Н" },
+      { item: armorItems[1], label: "П" },
+      { item: armorItems[0], label: "Б" },
+      { item: offhand, label: "Л" }
+    ];
+
+    armor.innerHTML = armorSlots.map(({ item, label }) => renderInventorySlot(item, { label })).join("");
   }
 }
-
 function renderOnlinePlayers(players) {
   const list = document.getElementById("onlinePlayersList");
   const count = document.getElementById("serverOnlineCount");

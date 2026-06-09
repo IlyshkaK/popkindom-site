@@ -2337,3 +2337,141 @@ body.is-auth .auth-action-mobile::after {
 }
 
 .hero{min-height:auto!important;padding-bottom:40px;} .footer{margin-top:0!important;} body{overflow-x:hidden;}
+
+/* ===== MINECRAFT MATERIAL INVENTORY ===== */
+.inventory-wrap {
+  align-items: start;
+}
+
+.armor-column {
+  grid-template-rows: repeat(5, 52px);
+}
+
+.armor-column span,
+.inventory-grid span.mc-slot {
+  position: relative;
+  min-height: 52px;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.07), rgba(0,0,0,.28)),
+    rgba(0,0,0,.46);
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.38), inset 0 -10px 18px rgba(0,0,0,.18);
+  overflow: visible;
+}
+
+.inventory-grid span.mc-slot.hotbar {
+  margin-top: 4px;
+}
+
+.inventory-grid span.mc-slot.active {
+  border-color: rgba(142,240,82,.85);
+  box-shadow: 0 0 0 2px rgba(142,240,82,.18), inset 0 0 0 1px rgba(142,240,82,.32);
+}
+
+.mc-item-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,.55));
+  pointer-events: none;
+}
+
+.mc-item-fallback {
+  font-size: 25px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.mc-slot-label {
+  position: absolute;
+  left: 5px;
+  top: 4px;
+  z-index: 1;
+  font-size: 9px;
+  font-weight: 900;
+  color: rgba(255,255,255,.46);
+  text-shadow: 0 1px 3px rgba(0,0,0,.9);
+  pointer-events: none;
+}
+
+.mc-slot small,
+.inventory-grid span small {
+  right: 5px;
+  bottom: 3px;
+  z-index: 2;
+  font-size: 12px;
+}
+
+.mc-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  z-index: 50;
+  min-width: 190px;
+  max-width: 260px;
+  transform: translateX(-50%) translateY(4px);
+  display: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(5, 8, 10, .96);
+  border: 1px solid rgba(142,240,82,.34);
+  box-shadow: 0 12px 34px rgba(0,0,0,.45);
+  text-align: left;
+  pointer-events: none;
+}
+
+.mc-slot:hover .mc-tooltip {
+  display: grid;
+  gap: 4px;
+}
+
+.mc-tooltip b {
+  color: #fff;
+  font-size: 14px;
+}
+
+.mc-tooltip span,
+.mc-tooltip small {
+  position: static;
+  color: rgba(255,255,255,.72);
+  font-size: 12px;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.mc-tooltip em {
+  margin-top: 3px;
+  color: #8ef052;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+@media (max-width: 820px) {
+  .inventory-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .armor-column {
+    grid-template-columns: repeat(5, 52px);
+    grid-template-rows: none;
+  }
+
+  .inventory-grid {
+    grid-template-columns: repeat(9, minmax(32px, 1fr));
+    gap: 5px;
+  }
+
+  .armor-column span,
+  .inventory-grid span.mc-slot {
+    min-height: 38px;
+  }
+
+  .mc-item-icon {
+    width: 28px;
+    height: 28px;
+  }
+}

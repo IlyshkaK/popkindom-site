@@ -60,7 +60,7 @@ module.exports = async function handler(req, res) {
     );
 
     const inventoryResult = await query(
-      `SELECT inventory_json, armor_json, offhand_json, ender_chest_json, updated_at
+      `SELECT inventory_json, armor_json, offhand_json, ender_chest_json, selected_hotbar_slot, updated_at
        FROM player_inventory
        WHERE auth_user_id = $1
        ORDER BY updated_at DESC
