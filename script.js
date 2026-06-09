@@ -31,7 +31,7 @@ function setAuthButtonIcon(iconElement, username) {
   if (username) {
     iconElement.innerHTML = `<img class="auth-player-head" src="${minecraftHeadUrl(username, 36)}" alt="Голова игрока" onerror="this.src='https://minotar.net/helm/Steve/36.png'">`;
   } else {
-    iconElement.innerHTML = `<i data-lucide="users-round"></i>`;
+    iconElement.innerHTML = `<i data-lucide="log-in"></i>`;
   }
 }
 
@@ -102,7 +102,7 @@ function refreshAuthUI() {
       button.innerHTML = `<img class="mobile-auth-head" src="${minecraftHeadUrl(currentUser.username, 28)}" alt="Голова игрока"> ${currentUser.username}`;
     } else {
       button.href = "login.html";
-      button.textContent = "Войти";
+      button.innerHTML = `<i data-lucide="log-in"></i> Войти`;
     }
   });
 

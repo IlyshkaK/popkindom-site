@@ -10,18 +10,16 @@
 </head>
 <body>
 <header class="header">
-  <a href="index.html" class="brand" aria-label="PopkinDom 4"><img src="logo.png" alt="PopkinDom 4" class="brand-logo-img"></a>
+  <a href="index.html" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
   <nav class="nav">
     <a href="index.html">Главная</a>
     <a href="rules.html">Правила</a>
-    <a href="#">Моды</a>
-    <a href="#">Гайды</a>
-    <a href="#">О сервере</a>
+    <a href="about.html">Подробней</a>
   </nav>
 
   <div class="auth-menu-wrap">
     <a href="login.html" class="register-btn auth-action-btn" id="authMenuBtn">
-      <span class="auth-action-icon">👥</span>
+      <span class="auth-action-icon"><i data-lucide="log-in"></i></span>
       <b class="auth-action-text">Войти</b>
     </a>
     <div class="auth-dropdown" id="authDropdown">
@@ -41,9 +39,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html">Главная</a>
   <a href="rules.html">Правила</a>
-  <a href="#">Моды</a>
-  <a href="#">Гайды</a>
-  <a href="#">О сервере</a>
+  <a href="about.html">Подробней</a>
   <a href="login.html" class="mobile-register auth-action-mobile">Войти</a>
   <a href="account.html" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
   <a href="security.html" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
@@ -57,11 +53,12 @@
     <h1>Вход в аккаунт</h1>
     <p class="auth-subtitle">Войди в аккаунт, чтобы открыть личный кабинет.</p>
     <form class="auth-form" id="loginForm">
-      <label>Ник в Minecraft<input type="text" id="loginUsername" placeholder="Например: Popkin" minlength="3" maxlength="16" required></label>
-      <label>Пароль<input type="password" id="loginPassword" placeholder="Введи пароль" minlength="8" required></label>
+      <label>Ник в Minecraft<input type="text" id="loginUsername" placeholder="Введите ваш игровой ник" minlength="3" maxlength="16" required></label>
+      <label>Пароль<input type="password" id="loginPassword" placeholder="Введите ваш пароль" minlength="8" required></label>
       <button type="submit" class="auth-submit">Войти</button>
       <p class="auth-message" id="loginMessage"></p>
     </form>
+    <div class="auth-divider" aria-hidden="true"></div>
     <div class="auth-bottom">
       <p>Нет аккаунта?</p>
       <a href="register.html" class="auth-second-btn">Зарегистрироваться</a>
