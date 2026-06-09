@@ -15,6 +15,12 @@ if (burgerBtn && mobileMenu) {
 let currentUser = null;
 let currentAccountData = null;
 
+function refreshLucideIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === "function") {
+    window.lucide.createIcons({ attrs: { "stroke-width": 2.4 } });
+  }
+}
+
 function setAuthMessage(element, text, type) {
   if (!element) return;
   element.className = `auth-message ${type}`;
@@ -276,31 +282,260 @@ function formatDate(value) {
   });
 }
 
+function formatServerSince(value) {
+  if (!value) return "—";
+  return new Date(value).toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function formatLastLogin(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  const now = new Date();
+  const isToday = date.toDateString() === now.toDateString();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const time = date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+
+  if (isToday) return `Сегодня в ${time}`;
+  if (date.toDateString() === yesterday.toDateString()) return `Вчера в ${time}`;
+
+  return date.toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 function prettyMaterial(type) {
   if (!type) return "—";
+
+  const normalized = String(type)
+    .trim()
+    .replace(/^minecraft:/i, "")
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
+    .replace(/[\s-]+/g, "_")
+    .toUpperCase();
+
   const map = {
+    AIR: "Воздух",
     STONE: "Камень",
-    COBBLESTONE: "Булыжник",
-    DIRT: "Земля",
+    GRANITE: "Гранит",
+    POLISHED_GRANITE: "Полированный гранит",
+    DIORITE: "Диорит",
+    POLISHED_DIORITE: "Полированный диорит",
+    ANDESITE: "Андезит",
+    POLISHED_ANDESITE: "Полированный андезит",
+    DEEPSLATE: "Глубинный сланец",
+    COBBLED_DEEPSLATE: "Булыжный глубинный сланец",
+    TUFF: "Туф",
+    CALCITE: "Кальцит",
+    DRIPSTONE_BLOCK: "Капельниковый блок",
     GRASS_BLOCK: "Дёрн",
+    DIRT: "Земля",
+    COARSE_DIRT: "Каменистая земля",
+    PODZOL: "Подзол",
+    ROOTED_DIRT: "Корнистая земля",
+    MUD: "Грязь",
+    CLAY: "Глина",
+    SAND: "Песок",
+    RED_SAND: "Красный песок",
+    GRAVEL: "Гравий",
+    SNOW: "Снег",
+    SNOW_BLOCK: "Блок снега",
+    ICE: "Лёд",
+    PACKED_ICE: "Плотный лёд",
+    BLUE_ICE: "Синий лёд",
+    COBBLESTONE: "Булыжник",
+    MOSSY_COBBLESTONE: "Замшелый булыжник",
+    OBSIDIAN: "Обсидиан",
+    CRYING_OBSIDIAN: "Плачущий обсидиан",
+    BEDROCK: "Бедрок",
+    NETHERRACK: "Незерак",
+    SOUL_SAND: "Песок душ",
+    SOUL_SOIL: "Почва душ",
+    BASALT: "Базальт",
+    POLISHED_BASALT: "Полированный базальт",
+    BLACKSTONE: "Чернит",
+    END_STONE: "Эндерняк",
     OAK_LOG: "Дубовое бревно",
     SPRUCE_LOG: "Еловое бревно",
     BIRCH_LOG: "Берёзовое бревно",
+    JUNGLE_LOG: "Тропическое бревно",
+    ACACIA_LOG: "Акациевое бревно",
+    DARK_OAK_LOG: "Бревно тёмного дуба",
+    MANGROVE_LOG: "Мангровое бревно",
+    CHERRY_LOG: "Вишнёвое бревно",
+    CRIMSON_STEM: "Багровый стебель",
+    WARPED_STEM: "Искажённый стебель",
+    OAK_WOOD: "Дубовая древесина",
+    SPRUCE_WOOD: "Еловая древесина",
+    BIRCH_WOOD: "Берёзовая древесина",
+    JUNGLE_WOOD: "Тропическая древесина",
+    ACACIA_WOOD: "Акациевая древесина",
+    DARK_OAK_WOOD: "Древесина тёмного дуба",
+    OAK_PLANKS: "Дубовые доски",
+    SPRUCE_PLANKS: "Еловые доски",
+    BIRCH_PLANKS: "Берёзовые доски",
+    JUNGLE_PLANKS: "Тропические доски",
+    ACACIA_PLANKS: "Акациевые доски",
+    DARK_OAK_PLANKS: "Доски из тёмного дуба",
+    MANGROVE_PLANKS: "Мангровые доски",
+    CHERRY_PLANKS: "Вишнёвые доски",
+    CRIMSON_PLANKS: "Багровые доски",
+    WARPED_PLANKS: "Искажённые доски",
+    OAK_LEAVES: "Дубовая листва",
+    SPRUCE_LEAVES: "Еловая хвоя",
+    BIRCH_LEAVES: "Берёзовая листва",
+    JUNGLE_LEAVES: "Тропическая листва",
+    ACACIA_LEAVES: "Акациевая листва",
+    DARK_OAK_LEAVES: "Листва тёмного дуба",
     COAL_ORE: "Угольная руда",
+    DEEPSLATE_COAL_ORE: "Глубинная угольная руда",
     IRON_ORE: "Железная руда",
+    DEEPSLATE_IRON_ORE: "Глубинная железная руда",
     COPPER_ORE: "Медная руда",
+    DEEPSLATE_COPPER_ORE: "Глубинная медная руда",
     GOLD_ORE: "Золотая руда",
+    DEEPSLATE_GOLD_ORE: "Глубинная золотая руда",
+    REDSTONE_ORE: "Редстоуновая руда",
+    DEEPSLATE_REDSTONE_ORE: "Глубинная редстоуновая руда",
+    LAPIS_ORE: "Лазуритовая руда",
+    DEEPSLATE_LAPIS_ORE: "Глубинная лазуритовая руда",
     DIAMOND_ORE: "Алмазная руда",
+    DEEPSLATE_DIAMOND_ORE: "Глубинная алмазная руда",
+    EMERALD_ORE: "Изумрудная руда",
+    DEEPSLATE_EMERALD_ORE: "Глубинная изумрудная руда",
+    NETHER_GOLD_ORE: "Незерская золотая руда",
+    NETHER_QUARTZ_ORE: "Незерская кварцевая руда",
     ANCIENT_DEBRIS: "Древние обломки",
+    COAL: "Уголь",
+    CHARCOAL: "Древесный уголь",
+    RAW_IRON: "Рудное железо",
+    IRON_INGOT: "Железный слиток",
+    RAW_COPPER: "Рудная медь",
+    COPPER_INGOT: "Медный слиток",
+    RAW_GOLD: "Рудное золото",
+    GOLD_INGOT: "Золотой слиток",
+    DIAMOND: "Алмаз",
+    EMERALD: "Изумруд",
+    LAPIS_LAZULI: "Лазурит",
+    REDSTONE: "Редстоун",
+    QUARTZ: "Кварц",
+    NETHERITE_SCRAP: "Незеритовый лом",
+    NETHERITE_INGOT: "Незеритовый слиток",
+    STICK: "Палка",
+    TORCH: "Факел",
     CRAFTING_TABLE: "Верстак",
     FURNACE: "Печь",
-    TORCH: "Факел",
+    BLAST_FURNACE: "Плавильная печь",
+    SMOKER: "Коптильня",
+    CHEST: "Сундук",
+    TRAPPED_CHEST: "Сундук-ловушка",
+    BARREL: "Бочка",
+    LADDER: "Лестница",
+    SCAFFOLDING: "Подмостки",
+    BOOK: "Книга",
+    ENCHANTED_BOOK: "Зачарованная книга",
+    PAPER: "Бумага",
     BREAD: "Хлеб",
+    APPLE: "Яблоко",
+    GOLDEN_APPLE: "Золотое яблоко",
+    WATER_BUCKET: "Ведро воды",
+    LAVA_BUCKET: "Ведро лавы",
+    BUCKET: "Ведро",
+    SHIELD: "Щит",
+    BOW: "Лук",
+    CROSSBOW: "Арбалет",
+    ARROW: "Стрела",
+    TRIDENT: "Трезубец",
+    WOODEN_SWORD: "Деревянный меч",
+    STONE_SWORD: "Каменный меч",
+    IRON_SWORD: "Железный меч",
+    GOLDEN_SWORD: "Золотой меч",
+    DIAMOND_SWORD: "Алмазный меч",
+    NETHERITE_SWORD: "Незеритовый меч",
+    WOODEN_PICKAXE: "Деревянная кирка",
+    STONE_PICKAXE: "Каменная кирка",
     IRON_PICKAXE: "Железная кирка",
+    GOLDEN_PICKAXE: "Золотая кирка",
     DIAMOND_PICKAXE: "Алмазная кирка",
-    NETHERITE_SWORD: "Незеритовый меч"
+    NETHERITE_PICKAXE: "Незеритовая кирка",
+    WOODEN_AXE: "Деревянный топор",
+    STONE_AXE: "Каменный топор",
+    IRON_AXE: "Железный топор",
+    GOLDEN_AXE: "Золотой топор",
+    DIAMOND_AXE: "Алмазный топор",
+    NETHERITE_AXE: "Незеритовый топор",
+    WOODEN_SHOVEL: "Деревянная лопата",
+    STONE_SHOVEL: "Каменная лопата",
+    IRON_SHOVEL: "Железная лопата",
+    GOLDEN_SHOVEL: "Золотая лопата",
+    DIAMOND_SHOVEL: "Алмазная лопата",
+    NETHERITE_SHOVEL: "Незеритовая лопата",
+    WOODEN_HOE: "Деревянная мотыга",
+    STONE_HOE: "Каменная мотыга",
+    IRON_HOE: "Железная мотыга",
+    GOLDEN_HOE: "Золотая мотыга",
+    DIAMOND_HOE: "Алмазная мотыга",
+    NETHERITE_HOE: "Незеритовая мотыга",
+    LEATHER_HELMET: "Кожаный шлем",
+    LEATHER_CHESTPLATE: "Кожаная куртка",
+    LEATHER_LEGGINGS: "Кожаные штаны",
+    LEATHER_BOOTS: "Кожаные ботинки",
+    IRON_HELMET: "Железный шлем",
+    IRON_CHESTPLATE: "Железный нагрудник",
+    IRON_LEGGINGS: "Железные поножи",
+    IRON_BOOTS: "Железные ботинки",
+    DIAMOND_HELMET: "Алмазный шлем",
+    DIAMOND_CHESTPLATE: "Алмазный нагрудник",
+    DIAMOND_LEGGINGS: "Алмазные поножи",
+    DIAMOND_BOOTS: "Алмазные ботинки",
+    NETHERITE_HELMET: "Незеритовый шлем",
+    NETHERITE_CHESTPLATE: "Незеритовый нагрудник",
+    NETHERITE_LEGGINGS: "Незеритовые поножи",
+    NETHERITE_BOOTS: "Незеритовые ботинки"
   };
-  return map[type] || type.toLowerCase().split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+
+  if (map[normalized]) return map[normalized];
+
+  const colors = {
+    WHITE: "белый", ORANGE: "оранжевый", MAGENTA: "пурпурный", LIGHT_BLUE: "голубой",
+    YELLOW: "жёлтый", LIME: "лаймовый", PINK: "розовый", GRAY: "серый",
+    LIGHT_GRAY: "светло-серый", CYAN: "бирюзовый", PURPLE: "фиолетовый", BLUE: "синий",
+    BROWN: "коричневый", GREEN: "зелёный", RED: "красный", BLACK: "чёрный"
+  };
+  for (const [prefix, color] of Object.entries(colors)) {
+    if (normalized === `${prefix}_WOOL`) return `${color[0].toUpperCase()}${color.slice(1)} шерсть`;
+    if (normalized === `${prefix}_BED`) return `${color[0].toUpperCase()}${color.slice(1)} кровать`;
+    if (normalized === `${prefix}_CONCRETE`) return `${color[0].toUpperCase()}${color.slice(1)} бетон`;
+    if (normalized === `${prefix}_TERRACOTTA`) return `${color[0].toUpperCase()}${color.slice(1)} керамика`;
+    if (normalized === `${prefix}_STAINED_GLASS`) return `${color[0].toUpperCase()}${color.slice(1)} стекло`;
+  }
+
+  const fallbackWords = {
+    OAK: "дубовый", SPRUCE: "еловый", BIRCH: "берёзовый", JUNGLE: "тропический",
+    ACACIA: "акациевый", DARK: "тёмный", MANGROVE: "мангровый", CHERRY: "вишнёвый",
+    CRIMSON: "багровый", WARPED: "искажённый", PLANKS: "доски", LOG: "бревно",
+    WOOD: "древесина", STONE: "камень", DEEPSLATE: "глубинный сланец", COBBLESTONE: "булыжник",
+    BRICKS: "кирпичи", BRICK: "кирпич", BLOCK: "блок", SLAB: "плита", STAIRS: "ступеньки",
+    WALL: "ограда", DOOR: "дверь", TRAPDOOR: "люк", FENCE: "забор", GATE: "калитка",
+    BUTTON: "кнопка", PRESSURE: "нажимная", PLATE: "плита", SWORD: "меч", PICKAXE: "кирка",
+    AXE: "топор", SHOVEL: "лопата", HOE: "мотыга", HELMET: "шлем", CHESTPLATE: "нагрудник",
+    LEGGINGS: "поножи", BOOTS: "ботинки", IRON: "железный", GOLDEN: "золотой", DIAMOND: "алмазный",
+    NETHERITE: "незеритовый", WOODEN: "деревянный"
+  };
+
+  return normalized
+    .split("_")
+    .map((word) => fallbackWords[word] || word.toLowerCase())
+    .join(" ")
+    .replace(/^./, (letter) => letter.toUpperCase());
 }
 
 function itemIcon(type) {
@@ -354,7 +589,6 @@ function renderStatsList(stats, blocksTotal) {
   const rows = [
     ["Время в игре", formatTicks(stats?.play_time_ticks)],
     ["Пройдено пешком", cmToKm(stats?.walk_distance)],
-    ["Полетено", cmToKm(stats?.fly_distance)],
     ["Сломано блоков", formatNumber(blocksTotal)],
     ["Смерти", formatNumber(stats?.deaths)],
     ["Убийства мобов", formatNumber(stats?.mob_kills)],
@@ -448,7 +682,7 @@ function renderOnlinePlayers(players) {
   if (!list) return;
 
   const onlineCount = (players || []).filter((player) => player.online).length;
-  if (count) count.textContent = `${onlineCount} онлайн`;
+  if (count) count.textContent = `${onlineCount} / 20 игроков`;
 
   if (!players || players.length === 0) {
     list.innerHTML = `<p><span>Пока никого нет</span><b>—</b></p>`;
@@ -520,16 +754,18 @@ function renderAccountData(data) {
 
   setText("profileXpText", `Уровень: ${xpLevel}`);
   setText("profileXpProgress", `${formatNumber(xpCurrent)} / ${formatNumber(xpNeed)} XP`);
-  setText("serverXpLevel", `${xpLevel} уровень`);
-  setText("serverXpTotal", `${formatNumber(totalXp)} XP`);
 
   const progressLine = document.querySelector(".profile-hero .progress i");
   if (progressLine) {
     progressLine.style.width = `${xpProgress}%`;
   }
 
+  const achievementsTotal = Number(data.achievements_count || data.achievementsCount || player.achievements_count || 0);
+
+  setText("profileRegisteredAt", formatServerSince(data.user?.registeredAt || data.user?.registered_at || player.first_join_at || player.created_at || player.updated_at));
+  setText("profileLastLogin", formatLastLogin(data.user?.lastServerLogin || data.user?.last_server_login || player.last_login_at || player.updated_at || data.meta?.updatedAt));
   setText("quickPlaytime", formatTicks(stats.play_time_ticks || player.play_time_ticks));
-  setText("quickBlocks", formatNumber(blocksTotal));
+  setText("quickAchievements", achievementsTotal > 0 ? formatNumber(achievementsTotal) : "—");
   setText("quickDeaths", formatNumber(stats.deaths || player.deaths));
   setText("quickMobKills", formatNumber(stats.mob_kills || player.mob_kills));
 
@@ -539,6 +775,7 @@ function renderAccountData(data) {
   renderSimpleList("craftsList", crafts, "item_type", "amount");
   renderEnchantments(data.enchantments);
   renderInventory(data.inventory);
+  refreshLucideIcons();
 }
 
 /* ===== SECURITY PAGE ACTIONS ===== */
@@ -599,6 +836,7 @@ async function refreshAccountRealtime() {
 (async function init() {
   const data = await loadMe();
   refreshAuthUI();
+  refreshLucideIcons();
 
   if (document.querySelector(".protected-page") && !currentUser) {
     window.location.href = "login.html";

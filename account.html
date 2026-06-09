@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Личный кабинет — PopkinDom</title>
-  <link rel="stylesheet" href="style.css?v=profile-role-xp-2" />
+  <link rel="stylesheet" href="style.css?v=lucide-account-history-1" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 <header class="header">
@@ -60,26 +61,32 @@
 
   <section class="account-layout">
     <aside class="account-sidebar glass-card">
-      <div class="account-mini-logo"><span>👤</span> Личный кабинет</div>
-      <a class="side-link active" href="#overview">🏠 Главная</a>
-      <a class="side-link" href="#stats">📊 Статистика</a>
-      <a class="side-link" href="#blocks">⛏ Добытые блоки</a>
-      <a class="side-link" href="#crafts">🔨 Крафты</a>
-      <a class="side-link" href="#enchants">✨ Зачарования</a>
-      <a class="side-link" href="#inventory">🎒 Инвентарь</a>
-      <a class="side-link" href="#deaths">💀 История смертей</a>
-      <a class="side-link" href="#achievements">🏆 Достижения</a>
-      <a class="side-link" href="#community">👥 Сообщество</a>
-      <button class="logout-btn" id="logoutBtn">Выйти из аккаунта</button>
+      <div class="account-mini-logo"><i data-lucide="user-round"></i> Личный кабинет</div>
+      <a class="side-link active" href="#overview"><i data-lucide="house"></i> Главная</a>
+      <a class="side-link" href="#stats"><i data-lucide="chart-column"></i> Статистика</a>
+      <a class="side-link" href="#blocks"><i data-lucide="pickaxe"></i> Добытые блоки</a>
+      <a class="side-link" href="#crafts"><i data-lucide="hammer"></i> Крафты</a>
+      <a class="side-link" href="#enchants"><i data-lucide="sparkles"></i> Зачарования</a>
+      <a class="side-link" href="#inventory"><i data-lucide="backpack"></i> Инвентарь</a>
+      <a class="side-link" href="#deaths"><i data-lucide="skull"></i> История смертей</a>
+      <a class="side-link" href="#achievements"><i data-lucide="trophy"></i> Достижения</a>
+      <a class="side-link" href="#community"><i data-lucide="users-round"></i> Сообщество</a>
+      <button class="logout-btn" id="logoutBtn"><i data-lucide="log-out"></i> Выйти из аккаунта</button>
       <div class="server-box">
-        <span>IP адрес сервера</span>
-        <strong>MC.POPKINDOM.RU</strong>
-        <span>Онлайн</span>
-        <strong class="green" id="serverOnlineCount">—</strong>
-        <span>Уровень</span>
-        <strong class="green" id="serverXpLevel">—</strong>
-        <span>Всего XP</span>
-        <strong class="green" id="serverXpTotal">—</strong>
+        <div class="server-info-row">
+          <i data-lucide="server"></i>
+          <div>
+            <span>IP адрес сервера</span>
+            <strong>MC.POPKINDOM.RU</strong>
+          </div>
+        </div>
+        <div class="server-info-row">
+          <i data-lucide="users-round"></i>
+          <div>
+            <span>Онлайн</span>
+            <strong class="green" id="serverOnlineCount">— / 20 игроков</strong>
+          </div>
+        </div>
       </div>
     </aside>
 
@@ -95,53 +102,69 @@
           <div class="level-line"><span id="profileXpText">Уровень: —</span><b id="profileXpProgress">— / — XP</b></div>
           <div class="progress"><i style="width: 52%"></i></div>
         </div>
+        <div class="profile-history" aria-label="История аккаунта">
+          <div class="history-item">
+            <i data-lucide="calendar-days"></i>
+            <div>
+              <span>На сервере с:</span>
+              <strong id="profileRegisteredAt">—</strong>
+            </div>
+          </div>
+          <div class="history-item">
+            <i data-lucide="gamepad-2"></i>
+            <div>
+              <span>Последний вход:</span>
+              <strong id="profileLastLogin">—</strong>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="quick-grid">
-        <div class="stat-card glass-card"><span>⏱</span><b id="quickPlaytime">—</b><p>Время в игре</p></div>
-        <div class="stat-card glass-card"><span>⛏</span><b id="quickBlocks">—</b><p>Добыто блоков</p></div>
-        <div class="stat-card glass-card"><span>💀</span><b id="quickDeaths">—</b><p>Смерти</p></div>
-        <div class="stat-card glass-card"><span>⚔</span><b id="quickMobKills">—</b><p>Убийства мобов</p></div>
+        <div class="stat-card glass-card"><i data-lucide="clock-3"></i><b id="quickPlaytime">—</b><p>Время в игре</p></div>
+        <div class="stat-card glass-card"><i data-lucide="trophy"></i><b id="quickAchievements">—</b><p>Достижения</p></div>
+        <div class="stat-card glass-card"><i data-lucide="skull"></i><b id="quickDeaths">—</b><p>Смерти</p></div>
+        <div class="stat-card glass-card"><i data-lucide="swords"></i><b id="quickMobKills">—</b><p>Убийства мобов</p></div>
       </div>
 
       <div class="dashboard-grid">
         <section class="panel glass-card large" id="stats">
-          <h2>📊 Подробная статистика</h2>
+          <h2><i data-lucide="chart-column"></i> Подробная статистика</h2>
           <div class="stats-list two-cols" id="detailedStatsList">
             <p><span>Загрузка...</span><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="community">
-          <h2>👥 Кто онлайн</h2>
+          <h2><i data-lucide="users-round"></i> Кто онлайн</h2>
           <div class="player-list" id="onlinePlayersList">
             <p><span>Загрузка...</span><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="blocks">
-          <h2>⛏ Добытые блоки</h2>
+          <h2><i data-lucide="pickaxe"></i> Добытые блоки</h2>
           <div class="bar-list" id="blocksList">
             <p><span>Загрузка...</span><i><em style="width:0%"></em></i><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="crafts">
-          <h2>🔨 Скрафченные предметы</h2>
+          <h2><i data-lucide="hammer"></i> Скрафченные предметы</h2>
           <div class="stats-list" id="craftsList">
             <p><span>Загрузка...</span><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="enchants">
-          <h2>✨ Зачарования</h2>
+          <h2><i data-lucide="sparkles"></i> Зачарования</h2>
           <div class="stats-list" id="enchantsList">
             <p><span>Загрузка...</span><b>—</b></p>
           </div>
         </section>
 
         <section class="panel glass-card wide" id="inventory">
-          <h2>🎒 Инвентарь</h2>
+          <h2><i data-lucide="backpack"></i> Инвентарь</h2>
           <div class="inventory-wrap">
             <div class="armor-column" id="armorColumn"><span>—</span><span>—</span><span>—</span><span>—</span></div>
             <div class="inventory-grid" id="inventoryGrid"></div>
@@ -149,16 +172,16 @@
         </section>
 
         <section class="panel glass-card" id="deaths">
-          <h2>💀 История смертей</h2>
+          <h2><i data-lucide="skull"></i> История смертей</h2>
           <div class="death-list" id="deathList">
             <article><b>Пока нет данных</b><span>Историю смертей добавим отдельным модулем WebBridge.</span></article>
           </div>
         </section>
 
         <section class="panel glass-card" id="achievements">
-          <h2>🏆 Последние достижения</h2>
+          <h2><i data-lucide="trophy"></i> Последние достижения</h2>
           <div class="achievement-list" id="achievementList">
-            <p><span>🏆 Пока нет данных</span><b>—</b></p>
+            <p><span>Пока нет данных</span><b>—</b></p>
           </div>
         </section>
       </div>
@@ -172,6 +195,6 @@
     <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
   </div>
 </footer>
-<script src="script.js?v=profile-role-xp-2"></script>
+<script src="script.js?v=lucide-account-history-1"></script>
 </body>
 </html>

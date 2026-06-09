@@ -54,6 +54,9 @@ function publicUser(row) {
     username: row.username,
     role: row.role,
     adminPanelEnabled: row.admin_panel_enabled,
+    registeredAt: row.registered_at,
+    lastServerLogin: row.last_server_login,
+    lastWebLogin: row.last_web_login,
   };
 }
 
