@@ -2709,3 +2709,161 @@ body.is-auth .auth-action-mobile::after {
     width: max-content !important;
   }
 }
+
+/* ===== INVENTORY DETAILS + STRICT FALLBACK FIX v4 ===== */
+#inventory.panel,
+#inventory.panel.wide {
+  grid-column: span 12 !important;
+  overflow: visible !important;
+}
+
+#inventory .inventory-wrap {
+  --inv-slot: clamp(48px, 4.4vw, 62px);
+  display: grid !important;
+  grid-template-columns: var(--inv-slot) max-content minmax(220px, 1fr) !important;
+  align-items: start !important;
+  gap: 18px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  padding: 4px 4px 18px !important;
+}
+
+#inventory .armor-column {
+  display: grid !important;
+  grid-template-columns: var(--inv-slot) !important;
+  grid-template-rows: repeat(5, var(--inv-slot)) !important;
+  gap: 10px !important;
+  width: var(--inv-slot) !important;
+  min-width: var(--inv-slot) !important;
+}
+
+#inventory .inventory-grid {
+  display: grid !important;
+  grid-template-columns: repeat(9, var(--inv-slot)) !important;
+  grid-auto-rows: var(--inv-slot) !important;
+  gap: 10px !important;
+  width: max-content !important;
+  max-width: none !important;
+  overflow: visible !important;
+}
+
+#inventory .armor-column > .mc-slot,
+#inventory .inventory-grid > .mc-slot {
+  width: var(--inv-slot) !important;
+  height: var(--inv-slot) !important;
+}
+
+#inventory .mc-item-icon,
+#inventory .mc-item-lucide {
+  width: calc(var(--inv-slot) - 16px) !important;
+  height: calc(var(--inv-slot) - 16px) !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+}
+
+#inventory .inventory-details {
+  min-height: calc((var(--inv-slot) * 5) + 40px) !important;
+  padding: 18px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(0,0,0,.34)), rgba(5, 8, 9, .64) !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.32), 0 14px 35px rgba(0,0,0,.18) !important;
+  overflow: hidden !important;
+}
+
+#inventory .inventory-details-empty {
+  height: 100% !important;
+  min-height: 160px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  color: rgba(255,255,255,.5) !important;
+  font-size: 14px !important;
+  line-height: 1.35 !important;
+}
+
+#inventory .inventory-details-icon {
+  width: 74px !important;
+  height: 74px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 12px !important;
+}
+
+#inventory .inventory-details-icon .mc-item-icon,
+#inventory .inventory-details-icon .mc-item-lucide {
+  width: 64px !important;
+  height: 64px !important;
+  max-width: 64px !important;
+  max-height: 64px !important;
+}
+
+#inventory .inventory-details h3 {
+  margin: 0 0 8px !important;
+  color: #8ef052 !important;
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+}
+
+#inventory .inventory-details-material {
+  margin-bottom: 14px !important;
+  color: rgba(255,255,255,.45) !important;
+  font-size: 12px !important;
+  word-break: break-word !important;
+}
+
+#inventory .inventory-details-list h4 {
+  margin: 14px 0 8px !important;
+  color: rgba(255,255,255,.68) !important;
+  font-size: 13px !important;
+}
+
+#inventory .inventory-details-list p {
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 7px 0 !important;
+  color: rgba(255,255,255,.78) !important;
+  font-size: 14px !important;
+  line-height: 1.3 !important;
+}
+
+#inventory .inventory-details-list p.lore {
+  display: block !important;
+  color: rgba(255,255,255,.62) !important;
+}
+
+#inventory .inventory-details-list b {
+  color: #fff !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 1180px) {
+  #inventory .inventory-wrap {
+    --inv-slot: 46px;
+    grid-template-columns: var(--inv-slot) max-content minmax(180px, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 920px) {
+  #inventory .inventory-wrap {
+    --inv-slot: 44px;
+    grid-template-columns: 1fr !important;
+    overflow: visible !important;
+  }
+
+  #inventory .armor-column {
+    grid-template-columns: repeat(5, var(--inv-slot)) !important;
+    grid-template-rows: var(--inv-slot) !important;
+    width: max-content !important;
+  }
+
+  #inventory .inventory-details {
+    min-height: 150px !important;
+  }
+}

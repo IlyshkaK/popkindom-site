@@ -643,11 +643,25 @@ function fallbackItemIconHtml(type) {
   return `<span class="mc-item-lucide mc-item-lucide-${kind}" title="Иконка-заглушка">${fallbackIconSvg(kind)}</span>`;
 }
 
-function renderItemIcon(item) {
-  const remoteUrl = remoteMaterialIconUrl(item);
-  const kind = itemFallbackKind(item?.type);
+function shouldUseFallbackIcon(item) {
+  const normalized = materialName(item?.type);
 
-  if (!remoteUrl) return fallbackItemIconHtml(item?.type);
+  if (!normalized || normalized === "AIR") return true;
+
+  // Новые предметы могут отсутствовать в удалённом наборе minecraft-иконок.
+  // В таком случае вообще не создаём <img>, чтобы не было пустых/битых слотов.
+  if (normalized.startsWith("COPPER_") && itemFallbackKind(normalized) === "shield") return true;
+
+  return false;
+}
+
+function renderItemIcon(item) {
+  const kind = itemFallbackKind(item?.type);
+  const remoteUrl = remoteMaterialIconUrl(item);
+
+  if (shouldUseFallbackIcon(item) || !remoteUrl) {
+    return fallbackItemIconHtml(item?.type);
+  }
 
   return `<img class="mc-item-icon" src="${remoteUrl}" alt="${escapeHtml(prettyMaterial(item.type))}" loading="eager" decoding="async" data-fallback-kind="${kind}" onerror="handleItemIconError(this)">`;
 }
@@ -772,6 +786,61 @@ function itemTooltip(item) {
   return `<div class="mc-tooltip">${lines.join("")}</div>`;
 }
 
+function renderInventoryDetails(item) {
+  const details = document.getElementById("inventoryDetails");
+  if (!details) return;
+
+  if (!item || item.type === "AIR" || item.empty || Number(item.amount || 0) <= 0) {
+    details.innerHTML = `<div class="inventory-details-empty">Наведи на предмет, чтобы увидеть описание</div>`;
+    return;
+  }
+
+  const displayName = item.name || prettyMaterial(item.type);
+  const lines = [];
+
+  if (Number(item.amount || 0) > 1) lines.push(`<p><span>Количество:</span><b>${escapeHtml(item.amount)}</b></p>`);
+  if (Number(item.max_durability || 0) > 0) {
+    lines.push(`<p><span>Прочность:</span><b>${escapeHtml(item.durability_left ?? 0)} / ${escapeHtml(item.max_durability)}</b></p>`);
+  }
+
+  if (Array.isArray(item.enchantments) && item.enchantments.length) {
+    lines.push(`<h4>Зачарования</h4>`);
+    item.enchantments.slice(0, 6).forEach((enchant) => {
+      lines.push(`<p><span>${escapeHtml(prettyMaterial(enchant.name || enchant.key))}</span><b>${escapeHtml(enchant.level || "")}</b></p>`);
+    });
+  }
+
+  if (Array.isArray(item.lore) && item.lore.length) {
+    lines.push(`<h4>Описание</h4>`);
+    item.lore.slice(0, 5).forEach((line) => lines.push(`<p class="lore">${escapeHtml(line)}</p>`));
+  }
+
+  details.innerHTML = `
+    <div class="inventory-details-icon">${renderItemIcon(item)}</div>
+    <h3>${escapeHtml(displayName)}</h3>
+    <div class="inventory-details-material">minecraft:${escapeHtml(materialName(item.type).toLowerCase())}</div>
+    <div class="inventory-details-list">${lines.join("") || `<p><span>Обычный предмет</span><b>—</b></p>`}</div>
+  `;
+}
+
+function bindInventoryDetails() {
+  const slots = document.querySelectorAll("#inventory .mc-slot[data-detail-id]");
+  slots.forEach((slot) => {
+    const id = slot.getAttribute("data-detail-id");
+    const item = window.__inventoryDetailItems?.[id];
+    slot.addEventListener("mouseenter", () => renderInventoryDetails(item));
+    slot.addEventListener("focus", () => renderInventoryDetails(item));
+    slot.addEventListener("click", () => renderInventoryDetails(item));
+  });
+}
+
+function registerInventoryDetailItem(item) {
+  if (!window.__inventoryDetailItems) window.__inventoryDetailItems = [];
+  const id = window.__inventoryDetailItems.length;
+  window.__inventoryDetailItems.push(item);
+  return id;
+}
+
 function renderInventorySlot(item, options = {}) {
   const empty = !item || item.type === "AIR" || item.empty || Number(item.amount || 0) <= 0;
   const slotClass = ["mc-slot", options.className || "", options.active ? "active" : "", empty ? "empty" : ""].filter(Boolean).join(" ");
@@ -783,13 +852,17 @@ function renderInventorySlot(item, options = {}) {
 
   const amount = Number(item.amount || 0) > 1 ? `<small>${escapeHtml(item.amount)}</small>` : "";
   const title = `${prettyMaterial(item.type)} x${item.amount}`;
-  return `<span class="${slotClass}" title="${escapeHtml(title)}">${label}${renderItemIcon(item)}${amount}${itemTooltip(item)}</span>`;
+  const detailId = registerInventoryDetailItem(item);
+  return `<span class="${slotClass}" tabindex="0" data-detail-id="${detailId}" title="${escapeHtml(title)}">${label}${renderItemIcon(item)}${amount}${itemTooltip(item)}</span>`;
 }
 
 function renderInventory(inventory) {
   const grid = document.getElementById("inventoryGrid");
   const armor = document.getElementById("armorColumn");
   if (!grid) return;
+
+  window.__inventoryDetailItems = [];
+  renderInventoryDetails(null);
 
   const items = parseInventoryJson(inventory?.inventory_json);
   const armorItems = parseInventoryJson(inventory?.armor_json);
@@ -818,6 +891,8 @@ function renderInventory(inventory) {
 
     armor.innerHTML = armorSlots.map(({ item, label }) => renderInventorySlot(item, { label })).join("");
   }
+
+  bindInventoryDetails();
 }
 function renderOnlinePlayers(players) {
   const list = document.getElementById("onlinePlayersList");
