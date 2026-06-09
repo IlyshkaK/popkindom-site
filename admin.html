@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админ-панель — PopkinDom 4</title>
+  <link rel="stylesheet" href="style.css?v=admin-panel-1" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="icon" type="image/png" href="favicon.png" />
+</head>
+<body>
+<header class="header">
+  <a href="index.html" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
+
+  <nav class="nav">
+    <a href="index.html">Главная</a>
+    <a href="rules.html">Правила</a>
+    <a href="about.html">Подробней</a>
+  </nav>
+
+  <div class="auth-menu-wrap">
+    <a href="login.html" class="register-btn auth-action-btn" id="authMenuBtn">
+      <span class="auth-action-icon"><i data-lucide="log-in"></i></span>
+      <b class="auth-action-text">Войти</b>
+    </a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="account.html"><i data-lucide="user-round"></i><b>Кабинет</b></a>
+      <a href="security.html"><i data-lucide="shield"></i><b>Безопасность</b></a>
+      <a href="admin.html" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
+    </div>
+  </div>
+  
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Главная</a>
+  <a href="rules.html">Правила</a>
+  <a href="about.html">Подробней</a>
+  <a href="login.html" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="account.html" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
+  <a href="security.html" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
+  <a href="admin.html" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
+  <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
+</div>
+
+<main class="admin-page protected-page">
+  <div class="account-bg"></div>
+  <div class="account-dark"></div>
+
+  <section class="admin-layout">
+    <div class="admin-hero glass-card">
+      <div>
+        <p class="eyebrow"><i data-lucide="shield-check"></i> Панель управления</p>
+        <h1>Админ-панель PopkinDom</h1>
+        <p>Минимальный доступ для ADMIN и OWNER. Перед входом нужно подтвердить PIN-код.</p>
+      </div>
+      <div class="admin-badge" id="adminBadge">Проверка доступа…</div>
+    </div>
+
+    <section class="admin-pin-card glass-card" id="adminPinGate" hidden>
+      <div class="admin-pin-icon"><i data-lucide="lock-keyhole"></i></div>
+      <h2 id="adminPinTitle">Введите PIN-код</h2>
+      <p id="adminPinText">Для входа в админ-панель подтвердите 4-значный PIN-код.</p>
+
+      <form id="adminPinForm" class="admin-pin-form">
+        <input id="adminPinInput" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="PIN-код" autocomplete="off" required />
+        <input id="adminPinRepeat" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Повторите PIN" autocomplete="off" hidden />
+        <button type="submit" class="primary-btn" id="adminPinSubmit"><i data-lucide="key-round"></i> Продолжить</button>
+      </form>
+      <p class="auth-message" id="adminPinMessage"></p>
+    </section>
+
+    <section class="admin-dashboard" id="adminDashboard" hidden>
+      <div class="admin-grid">
+        <article class="admin-stat glass-card">
+          <i data-lucide="users-round"></i>
+          <span>Игроков всего</span>
+          <b id="adminUsersCount">—</b>
+        </article>
+        <article class="admin-stat glass-card">
+          <i data-lucide="radio-tower"></i>
+          <span>Онлайн сейчас</span>
+          <b id="adminOnlineCount">—</b>
+        </article>
+        <article class="admin-stat glass-card">
+          <i data-lucide="crown"></i>
+          <span>Администрация</span>
+          <b id="adminAdminsCount">—</b>
+        </article>
+      </div>
+
+      <div class="admin-table-card glass-card">
+        <div class="admin-section-head">
+          <div>
+            <p class="eyebrow"><i data-lucide="history"></i> Быстрый просмотр</p>
+            <h2>Последние игроки</h2>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Игрок</th>
+                <th>Роль</th>
+                <th>Статус</th>
+                <th>Последний вход</th>
+              </tr>
+            </thead>
+            <tbody id="adminPlayersTable">
+              <tr><td colspan="4">Загрузка…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
+    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
+  </div>
+</footer>
+<script src="script.js?v=admin-panel-1"></script>
+</body>
+</html>

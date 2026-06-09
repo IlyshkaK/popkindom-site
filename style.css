@@ -3382,3 +3382,262 @@ body.is-auth .auth-action-mobile::after {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== MINIMAL ADMIN PANEL ===== */
+.admin-only {
+  display: none !important;
+}
+
+body.is-admin .admin-only {
+  display: flex !important;
+}
+
+.admin-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 120px 24px 70px;
+  overflow: hidden;
+}
+
+.admin-layout {
+  position: relative;
+  z-index: 2;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 22px;
+}
+
+.admin-hero {
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.admin-hero h1 {
+  margin: 6px 0 10px;
+  font-size: clamp(30px, 5vw, 54px);
+  line-height: 0.95;
+}
+
+.admin-hero p {
+  margin: 0;
+  color: rgba(255,255,255,0.72);
+}
+
+.admin-badge {
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 226, 60, 0.35);
+  color: #8ef052;
+  background: rgba(126, 226, 60, 0.1);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.admin-pin-card {
+  width: min(520px, 100%);
+  margin: 0 auto;
+  padding: 34px;
+  text-align: center;
+}
+
+.admin-pin-icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  color: #8ef052;
+  background: rgba(126, 226, 60, 0.12);
+  border: 1px solid rgba(126, 226, 60, 0.25);
+}
+
+.admin-pin-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.admin-pin-card h2 {
+  margin: 0 0 10px;
+  font-size: 30px;
+}
+
+.admin-pin-card p {
+  color: rgba(255,255,255,0.72);
+}
+
+.admin-pin-form {
+  margin-top: 22px;
+  display: grid;
+  gap: 12px;
+}
+
+.admin-pin-form input {
+  min-height: 56px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.28);
+  color: #fff;
+  padding: 0 18px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  outline: none;
+}
+
+.admin-pin-form input:focus {
+  border-color: rgba(126, 226, 60, 0.65);
+  box-shadow: 0 0 0 4px rgba(126, 226, 60, 0.12);
+}
+
+.admin-dashboard {
+  display: grid;
+  gap: 22px;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-stat {
+  padding: 22px;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-stat svg {
+  color: #8ef052;
+}
+
+.admin-stat span {
+  color: rgba(255,255,255,0.68);
+  font-weight: 800;
+}
+
+.admin-stat b {
+  font-size: 34px;
+  line-height: 1;
+}
+
+.admin-table-card {
+  padding: 24px;
+}
+
+.admin-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.admin-section-head h2 {
+  margin: 4px 0 0;
+  font-size: 28px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 15px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin-table th {
+  color: rgba(255,255,255,0.62);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-player-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 900;
+}
+
+.admin-player-cell img {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  image-rendering: pixelated;
+}
+
+.admin-status {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-status.online {
+  color: #8ef052;
+  background: rgba(126, 226, 60, 0.12);
+}
+
+.admin-status.offline {
+  color: rgba(255,255,255,0.62);
+  background: rgba(255,255,255,0.08);
+}
+
+@media (max-width: 760px) {
+  .admin-page {
+    padding: 98px 14px 50px;
+  }
+
+  .admin-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-pin-card {
+    padding: 24px 18px;
+  }
+}
+
+.primary-btn {
+  min-height: 52px;
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 16px;
+  color: #081008;
+  background: linear-gradient(135deg, #8ef052, #55c92f);
+  font: inherit;
+  font-weight: 1000;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 16px 34px rgba(85, 201, 47, 0.24);
+}
+
+.primary-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}

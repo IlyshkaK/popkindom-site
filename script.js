@@ -112,6 +112,9 @@ function refreshAuthUI() {
   const securityUsername = document.getElementById("securityUsername");
   if (securityUsername && isAuth) securityUsername.textContent = currentUser.username;
 
+  const isAdmin = isAuth && ["ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase());
+  document.body.classList.toggle("is-admin", isAdmin);
+
   refreshLucideIcons();
 
   const autoLoginStatus = document.getElementById("autoLoginStatus");
@@ -1070,7 +1073,164 @@ async function refreshAccountRealtime() {
 
   if (data) renderAccountData(data);
 
+  await initAdminPanel();
+
   if (document.querySelector(".account-page")) {
     setInterval(refreshAccountRealtime, 3000);
   }
 })();
+
+
+/* ===== MINIMAL ADMIN PANEL ===== */
+function isCurrentUserAdmin() {
+  return Boolean(currentUser && ["ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase()));
+}
+
+function setAdminMessage(text, type = "error") {
+  const message = document.getElementById("adminPinMessage");
+  if (!message) return;
+  message.className = `auth-message ${type}`;
+  message.textContent = text;
+}
+
+async function loadAdminOverview() {
+  const dashboard = document.getElementById("adminDashboard");
+  if (!dashboard) return;
+
+  const data = await apiRequest("/api/admin/overview");
+  dashboard.hidden = false;
+
+  const badge = document.getElementById("adminBadge");
+  if (badge) badge.textContent = `${data.admin.username} · ${data.admin.role}`;
+
+  const usersCount = document.getElementById("adminUsersCount");
+  const onlineCount = document.getElementById("adminOnlineCount");
+  const adminsCount = document.getElementById("adminAdminsCount");
+
+  if (usersCount) usersCount.textContent = formatNumber(data.cards.usersCount);
+  if (onlineCount) onlineCount.textContent = formatNumber(data.cards.onlineCount);
+  if (adminsCount) adminsCount.textContent = formatNumber(data.cards.adminCount);
+
+  const table = document.getElementById("adminPlayersTable");
+  if (table) {
+    const rows = data.latestPlayers || [];
+    table.innerHTML = rows.length ? rows.map((player) => {
+      const online = player.online === true;
+      return `
+        <tr>
+          <td><span class="admin-player-cell"><img src="${minecraftHeadUrl(player.username, 28)}" alt=""> ${player.username || "—"}</span></td>
+          <td>${player.role || "PLAYER"}</td>
+          <td><span class="admin-status ${online ? "online" : "offline"}">${online ? "Онлайн" : "Офлайн"}</span></td>
+          <td>${formatDate(player.last_web_login || player.player_updated_at || player.registered_at)}</td>
+        </tr>
+      `;
+    }).join("") : `<tr><td colspan="4">Игроков пока нет.</td></tr>`;
+  }
+
+  refreshLucideIcons();
+}
+
+async function initAdminPanel() {
+  if (!document.querySelector(".admin-page")) return;
+
+  const pinGate = document.getElementById("adminPinGate");
+  const dashboard = document.getElementById("adminDashboard");
+  const pinForm = document.getElementById("adminPinForm");
+  const pinTitle = document.getElementById("adminPinTitle");
+  const pinText = document.getElementById("adminPinText");
+  const pinInput = document.getElementById("adminPinInput");
+  const pinRepeat = document.getElementById("adminPinRepeat");
+  const pinSubmit = document.getElementById("adminPinSubmit");
+  const badge = document.getElementById("adminBadge");
+
+  if (!currentUser) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (!isCurrentUserAdmin()) {
+    if (badge) badge.textContent = "Доступ закрыт";
+    if (pinGate) {
+      pinGate.hidden = false;
+      pinGate.innerHTML = `
+        <div class="admin-pin-icon"><i data-lucide="ban"></i></div>
+        <h2>Недостаточно прав</h2>
+        <p>Админ-панель доступна только ролям ADMIN и OWNER.</p>
+        <a class="primary-btn" href="account.html"><i data-lucide="user-round"></i> Вернуться в кабинет</a>
+      `;
+    }
+    refreshLucideIcons();
+    return;
+  }
+
+  try {
+    const status = await apiRequest("/api/admin/status");
+    if (badge) badge.textContent = `${status.user.username} · ${status.user.role}`;
+
+    if (status.verified) {
+      if (pinGate) pinGate.hidden = true;
+      await loadAdminOverview();
+      return;
+    }
+
+    if (dashboard) dashboard.hidden = true;
+    if (pinGate) pinGate.hidden = false;
+
+    if (!status.hasPin) {
+      pinTitle.textContent = "Создайте PIN-код";
+      pinText.textContent = "PIN нужен для дополнительной защиты админ-панели. Используйте 4 цифры.";
+      pinRepeat.hidden = false;
+      pinSubmit.innerHTML = `<i data-lucide="key-round"></i> Создать PIN`;
+      pinForm.dataset.mode = "setup";
+    } else {
+      pinTitle.textContent = "Введите PIN-код";
+      pinText.textContent = "Подтвердите 4-значный PIN-код, чтобы открыть админ-панель.";
+      pinRepeat.hidden = true;
+      pinSubmit.innerHTML = `<i data-lucide="unlock-keyhole"></i> Войти`;
+      pinForm.dataset.mode = "verify";
+    }
+
+    refreshLucideIcons();
+  } catch (error) {
+    setAdminMessage(error.message || "Ошибка проверки доступа.", "error");
+    if (pinGate) pinGate.hidden = false;
+  }
+
+  if (pinForm) {
+    pinForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const mode = pinForm.dataset.mode || "verify";
+      const pin = pinInput.value.trim();
+      const pinRepeatValue = pinRepeat.value.trim();
+
+      if (!/^\d{4}$/.test(pin)) {
+        setAdminMessage("PIN должен состоять из 4 цифр.", "error");
+        return;
+      }
+
+      if (mode === "setup" && pin !== pinRepeatValue) {
+        setAdminMessage("PIN-коды не совпадают.", "error");
+        return;
+      }
+
+      try {
+        pinSubmit.disabled = true;
+        await apiRequest(mode === "setup" ? "/api/admin/setup-pin" : "/api/admin/verify-pin", {
+          method: "POST",
+          body: JSON.stringify({ pin, pinRepeat: pinRepeatValue })
+        });
+
+        setAdminMessage(mode === "setup" ? "PIN создан. Открываем панель..." : "Доступ разрешён. Открываем панель...", "success");
+        pinInput.value = "";
+        pinRepeat.value = "";
+        if (pinGate) pinGate.hidden = true;
+        await loadAdminOverview();
+      } catch (error) {
+        setAdminMessage(error.message, "error");
+      } finally {
+        pinSubmit.disabled = false;
+      }
+    });
+  }
+}
+
