@@ -191,14 +191,5 @@
   </div>
 </footer>
 <script src="script.js"></script>
-<script>
-  document.querySelectorAll('#aboutPlayBtn, #aboutFinalPlayBtn').forEach((btn) => {
-    btn.addEventListener('click', (event) => {
-      event.preventDefault();
-      const session = localStorage.getItem('popkinUserSession');
-      window.location.href = session ? 'account.html' : 'login.html';
-    });
-  });
-</script>
 </body>
 </html>

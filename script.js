@@ -1032,12 +1032,19 @@ if (logoutAllBtn) {
 }
 
 /* ===== PLAY BUTTON AUTH REDIRECT ===== */
+function goToStartDestination(event) {
+  if (event) event.preventDefault();
+  window.location.href = currentUser ? "account.html" : "register.html";
+}
+
 const playBtn = document.getElementById("playBtn");
 if (playBtn) {
-  playBtn.addEventListener("click", (event) => {
-    event.preventDefault();
-    window.location.href = currentUser ? "account.html" : "login.html";
-  });
+  playBtn.addEventListener("click", goToStartDestination);
+}
+
+const aboutFinalPlayBtn = document.getElementById("aboutFinalPlayBtn");
+if (aboutFinalPlayBtn) {
+  aboutFinalPlayBtn.addEventListener("click", goToStartDestination);
 }
 
 async function refreshAccountRealtime() {
