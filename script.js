@@ -1213,66 +1213,79 @@ async function loadAdminPlayers() {
 
 function renderAdminPlayerPanel(player) {
   adminSelectedPlayer = player;
-  const panel = document.getElementById("adminPlayerPanel");
-  if (!panel) return;
+  const playerPanel = document.getElementById("adminPlayerPanel");
+  const actionsPanel = document.getElementById("adminActionsPanel");
+  const historyPanel = document.getElementById("adminHistoryPanel");
+  if (!playerPanel || !actionsPanel || !historyPanel) return;
 
-  panel.innerHTML = `
-    <div class="admin-player-profile">
+  playerPanel.innerHTML = `
+    <div class="admin-player-profile admin-player-profile-modern">
       <img src="${minecraftHeadUrl(player.username, 64)}" alt="">
       <div>
         <p class="eyebrow"><i data-lucide="user-cog"></i> Игрок выбран</p>
         <h2>${player.username}</h2>
-        <div class="admin-tags">${adminWhitelistBadge(player)} ${adminStatusBadges(player)}</div>
+        <div class="admin-tags"><span class="admin-status ${player.online ? "online" : "offline"}">${player.online ? "Онлайн" : "Офлайн"}</span> ${adminWhitelistBadge(player)}</div>
       </div>
     </div>
+    <div class="admin-player-info-grid">
+      <div><span>Роль</span><b><i data-lucide="shield"></i>${player.role || "PLAYER"}</b></div>
+      <div><span>Статус</span><b><i data-lucide="circle-dot"></i>${player.online ? "Онлайн" : "Офлайн"}</b></div>
+      <div><span>White-List</span><b><i data-lucide="circle-check"></i>${player.whitelisted ? "Да" : "Нет"}</b></div>
+      <div><span>Наказания</span><b><i data-lucide="shield"></i>${(player.banned || player.muted) ? "Имеются" : "Нет"}</b></div>
+    </div>
+  `;
 
-    <div class="admin-selected-grid">
-      <form class="admin-action-form" id="adminActionForm">
-        <label>Действие</label>
-        <input id="adminActionType" type="hidden" value="BAN" />
-        <div class="admin-action-picker" role="radiogroup" aria-label="Выбор действия">
-          <button type="button" class="active danger" data-admin-action="BAN"><i data-lucide="ban"></i><span>Бан</span></button>
-          <button type="button" class="danger" data-admin-action="TEMP_BAN"><i data-lucide="timer-off"></i><span>Временный бан</span></button>
-          <button type="button" class="warn" data-admin-action="MUTE"><i data-lucide="message-circle-off"></i><span>Мут</span></button>
-          <button type="button" class="warn" data-admin-action="TEMP_MUTE"><i data-lucide="clock-3"></i><span>Временный мут</span></button>
-          <button type="button" class="safe" data-admin-action="UNBAN"><i data-lucide="shield-check"></i><span>Снять бан</span></button>
-          <button type="button" class="safe" data-admin-action="UNMUTE"><i data-lucide="message-circle"></i><span>Снять мут</span></button>
-          <button type="button" data-admin-action="KICK"><i data-lucide="log-out"></i><span>Кикнуть</span></button>
-          <button type="button" data-admin-action="WHITELIST_REMOVE"><i data-lucide="user-minus"></i><span>Удалить из WL</span></button>
-        </div>
-
-        <label id="adminDurationLabel" hidden>Срок</label>
-        <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
-
-        <label>Причина</label>
-        <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
-
-        <button type="submit" class="primary-btn"><i data-lucide="gavel"></i> Выполнить действие</button>
-        <p class="auth-message" id="adminActionMessage"></p>
-      </form>
-
-      <div class="admin-history-box">
-        <div class="admin-section-head compact">
-          <div>
-            <p class="eyebrow"><i data-lucide="history"></i> История</p>
-            <h3>Наказания игрока</h3>
-          </div>
-          <button type="button" class="admin-mini-btn" id="adminHistoryRefresh"><i data-lucide="refresh-cw"></i></button>
-        </div>
-        <div id="adminPlayerHistory" class="admin-history-list">Загрузка…</div>
+  actionsPanel.innerHTML = `
+    <div class="admin-section-head compact">
+      <div>
+        <h3>Действия с игроком</h3>
       </div>
     </div>
+    <form class="admin-action-form" id="adminActionForm">
+      <input id="adminActionType" type="hidden" value="BAN" />
+      <div class="admin-action-picker" role="radiogroup" aria-label="Выбор действия">
+        <button type="button" class="active danger" data-admin-action="BAN"><i data-lucide="ban"></i><span>Бан</span></button>
+        <button type="button" class="orange" data-admin-action="TEMP_BAN"><i data-lucide="timer-off"></i><span>Временный бан</span></button>
+        <button type="button" class="blue" data-admin-action="MUTE"><i data-lucide="message-circle-off"></i><span>Мут</span></button>
+        <button type="button" class="purple" data-admin-action="TEMP_MUTE"><i data-lucide="clock-3"></i><span>Временный мут</span></button>
+        <button type="button" class="safe" data-admin-action="UNBAN"><i data-lucide="circle-check"></i><span>Снять бан</span></button>
+        <button type="button" class="cyan" data-admin-action="UNMUTE"><i data-lucide="message-circle"></i><span>Снять мут</span></button>
+        <button type="button" class="yellow" data-admin-action="KICK"><i data-lucide="user-x"></i><span>Кикнуть</span></button>
+        <button type="button" class="neutral" data-admin-action="WHITELIST_REMOVE"><i data-lucide="user-minus"></i><span>Удалить из White-List</span></button>
+      </div>
+
+      <label id="adminDurationLabel" hidden>Срок</label>
+      <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
+
+      <label>Причина</label>
+      <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
+
+      <button type="submit" class="primary-btn"><i data-lucide="gavel"></i> Выполнить действие</button>
+      <p class="auth-message" id="adminActionMessage"></p>
+    </form>
+  `;
+
+  historyPanel.innerHTML = `
+    <div class="admin-section-head compact">
+      <div>
+        <p class="eyebrow"><i data-lucide="history"></i> История</p>
+        <h3>Наказания игрока</h3>
+      </div>
+      <button type="button" class="admin-mini-btn" id="adminHistoryRefresh"><i data-lucide="refresh-cw"></i></button>
+    </div>
+    <div id="adminPlayerHistory" class="admin-history-list">Загрузка…</div>
   `;
 
   const actionType = document.getElementById("adminActionType");
   const duration = document.getElementById("adminActionDuration");
   const durationLabel = document.getElementById("adminDurationLabel");
-  const actionButtons = panel.querySelectorAll("[data-admin-action]");
+  const actionButtons = actionsPanel.querySelectorAll("[data-admin-action]");
 
   function syncDurationVisibility() {
     const needDuration = ["TEMP_BAN", "TEMP_MUTE"].includes(actionType.value);
     duration.hidden = !needDuration;
     durationLabel.hidden = !needDuration;
+    duration.required = needDuration;
     if (!needDuration) duration.value = "";
   }
 
