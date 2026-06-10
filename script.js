@@ -1247,10 +1247,13 @@ function renderAdminPlayerPanel(player) {
     <div class="admin-player-profile">
       <img src="${minecraftHeadUrl(player.username, 64)}" alt="">
       <div>
-        <p class="eyebrow"><i data-lucide="user-cog"></i> Игрок выбран</p>
         <h2>${player.username}</h2>
         <div class="admin-selected-role">${adminRoleBadge(player.role)}</div>
-        <div class="admin-tags">${adminWhitelistBadge(player)} ${adminStatusBadges(player)}</div>
+        <div class="admin-tags">
+          <span class="admin-status ${(player.online||player.isOnline)? "online":"offline"}">${(player.online||player.isOnline)? "Онлайн":"Офлайн"}</span>
+          ${adminWhitelistBadge(player)}
+          <span class="admin-status ${(player.hasPunishment||player.hasActivePunishments)? "offline":"online"}">${(player.hasPunishment||player.hasActivePunishments)? "Наказания: Есть":"Наказания: Нет"}</span>
+        </div>
       </div>
     </div>
 
