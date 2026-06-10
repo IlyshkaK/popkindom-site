@@ -5072,3 +5072,38 @@ body.admin-pin-locked .footer {
 .admin-info-label{font-size:12px;text-transform:uppercase;opacity:.7;font-weight:700}
 .admin-player-main{display:flex;align-items:center;gap:14px}
 @media(max-width:900px){.admin-player-profile-wide{grid-template-columns:1fr}}
+
+
+/* admin tweaks */
+.admin-players-table td:last-child,
+.admin-players-table th:last-child{
+ text-align:right;
+}
+.admin-players-table td:last-child .admin-mini-btn,
+.admin-players-table td:last-child button{
+ margin-left:auto;
+}
+.admin-history-list,
+.admin-punishments-history,
+.history-list{
+ scrollbar-width: thin;
+ scrollbar-color: #84f146 rgba(255,255,255,.05);
+}
+.admin-history-list::-webkit-scrollbar,
+.admin-punishments-history::-webkit-scrollbar,
+.history-list::-webkit-scrollbar{
+ width:10px;
+}
+.admin-history-list::-webkit-scrollbar-track,
+.admin-punishments-history::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track{
+ background: rgba(255,255,255,.04);
+ border-radius:999px;
+}
+.admin-history-list::-webkit-scrollbar-thumb,
+.admin-punishments-history::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb{
+ background: linear-gradient(180deg,#84f146,#59c41e);
+ border-radius:999px;
+ box-shadow:0 0 8px rgba(132,241,70,.35);
+}
