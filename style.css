@@ -5066,3 +5066,9 @@ body.admin-pin-locked .footer {
   color: #8ef052;
   font-weight: 1000;
 }
+
+.admin-player-profile-wide{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:24px;align-items:center;width:100%}
+.admin-info-col{display:flex;flex-direction:column;gap:10px}
+.admin-info-label{font-size:12px;text-transform:uppercase;opacity:.7;font-weight:700}
+.admin-player-main{display:flex;align-items:center;gap:14px}
+@media(max-width:900px){.admin-player-profile-wide{grid-template-columns:1fr}}

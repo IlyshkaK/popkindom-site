@@ -1244,16 +1244,33 @@ function renderAdminPlayerPanel(player) {
   if (!panel) return;
 
   panel.innerHTML = `
-    <div class="admin-player-profile">
-      <img src="${minecraftHeadUrl(player.username, 64)}" alt="">
-      <div>
-        <h2>${player.username}</h2>
-        <div class="admin-selected-role">${adminRoleBadge(player.role)}</div>
-        <div class="admin-tags">
-          <span class="admin-status ${(player.online||player.isOnline)? "online":"offline"}">${(player.online||player.isOnline)? "Онлайн":"Офлайн"}</span>
-          ${adminWhitelistBadge(player)}
-          <span class="admin-status ${(player.hasPunishment||player.hasActivePunishments)? "offline":"online"}">${(player.hasPunishment||player.hasActivePunishments)? "Наказания: Есть":"Наказания: Нет"}</span>
+    <div class="admin-player-profile admin-player-profile-wide">
+      <div class="admin-info-col">
+        <span class="admin-info-label">Ник</span>
+        <div class="admin-player-main">
+          <img src="${minecraftHeadUrl(player.username, 64)}" alt="">
+          <h2>${player.username}</h2>
         </div>
+      </div>
+
+      <div class="admin-info-col">
+        <span class="admin-info-label">Роль</span>
+        <div class="admin-selected-role">${adminRoleBadge(player.role)}</div>
+      </div>
+
+      <div class="admin-info-col">
+        <span class="admin-info-label">Статус</span>
+        <span class="admin-status ${(player.online||player.isOnline)? "online":"offline"}">${(player.online||player.isOnline)? "Онлайн":"Офлайн"}</span>
+      </div>
+
+      <div class="admin-info-col">
+        <span class="admin-info-label">White-List</span>
+        ${adminWhitelistBadge(player)}
+      </div>
+
+      <div class="admin-info-col">
+        <span class="admin-info-label">Наказания</span>
+        <span class="admin-status ${(player.hasPunishment||player.hasActivePunishments)? "offline":"online"}">${(player.hasPunishment||player.hasActivePunishments)? "Есть":"Нет"}</span>
       </div>
     </div>
 
