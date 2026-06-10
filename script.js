@@ -28,7 +28,13 @@ function minecraftHeadUrl(username, size = 36) {
 
 function minecraftBustUrl(username, size = 320) {
   const safeName = encodeURIComponent(username || "Steve");
-  // armor/bust отдаёт 3D bust-рендер с включённым outer layer скина: шляпа, рукава, куртка.
+  // 3D bust render with skin outer layer: hat / jacket / sleeves.
+  // Starlight renders the actual 3D model instead of a flat head texture.
+  return `https://starlightskins.lunareclipse.studio/render/bust/${safeName}/full?scale=${size}`;
+}
+
+function minecraftBustFallbackUrl(username, size = 320) {
+  const safeName = encodeURIComponent(username || "Steve");
   return `https://minotar.net/armor/bust/${safeName}/${size}.png`;
 }
 
@@ -986,10 +992,13 @@ function renderAccountData(data) {
 
   const playerHead = document.getElementById("playerHead");
   if (playerHead) {
-    playerHead.src = minecraftBustUrl(username, 320);
+    playerHead.src = minecraftBustUrl(username, 300);
     playerHead.onerror = () => {
-      playerHead.onerror = null;
-      playerHead.src = minecraftBustUrl("Steve", 320);
+      playerHead.onerror = () => {
+        playerHead.onerror = null;
+        playerHead.src = minecraftBustFallbackUrl("Steve", 300);
+      };
+      playerHead.src = minecraftBustFallbackUrl(username, 300);
     };
   }
 
