@@ -28,15 +28,15 @@ function minecraftHeadUrl(username, size = 36) {
 
 function minecraftBustUrl(username, size = 512) {
   const safeName = encodeURIComponent(username || "Steve");
-  // Настоящий 3D bust-рендер: голова + плечи + тело, с поддержкой outer layer скина.
-  // Используем отдельный API, потому что плоские helm/armor-ссылки не показывают 3D-слои.
-  return `https://identicraft.js.org/bust/${safeName}/${size}.png`;
+  // Берём именно скин по НИКУ игрока, а не по UUID, чтобы на пиратском сервере
+  // не подставлялся стандартный Alex/Steve. mc-heads показывает body-render со second/outer layer.
+  return `https://mc-heads.net/body/${safeName}/${size}`;
 }
 
 function minecraftBustFallbackUrl(username, size = 512) {
   const safeName = encodeURIComponent(username || "Steve");
-  // Резервный 3D-рендер с overlay/layers.
-  return `https://visage.surgeplay.com/bust/${size}/${safeName}.png`;
+  // Запасной вариант тоже по нику игрока.
+  return `https://minotar.net/body/${safeName}/${size}.png`;
 }
 
 function setAuthButtonIcon(iconElement, username) {
@@ -963,7 +963,11 @@ function renderAccountData(data) {
     MODER: "Модератор",
     ADMIN: "Администратор",
     ADMINISTRATOR: "Администратор",
-    OWNER: "Владелец"
+    OWNER: "Владелец",
+    "ИГРОК": "Игрок",
+    "МОДЕРАТОР": "Модератор",
+    "АДМИНИСТРАТОР": "Администратор",
+    "ВЛАДЕЛЕЦ": "Владелец"
   };
   const roleClassMap = {
     PLAYER: "player",
@@ -973,7 +977,11 @@ function renderAccountData(data) {
     MODER: "moderator",
     ADMIN: "admin",
     ADMINISTRATOR: "admin",
-    OWNER: "owner"
+    OWNER: "owner",
+    "ИГРОК": "player",
+    "МОДЕРАТОР": "moderator",
+    "АДМИНИСТРАТОР": "admin",
+    "ВЛАДЕЛЕЦ": "owner"
   };
   const roleRaw = String(data.user?.role || player.role || "PLAYER").toUpperCase();
   const roleLabel = roleMap[roleRaw] || roleRaw;
@@ -993,14 +1001,14 @@ function renderAccountData(data) {
 
   const playerHead = document.getElementById("playerHead");
   if (playerHead) {
-    const skinId = player.uuid || player.player_uuid || player.minecraft_uuid || data.user?.uuid || username;
-    playerHead.src = minecraftBustUrl(skinId, 512);
+    const skinName = player.nickname || data.user?.username || username || "Steve";
+    playerHead.src = minecraftBustUrl(skinName, 512);
     playerHead.onerror = () => {
       playerHead.onerror = () => {
         playerHead.onerror = null;
         playerHead.src = minecraftBustFallbackUrl("Steve", 512);
       };
-      playerHead.src = minecraftBustFallbackUrl(skinId, 512);
+      playerHead.src = minecraftBustFallbackUrl(skinName, 512);
     };
   }
 
