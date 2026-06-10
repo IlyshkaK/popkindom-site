@@ -4803,3 +4803,153 @@ body.is-admin .admin-only {
     flex-direction: column;
   }
 }
+
+/* ===== ADMIN PANEL UX POLISH: full-width action block + custom action picker ===== */
+.admin-hero > div:first-child {
+  max-width: 850px;
+}
+
+.admin-hero p:not(.eyebrow) {
+  max-width: 760px;
+  line-height: 1.55;
+}
+
+.admin-panel-grid {
+  grid-template-columns: 1fr !important;
+  align-items: stretch !important;
+}
+
+.admin-action-card {
+  width: 100% !important;
+  position: static !important;
+  top: auto !important;
+  padding: 24px !important;
+}
+
+.admin-player-profile {
+  padding: 4px 0 20px;
+  margin-bottom: 20px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin-selected-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.admin-action-form {
+  margin-bottom: 0 !important;
+}
+
+.admin-action-form input:not([type="hidden"]),
+.admin-action-form textarea,
+.admin-search-row input {
+  background: rgba(0, 0, 0, 0.34) !important;
+  border-color: rgba(255,255,255,0.16) !important;
+}
+
+.admin-action-form input:not([type="hidden"]):focus,
+.admin-action-form textarea:focus,
+.admin-search-row input:focus {
+  border-color: rgba(126, 226, 60, 0.55) !important;
+  box-shadow: 0 0 0 4px rgba(126, 226, 60, 0.10) !important;
+}
+
+.admin-action-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-action-picker button {
+  min-height: 54px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.13);
+  background: linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.035));
+  color: rgba(255,255,255,0.86);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+  text-align: left;
+}
+
+.admin-action-picker button svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: rgba(255,255,255,0.72);
+}
+
+.admin-action-picker button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(126, 226, 60, 0.38);
+  background: rgba(126, 226, 60, 0.10);
+}
+
+.admin-action-picker button.active {
+  border-color: rgba(126, 226, 60, 0.72);
+  background: linear-gradient(135deg, rgba(126, 226, 60, 0.22), rgba(85, 201, 47, 0.10));
+  box-shadow: inset 0 0 0 1px rgba(126, 226, 60, 0.10), 0 0 24px rgba(126, 226, 60, 0.12);
+  color: #fff;
+}
+
+.admin-action-picker button.active svg {
+  color: #8ef052;
+}
+
+.admin-action-picker button.danger.active {
+  border-color: rgba(255, 112, 112, 0.66);
+  background: linear-gradient(135deg, rgba(255, 112, 112, 0.20), rgba(255, 112, 112, 0.065));
+  box-shadow: inset 0 0 0 1px rgba(255, 112, 112, 0.08), 0 0 22px rgba(255, 112, 112, 0.10);
+}
+
+.admin-action-picker button.danger.active svg {
+  color: #ff7070;
+}
+
+.admin-action-picker button.warn.active {
+  border-color: rgba(255, 209, 102, 0.62);
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.19), rgba(255, 209, 102, 0.06));
+  box-shadow: inset 0 0 0 1px rgba(255, 209, 102, 0.08), 0 0 22px rgba(255, 209, 102, 0.10);
+}
+
+.admin-action-picker button.warn.active svg {
+  color: #ffd166;
+}
+
+.admin-action-picker button.safe.active {
+  border-color: rgba(126, 226, 60, 0.66);
+}
+
+.admin-history-box {
+  border-top: 0 !important;
+  padding-top: 0 !important;
+  min-width: 0;
+}
+
+.admin-history-list {
+  max-height: 430px !important;
+}
+
+.admin-tag.ok {
+  color: #8ef052;
+}
+
+@media (max-width: 980px) {
+  .admin-selected-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .admin-action-picker {
+    grid-template-columns: 1fr;
+  }
+}

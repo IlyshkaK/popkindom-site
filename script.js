@@ -1138,7 +1138,7 @@ function adminStatusBadges(player) {
   const badges = [];
   if (player.banned) badges.push(`<span class="admin-tag danger">Бан</span>`);
   if (player.muted) badges.push(`<span class="admin-tag warn">Мут</span>`);
-  if (!badges.length) badges.push(`<span class="admin-tag ok">Чисто</span>`);
+  if (!badges.length) badges.push(`<span class="admin-tag ok">Нет</span>`);
   return badges.join("");
 }
 
@@ -1226,44 +1226,48 @@ function renderAdminPlayerPanel(player) {
       </div>
     </div>
 
-    <form class="admin-action-form" id="adminActionForm">
-      <label>Действие</label>
-      <select id="adminActionType">
-        <option value="BAN">Бан</option>
-        <option value="TEMP_BAN">Временный бан</option>
-        <option value="MUTE">Мут</option>
-        <option value="TEMP_MUTE">Временный мут</option>
-        <option value="UNBAN">Снять бан</option>
-        <option value="UNMUTE">Снять мут</option>
-        <option value="KICK">Кикнуть</option>
-        <option value="WHITELIST_REMOVE">Удалить из White-List</option>
-      </select>
-
-      <label id="adminDurationLabel" hidden>Срок</label>
-      <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
-
-      <label>Причина</label>
-      <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
-
-      <button type="submit" class="primary-btn"><i data-lucide="gavel"></i> Выполнить действие</button>
-      <p class="auth-message" id="adminActionMessage"></p>
-    </form>
-
-    <div class="admin-history-box">
-      <div class="admin-section-head compact">
-        <div>
-          <p class="eyebrow"><i data-lucide="history"></i> История</p>
-          <h3>Наказания игрока</h3>
+    <div class="admin-selected-grid">
+      <form class="admin-action-form" id="adminActionForm">
+        <label>Действие</label>
+        <input id="adminActionType" type="hidden" value="BAN" />
+        <div class="admin-action-picker" role="radiogroup" aria-label="Выбор действия">
+          <button type="button" class="active danger" data-admin-action="BAN"><i data-lucide="ban"></i><span>Бан</span></button>
+          <button type="button" class="danger" data-admin-action="TEMP_BAN"><i data-lucide="timer-off"></i><span>Временный бан</span></button>
+          <button type="button" class="warn" data-admin-action="MUTE"><i data-lucide="message-circle-off"></i><span>Мут</span></button>
+          <button type="button" class="warn" data-admin-action="TEMP_MUTE"><i data-lucide="clock-3"></i><span>Временный мут</span></button>
+          <button type="button" class="safe" data-admin-action="UNBAN"><i data-lucide="shield-check"></i><span>Снять бан</span></button>
+          <button type="button" class="safe" data-admin-action="UNMUTE"><i data-lucide="message-circle"></i><span>Снять мут</span></button>
+          <button type="button" data-admin-action="KICK"><i data-lucide="log-out"></i><span>Кикнуть</span></button>
+          <button type="button" data-admin-action="WHITELIST_REMOVE"><i data-lucide="user-minus"></i><span>Удалить из WL</span></button>
         </div>
-        <button type="button" class="admin-mini-btn" id="adminHistoryRefresh"><i data-lucide="refresh-cw"></i></button>
+
+        <label id="adminDurationLabel" hidden>Срок</label>
+        <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
+
+        <label>Причина</label>
+        <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
+
+        <button type="submit" class="primary-btn"><i data-lucide="gavel"></i> Выполнить действие</button>
+        <p class="auth-message" id="adminActionMessage"></p>
+      </form>
+
+      <div class="admin-history-box">
+        <div class="admin-section-head compact">
+          <div>
+            <p class="eyebrow"><i data-lucide="history"></i> История</p>
+            <h3>Наказания игрока</h3>
+          </div>
+          <button type="button" class="admin-mini-btn" id="adminHistoryRefresh"><i data-lucide="refresh-cw"></i></button>
+        </div>
+        <div id="adminPlayerHistory" class="admin-history-list">Загрузка…</div>
       </div>
-      <div id="adminPlayerHistory" class="admin-history-list">Загрузка…</div>
     </div>
   `;
 
   const actionType = document.getElementById("adminActionType");
   const duration = document.getElementById("adminActionDuration");
   const durationLabel = document.getElementById("adminDurationLabel");
+  const actionButtons = panel.querySelectorAll("[data-admin-action]");
 
   function syncDurationVisibility() {
     const needDuration = ["TEMP_BAN", "TEMP_MUTE"].includes(actionType.value);
@@ -1272,7 +1276,16 @@ function renderAdminPlayerPanel(player) {
     if (!needDuration) duration.value = "";
   }
 
-  actionType.addEventListener("change", syncDurationVisibility);
+  function setAdminAction(action) {
+    actionType.value = action;
+    actionButtons.forEach((button) => button.classList.toggle("active", button.dataset.adminAction === action));
+    syncDurationVisibility();
+  }
+
+  actionButtons.forEach((button) => {
+    button.addEventListener("click", () => setAdminAction(button.dataset.adminAction));
+  });
+
   syncDurationVisibility();
 
   document.getElementById("adminActionForm")?.addEventListener("submit", async (event) => {
