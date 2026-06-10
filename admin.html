@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Админ-панель — PopkinDom 4</title>
-  <link rel="stylesheet" href="style.css?v=admin-panel-1" />
+  <link rel="stylesheet" href="style.css?v=admin-panel-2" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <link rel="icon" type="image/png" href="favicon.png" />
 </head>
@@ -78,7 +78,7 @@
     </section>
 
     <section class="admin-dashboard" id="adminDashboard" hidden>
-      <div class="admin-grid">
+      <div class="admin-grid admin-grid-four">
         <article class="admin-stat glass-card">
           <i data-lucide="users-round"></i>
           <span>Игроков всего</span>
@@ -94,31 +94,77 @@
           <span>Администрация</span>
           <b id="adminAdminsCount">—</b>
         </article>
+        <article class="admin-stat glass-card">
+          <i data-lucide="list-checks"></i>
+          <span>Заявки WL</span>
+          <b id="adminWhitelistRequestsCount">—</b>
+        </article>
       </div>
 
-      <div class="admin-table-card glass-card">
+      <div class="admin-panel-grid">
+        <section class="admin-table-card glass-card">
+          <div class="admin-section-head">
+            <div>
+              <p class="eyebrow"><i data-lucide="search"></i> Модерация</p>
+              <h2>Выбор игрока</h2>
+            </div>
+          </div>
+          <div class="admin-search-row">
+            <input id="adminPlayerSearch" type="search" placeholder="Найти игрока по нику" autocomplete="off" />
+            <button type="button" class="admin-mini-btn" id="adminPlayersRefresh"><i data-lucide="refresh-cw"></i> Обновить</button>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table admin-players-table">
+              <thead>
+                <tr>
+                  <th>Игрок</th>
+                  <th>Роль</th>
+                  <th>Статус</th>
+                  <th>WL</th>
+                  <th>Наказания</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="adminPlayersTable">
+                <tr><td colspan="6">Загрузка…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="admin-action-card glass-card" id="adminPlayerPanel">
+          <div class="admin-empty-state">
+            <i data-lucide="mouse-pointer-click"></i>
+            <h2>Выбери игрока</h2>
+            <p>После выбора откроется меню действий: бан, мут, снятие наказаний, kick, whitelist и история.</p>
+          </div>
+        </aside>
+      </div>
+
+      <section class="admin-table-card glass-card">
         <div class="admin-section-head">
           <div>
-            <p class="eyebrow"><i data-lucide="history"></i> Быстрый просмотр</p>
-            <h2>Последние игроки</h2>
+            <p class="eyebrow"><i data-lucide="clipboard-list"></i> Whitelist</p>
+            <h2>Заявки игроков</h2>
           </div>
+          <button type="button" class="admin-mini-btn" id="adminRequestsRefresh"><i data-lucide="refresh-cw"></i> Обновить</button>
         </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
               <tr>
                 <th>Игрок</th>
+                <th>Дата заявки</th>
                 <th>Роль</th>
-                <th>Статус</th>
-                <th>Последний вход</th>
+                <th>Действие</th>
               </tr>
             </thead>
-            <tbody id="adminPlayersTable">
+            <tbody id="adminWhitelistRequestsTable">
               <tr><td colspan="4">Загрузка…</td></tr>
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
     </section>
   </section>
 </main>
@@ -129,6 +175,6 @@
     <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
   </div>
 </footer>
-<script src="script.js?v=admin-panel-1"></script>
+<script src="script.js?v=admin-panel-2"></script>
 </body>
 </html>

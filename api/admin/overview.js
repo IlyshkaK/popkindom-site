@@ -19,10 +19,11 @@ module.exports = async function handler(req, res) {
     const admin = await getAdminUser(req);
     if (!admin) return sendJson(res, 403, { message: 'Нужно подтвердить вход PIN-кодом.' });
 
-    const [usersCount, onlineCount, adminCount] = await Promise.all([
+    const [usersCount, onlineCount, adminCount, whitelistRequestsCount] = await Promise.all([
       safeCount(`SELECT COUNT(*) FROM pd_users;`),
       safeCount(`SELECT COUNT(*) FROM players WHERE online = TRUE;`),
       safeCount(`SELECT COUNT(*) FROM pd_users WHERE role IN ('ADMIN', 'OWNER');`),
+      safeCount(`SELECT COUNT(*) FROM moderation_whitelist_requests WHERE status = 'PENDING';`),
     ]);
 
     let latestPlayers = [];
@@ -51,6 +52,7 @@ module.exports = async function handler(req, res) {
         usersCount,
         onlineCount,
         adminCount,
+        whitelistRequestsCount,
       },
       latestPlayers,
     });

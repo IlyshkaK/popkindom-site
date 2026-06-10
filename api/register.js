@@ -48,8 +48,17 @@ module.exports = async function handler(req, res) {
     );
 
     const user = created.rows[0];
+
+    await query(
+      `INSERT INTO moderation_whitelist_requests (user_id, player_name, player_name_lower, status)
+       VALUES ($1, $2, $3, 'PENDING')
+       ON CONFLICT (player_name_lower) WHERE status = 'PENDING'
+       DO NOTHING;`,
+      [user.id, username, usernameLower]
+    );
+
     await createWebSession(user, ip, res);
-    await logSecurity(user, ip, 'REGISTER_WEB', 'Аккаунт зарегистрирован через сайт');
+    await logSecurity(user, ip, 'REGISTER_WEB', 'Аккаунт зарегистрирован через сайт, создана заявка в whitelist');
 
     return sendJson(res, 201, { user: publicUser(user) });
   } catch (error) {

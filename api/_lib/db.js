@@ -85,6 +85,79 @@ async function ensureAuthTables() {
     await query(`CREATE INDEX IF NOT EXISTS idx_pd_users_username_lower ON pd_users(username_lower);`);
     await query(`CREATE INDEX IF NOT EXISTS idx_pd_auth_sessions_lookup ON pd_auth_sessions(user_id, session_type, ip_address, revoked, expires_at);`);
     await query(`CREATE INDEX IF NOT EXISTS idx_pd_auth_sessions_token ON pd_auth_sessions(token_hash);`);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS moderation_punishments (
+        id BIGSERIAL PRIMARY KEY,
+        player_name TEXT NOT NULL,
+        player_name_lower TEXT NOT NULL,
+        offline_uuid TEXT,
+        type TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        moderator_name TEXT NOT NULL,
+        moderator_uuid TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at TIMESTAMPTZ,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        removed_by TEXT,
+        removed_at TIMESTAMPTZ,
+        remove_reason TEXT,
+        source TEXT NOT NULL DEFAULT 'WEBSITE'
+      );
+    `);
+
+    await query(`
+      CREATE INDEX IF NOT EXISTS idx_moderation_punishments_player_active
+      ON moderation_punishments (player_name_lower, active);
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS moderation_whitelist (
+        id BIGSERIAL PRIMARY KEY,
+        player_name TEXT NOT NULL,
+        player_name_lower TEXT NOT NULL UNIQUE,
+        offline_uuid TEXT,
+        added_by TEXT NOT NULL,
+        reason TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        removed_by TEXT,
+        removed_at TIMESTAMPTZ
+      );
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS moderation_whitelist_requests (
+        id BIGSERIAL PRIMARY KEY,
+        user_id INT NULL REFERENCES pd_users(id) ON DELETE SET NULL,
+        player_name TEXT NOT NULL,
+        player_name_lower TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'PENDING',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        reviewed_by TEXT,
+        reviewed_at TIMESTAMPTZ,
+        review_reason TEXT
+      );
+    `);
+
+    await query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_moderation_whitelist_requests_pending
+      ON moderation_whitelist_requests (player_name_lower)
+      WHERE status = 'PENDING';
+    `);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS moderation_audit_log (
+        id BIGSERIAL PRIMARY KEY,
+        action TEXT NOT NULL,
+        target_player TEXT,
+        executor TEXT NOT NULL,
+        details TEXT,
+        source TEXT NOT NULL DEFAULT 'WEBSITE',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
   })();
 
   return ensurePromise;

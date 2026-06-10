@@ -1119,7 +1119,10 @@ async function refreshAccountRealtime() {
 })();
 
 
-/* ===== MINIMAL ADMIN PANEL ===== */
+/* ===== ADMIN PANEL ===== */
+let adminSelectedPlayer = null;
+let adminPlayersCache = [];
+
 function isCurrentUserAdmin() {
   return Boolean(currentUser && ["ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase()));
 }
@@ -1129,6 +1132,20 @@ function setAdminMessage(text, type = "error") {
   if (!message) return;
   message.className = `auth-message ${type}`;
   message.textContent = text;
+}
+
+function adminStatusBadges(player) {
+  const badges = [];
+  if (player.banned) badges.push(`<span class="admin-tag danger">Бан</span>`);
+  if (player.muted) badges.push(`<span class="admin-tag warn">Мут</span>`);
+  if (!badges.length) badges.push(`<span class="admin-tag ok">Чисто</span>`);
+  return badges.join("");
+}
+
+function adminWhitelistBadge(player) {
+  return player.whitelisted
+    ? `<span class="admin-tag ok">Да</span>`
+    : `<span class="admin-tag muted">Нет</span>`;
 }
 
 async function loadAdminOverview() {
@@ -1144,28 +1161,234 @@ async function loadAdminOverview() {
   const usersCount = document.getElementById("adminUsersCount");
   const onlineCount = document.getElementById("adminOnlineCount");
   const adminsCount = document.getElementById("adminAdminsCount");
+  const wlCount = document.getElementById("adminWhitelistRequestsCount");
 
   if (usersCount) usersCount.textContent = formatNumber(data.cards.usersCount);
   if (onlineCount) onlineCount.textContent = formatNumber(data.cards.onlineCount);
   if (adminsCount) adminsCount.textContent = formatNumber(data.cards.adminCount);
+  if (wlCount) wlCount.textContent = formatNumber(data.cards.whitelistRequestsCount || 0);
 
+  await Promise.all([loadAdminPlayers(), loadAdminWhitelistRequests()]);
+  refreshLucideIcons();
+}
+
+async function loadAdminPlayers() {
   const table = document.getElementById("adminPlayersTable");
-  if (table) {
-    const rows = data.latestPlayers || [];
-    table.innerHTML = rows.length ? rows.map((player) => {
+  if (!table) return;
+
+  const search = document.getElementById("adminPlayerSearch")?.value?.trim() || "";
+  table.innerHTML = `<tr><td colspan="6">Загрузка…</td></tr>`;
+
+  try {
+    const data = await apiRequest(`/api/admin/players?search=${encodeURIComponent(search)}`);
+    adminPlayersCache = data.players || [];
+
+    table.innerHTML = adminPlayersCache.length ? adminPlayersCache.map((player) => {
       const online = player.online === true;
       return `
-        <tr>
+        <tr class="${adminSelectedPlayer?.username_lower === player.username_lower ? "selected" : ""}">
           <td><span class="admin-player-cell"><img src="${minecraftHeadUrl(player.username, 28)}" alt=""> ${player.username || "—"}</span></td>
           <td>${player.role || "PLAYER"}</td>
           <td><span class="admin-status ${online ? "online" : "offline"}">${online ? "Онлайн" : "Офлайн"}</span></td>
-          <td>${formatDate(player.last_web_login || player.player_updated_at || player.registered_at)}</td>
+          <td>${adminWhitelistBadge(player)}</td>
+          <td><span class="admin-tags">${adminStatusBadges(player)}</span></td>
+          <td><button type="button" class="admin-mini-btn" data-admin-select="${player.username}"><i data-lucide="settings-2"></i> Открыть</button></td>
         </tr>
       `;
-    }).join("") : `<tr><td colspan="4">Игроков пока нет.</td></tr>`;
+    }).join("") : `<tr><td colspan="6">Игроки не найдены.</td></tr>`;
+
+    table.querySelectorAll("[data-admin-select]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const username = button.dataset.adminSelect;
+        const player = adminPlayersCache.find((item) => item.username === username);
+        if (player) renderAdminPlayerPanel(player);
+      });
+    });
+
+    refreshLucideIcons();
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="6">${error.message || "Ошибка загрузки игроков."}</td></tr>`;
+  }
+}
+
+function renderAdminPlayerPanel(player) {
+  adminSelectedPlayer = player;
+  const panel = document.getElementById("adminPlayerPanel");
+  if (!panel) return;
+
+  panel.innerHTML = `
+    <div class="admin-player-profile">
+      <img src="${minecraftHeadUrl(player.username, 64)}" alt="">
+      <div>
+        <p class="eyebrow"><i data-lucide="user-cog"></i> Игрок выбран</p>
+        <h2>${player.username}</h2>
+        <div class="admin-tags">${adminWhitelistBadge(player)} ${adminStatusBadges(player)}</div>
+      </div>
+    </div>
+
+    <form class="admin-action-form" id="adminActionForm">
+      <label>Действие</label>
+      <select id="adminActionType">
+        <option value="BAN">Бан</option>
+        <option value="TEMP_BAN">Временный бан</option>
+        <option value="MUTE">Мут</option>
+        <option value="TEMP_MUTE">Временный мут</option>
+        <option value="UNBAN">Снять бан</option>
+        <option value="UNMUTE">Снять мут</option>
+        <option value="KICK">Кикнуть</option>
+        <option value="WHITELIST_REMOVE">Удалить из White-List</option>
+      </select>
+
+      <label id="adminDurationLabel" hidden>Срок</label>
+      <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
+
+      <label>Причина</label>
+      <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
+
+      <button type="submit" class="primary-btn"><i data-lucide="gavel"></i> Выполнить действие</button>
+      <p class="auth-message" id="adminActionMessage"></p>
+    </form>
+
+    <div class="admin-history-box">
+      <div class="admin-section-head compact">
+        <div>
+          <p class="eyebrow"><i data-lucide="history"></i> История</p>
+          <h3>Наказания игрока</h3>
+        </div>
+        <button type="button" class="admin-mini-btn" id="adminHistoryRefresh"><i data-lucide="refresh-cw"></i></button>
+      </div>
+      <div id="adminPlayerHistory" class="admin-history-list">Загрузка…</div>
+    </div>
+  `;
+
+  const actionType = document.getElementById("adminActionType");
+  const duration = document.getElementById("adminActionDuration");
+  const durationLabel = document.getElementById("adminDurationLabel");
+
+  function syncDurationVisibility() {
+    const needDuration = ["TEMP_BAN", "TEMP_MUTE"].includes(actionType.value);
+    duration.hidden = !needDuration;
+    durationLabel.hidden = !needDuration;
+    if (!needDuration) duration.value = "";
   }
 
+  actionType.addEventListener("change", syncDurationVisibility);
+  syncDurationVisibility();
+
+  document.getElementById("adminActionForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await submitAdminPlayerAction(player.username);
+  });
+
+  document.getElementById("adminHistoryRefresh")?.addEventListener("click", () => loadAdminPlayerHistory(player.username));
+
+  loadAdminPlayerHistory(player.username);
+  loadAdminPlayers();
   refreshLucideIcons();
+}
+
+async function submitAdminPlayerAction(username) {
+  const action = document.getElementById("adminActionType")?.value;
+  const duration = document.getElementById("adminActionDuration")?.value?.trim() || "";
+  const reason = document.getElementById("adminActionReason")?.value?.trim() || "Действие выполнено через админ-панель сайта";
+  const message = document.getElementById("adminActionMessage");
+
+  if (message) {
+    message.className = "auth-message";
+    message.textContent = "Выполняю…";
+  }
+
+  try {
+    const result = await apiRequest("/api/admin/player-action", {
+      method: "POST",
+      body: JSON.stringify({ username, action, duration, reason })
+    });
+
+    if (message) {
+      message.className = "auth-message success";
+      message.textContent = result.message || "Готово.";
+    }
+
+    await Promise.all([loadAdminPlayers(), loadAdminPlayerHistory(username)]);
+  } catch (error) {
+    if (message) {
+      message.className = "auth-message error";
+      message.textContent = error.message || "Ошибка действия.";
+    }
+  }
+}
+
+async function loadAdminPlayerHistory(username) {
+  const box = document.getElementById("adminPlayerHistory");
+  if (!box) return;
+
+  box.textContent = "Загрузка…";
+
+  try {
+    const data = await apiRequest(`/api/admin/player-history?username=${encodeURIComponent(username)}`);
+    const rows = data.history || [];
+
+    box.innerHTML = rows.length ? rows.map((row) => {
+      const active = row.active === true;
+      const until = row.expires_at ? `до ${formatDate(row.expires_at)}` : "навсегда";
+      return `
+        <div class="admin-history-item">
+          <div><b>${row.type}</b> <span class="admin-tag ${active ? "ok" : "muted"}">${active ? "Активно" : "Снято"}</span></div>
+          <p>${row.reason || "Без причины"}</p>
+          <small>${formatDate(row.created_at)} · ${until} · ${row.moderator_name || "—"} · ${row.source || "SERVER"}</small>
+        </div>
+      `;
+    }).join("") : `<div class="admin-empty-mini">Истории наказаний нет.</div>`;
+  } catch (error) {
+    box.textContent = error.message || "Ошибка загрузки истории.";
+  }
+}
+
+async function loadAdminWhitelistRequests() {
+  const table = document.getElementById("adminWhitelistRequestsTable");
+  if (!table) return;
+
+  table.innerHTML = `<tr><td colspan="4">Загрузка…</td></tr>`;
+
+  try {
+    const data = await apiRequest("/api/admin/whitelist-requests");
+    const rows = data.requests || [];
+
+    table.innerHTML = rows.length ? rows.map((request) => `
+      <tr>
+        <td><span class="admin-player-cell"><img src="${minecraftHeadUrl(request.player_name, 28)}" alt=""> ${request.player_name}</span></td>
+        <td>${formatDate(request.created_at)}</td>
+        <td>${request.role || "PLAYER"}</td>
+        <td class="admin-request-actions">
+          <button type="button" class="admin-mini-btn approve" data-request-approve="${request.id}"><i data-lucide="check"></i> Одобрить</button>
+          <button type="button" class="admin-mini-btn reject" data-request-reject="${request.id}"><i data-lucide="x"></i> Отклонить</button>
+        </td>
+      </tr>
+    `).join("") : `<tr><td colspan="4">Активных заявок нет.</td></tr>`;
+
+    table.querySelectorAll("[data-request-approve]").forEach((button) => {
+      button.addEventListener("click", () => reviewWhitelistRequest(button.dataset.requestApprove, "APPROVE"));
+    });
+
+    table.querySelectorAll("[data-request-reject]").forEach((button) => {
+      button.addEventListener("click", () => reviewWhitelistRequest(button.dataset.requestReject, "REJECT"));
+    });
+
+    refreshLucideIcons();
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="4">${error.message || "Ошибка загрузки заявок."}</td></tr>`;
+  }
+}
+
+async function reviewWhitelistRequest(id, decision) {
+  const reason = decision === "APPROVE" ? "Заявка одобрена через админ-панель" : "Заявка отклонена через админ-панель";
+
+  await apiRequest("/api/admin/whitelist-requests", {
+    method: "POST",
+    body: JSON.stringify({ id: Number(id), decision, reason })
+  });
+
+  await Promise.all([loadAdminWhitelistRequests(), loadAdminPlayers(), loadAdminOverview()]);
 }
 
 async function initAdminPanel() {
@@ -1208,6 +1431,7 @@ async function initAdminPanel() {
     if (status.verified) {
       if (pinGate) pinGate.hidden = true;
       await loadAdminOverview();
+      bindAdminControls();
       return;
     }
 
@@ -1263,6 +1487,7 @@ async function initAdminPanel() {
         pinRepeat.value = "";
         if (pinGate) pinGate.hidden = true;
         await loadAdminOverview();
+        bindAdminControls();
       } catch (error) {
         setAdminMessage(error.message, "error");
       } finally {
@@ -1272,3 +1497,27 @@ async function initAdminPanel() {
   }
 }
 
+function bindAdminControls() {
+  const search = document.getElementById("adminPlayerSearch");
+  const refreshPlayers = document.getElementById("adminPlayersRefresh");
+  const refreshRequests = document.getElementById("adminRequestsRefresh");
+
+  if (search && !search.dataset.bound) {
+    search.dataset.bound = "true";
+    let timer = null;
+    search.addEventListener("input", () => {
+      clearTimeout(timer);
+      timer = setTimeout(loadAdminPlayers, 250);
+    });
+  }
+
+  if (refreshPlayers && !refreshPlayers.dataset.bound) {
+    refreshPlayers.dataset.bound = "true";
+    refreshPlayers.addEventListener("click", loadAdminPlayers);
+  }
+
+  if (refreshRequests && !refreshRequests.dataset.bound) {
+    refreshRequests.dataset.bound = "true";
+    refreshRequests.addEventListener("click", loadAdminWhitelistRequests);
+  }
+}
