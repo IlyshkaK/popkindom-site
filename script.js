@@ -955,41 +955,33 @@ function renderAccountData(data) {
 
   setText("profileUsername", username);
 
-  const roleMap = {
-    PLAYER: "Игрок",
-    USER: "Игрок",
-    MEMBER: "Игрок",
-    MODERATOR: "Модератор",
-    MODER: "Модератор",
-    ADMIN: "Администратор",
-    ADMINISTRATOR: "Администратор",
-    OWNER: "Владелец",
-    "ИГРОК": "Игрок",
-    "МОДЕРАТОР": "Модератор",
-    "АДМИНИСТРАТОР": "Администратор",
-    "ВЛАДЕЛЕЦ": "Владелец"
-  };
-  const roleClassMap = {
-    PLAYER: "player",
-    USER: "player",
-    MEMBER: "player",
-    MODERATOR: "moderator",
-    MODER: "moderator",
-    ADMIN: "admin",
-    ADMINISTRATOR: "admin",
-    OWNER: "owner",
-    "ИГРОК": "player",
-    "МОДЕРАТОР": "moderator",
-    "АДМИНИСТРАТОР": "admin",
-    "ВЛАДЕЛЕЦ": "owner"
-  };
-  const roleRaw = String(data.user?.role || player.role || "PLAYER").toUpperCase();
-  const roleLabel = roleMap[roleRaw] || roleRaw;
-  const roleClass = roleClassMap[roleRaw] || "player";
+  const roleRawOriginal = String(data.user?.role || player.role || "PLAYER").trim();
+  const roleRaw = roleRawOriginal.toUpperCase();
+
+  function resolveRole(raw) {
+    const value = String(raw || "PLAYER").trim().toUpperCase();
+
+    if (value.includes("OWNER") || value.includes("ВЛАДЕЛ")) {
+      return { label: "Владелец", className: "owner" };
+    }
+
+    if (value.includes("ADMIN") || value.includes("АДМИН")) {
+      return { label: "Администратор", className: "admin" };
+    }
+
+    if (value.includes("MODER") || value.includes("МОДЕР")) {
+      return { label: "Модератор", className: "moderator" };
+    }
+
+    return { label: "Игрок", className: "player" };
+  }
+
+  const resolvedRole = resolveRole(roleRaw);
   const roleElement = document.getElementById("profileRole");
   if (roleElement) {
-    roleElement.textContent = roleLabel;
-    roleElement.className = `role-badge role-${roleClass}`;
+    roleElement.textContent = resolvedRole.label;
+    roleElement.className = `role-badge role-${resolvedRole.className}`;
+    roleElement.dataset.role = resolvedRole.className;
   }
 
   const status = document.getElementById("profileOnlineStatus");
