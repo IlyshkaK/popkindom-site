@@ -26,16 +26,17 @@ function minecraftHeadUrl(username, size = 36) {
   return `https://minotar.net/helm/${safeName}/${size}.png`;
 }
 
-function minecraftBustUrl(username, size = 320) {
+function minecraftBustUrl(username, size = 512) {
   const safeName = encodeURIComponent(username || "Steve");
-  // 3D bust render with skin outer layer: hat / jacket / sleeves.
-  // Starlight renders the actual 3D model instead of a flat head texture.
-  return `https://starlightskins.lunareclipse.studio/render/bust/${safeName}/full?scale=${size}`;
+  // Настоящий 3D bust-рендер: голова + плечи + тело, с поддержкой outer layer скина.
+  // Используем отдельный API, потому что плоские helm/armor-ссылки не показывают 3D-слои.
+  return `https://identicraft.js.org/bust/${safeName}/${size}.png`;
 }
 
-function minecraftBustFallbackUrl(username, size = 320) {
+function minecraftBustFallbackUrl(username, size = 512) {
   const safeName = encodeURIComponent(username || "Steve");
-  return `https://minotar.net/armor/bust/${safeName}/${size}.png`;
+  // Резервный 3D-рендер с overlay/layers.
+  return `https://visage.surgeplay.com/bust/${size}/${safeName}.png`;
 }
 
 function setAuthButtonIcon(iconElement, username) {
@@ -992,13 +993,14 @@ function renderAccountData(data) {
 
   const playerHead = document.getElementById("playerHead");
   if (playerHead) {
-    playerHead.src = minecraftBustUrl(username, 300);
+    const skinId = player.uuid || player.player_uuid || player.minecraft_uuid || data.user?.uuid || username;
+    playerHead.src = minecraftBustUrl(skinId, 512);
     playerHead.onerror = () => {
       playerHead.onerror = () => {
         playerHead.onerror = null;
-        playerHead.src = minecraftBustFallbackUrl("Steve", 300);
+        playerHead.src = minecraftBustFallbackUrl("Steve", 512);
       };
-      playerHead.src = minecraftBustFallbackUrl(username, 300);
+      playerHead.src = minecraftBustFallbackUrl(skinId, 512);
     };
   }
 
