@@ -1127,6 +1127,33 @@ function isCurrentUserAdmin() {
   return Boolean(currentUser && ["ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase()));
 }
 
+function resolveAdminRole(raw) {
+  const value = String(raw || "PLAYER").trim().toUpperCase();
+
+  if (value.includes("OWNER") || value.includes("ВЛАДЕЛ")) {
+    return { label: "Владелец", className: "owner" };
+  }
+
+  if (value.includes("ADMIN") || value.includes("АДМИН")) {
+    return { label: "Администратор", className: "admin" };
+  }
+
+  if (value.includes("MODER") || value.includes("МОДЕР")) {
+    return { label: "Модератор", className: "moderator" };
+  }
+
+  return { label: "Игрок", className: "player" };
+}
+
+function adminRoleBadge(raw) {
+  const role = resolveAdminRole(raw);
+  return `<span class="role-badge role-${role.className} admin-role-badge">${role.label}</span>`;
+}
+
+function adminUserBadge(username, roleRaw) {
+  return `<span class="admin-user-badge-name">${username || "Администратор"}</span>${adminRoleBadge(roleRaw)}`;
+}
+
 function setAdminMessage(text, type = "error") {
   const message = document.getElementById("adminPinMessage");
   if (!message) return;
@@ -1156,7 +1183,7 @@ async function loadAdminOverview() {
   dashboard.hidden = false;
 
   const badge = document.getElementById("adminBadge");
-  if (badge) badge.textContent = `${data.admin.username} · ${data.admin.role}`;
+  if (badge) badge.innerHTML = adminUserBadge(data.admin.username, data.admin.role);
 
   const usersCount = document.getElementById("adminUsersCount");
   const onlineCount = document.getElementById("adminOnlineCount");
@@ -1188,7 +1215,7 @@ async function loadAdminPlayers() {
       return `
         <tr class="${adminSelectedPlayer?.username_lower === player.username_lower ? "selected" : ""}">
           <td><span class="admin-player-cell"><img src="${minecraftHeadUrl(player.username, 28)}" alt=""> ${player.username || "—"}</span></td>
-          <td>${player.role || "PLAYER"}</td>
+          <td>${adminRoleBadge(player.role)}</td>
           <td><span class="admin-status ${online ? "online" : "offline"}">${online ? "Онлайн" : "Офлайн"}</span></td>
           <td>${adminWhitelistBadge(player)}</td>
           <td><span class="admin-tags">${adminStatusBadges(player)}</span></td>
@@ -1222,6 +1249,7 @@ function renderAdminPlayerPanel(player) {
       <div>
         <p class="eyebrow"><i data-lucide="user-cog"></i> Игрок выбран</p>
         <h2>${player.username}</h2>
+        <div class="admin-selected-role">${adminRoleBadge(player.role)}</div>
         <div class="admin-tags">${adminWhitelistBadge(player)} ${adminStatusBadges(player)}</div>
       </div>
     </div>
@@ -1371,7 +1399,7 @@ async function loadAdminWhitelistRequests() {
       <tr>
         <td><span class="admin-player-cell"><img src="${minecraftHeadUrl(request.player_name, 28)}" alt=""> ${request.player_name}</span></td>
         <td>${formatDate(request.created_at)}</td>
-        <td>${request.role || "PLAYER"}</td>
+        <td>${adminRoleBadge(request.role)}</td>
         <td class="admin-request-actions">
           <button type="button" class="admin-mini-btn approve" data-request-approve="${request.id}"><i data-lucide="check"></i> Одобрить</button>
           <button type="button" class="admin-mini-btn reject" data-request-reject="${request.id}"><i data-lucide="x"></i> Отклонить</button>
@@ -1439,7 +1467,7 @@ async function initAdminPanel() {
 
   try {
     const status = await apiRequest("/api/admin?section=status");
-    if (badge) badge.textContent = `${status.user.username} · ${status.user.role}`;
+    if (badge) badge.innerHTML = adminUserBadge(status.user.username, status.user.role);
 
     if (status.verified) {
       if (pinGate) pinGate.hidden = true;

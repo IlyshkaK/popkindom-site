@@ -4953,3 +4953,45 @@ body.is-admin .admin-only {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ===== ADMIN ROLE BADGES: unified with personal cabinet role style ===== */
+.admin-role-badge {
+  margin: 0 !important;
+  min-height: 30px;
+  padding: 8px 12px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  text-transform: none;
+}
+
+.admin-table .admin-role-badge {
+  min-height: 28px;
+  padding: 7px 11px !important;
+  font-size: 12px !important;
+}
+
+.admin-selected-role {
+  margin: 6px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-badge .admin-role-badge {
+  min-height: 32px;
+  padding: 8px 13px !important;
+}
+
+.admin-user-badge-name {
+  color: #8ef052;
+  font-weight: 1000;
+}
