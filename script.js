@@ -965,10 +965,10 @@ function renderAccountData(data) {
 
   const playerHead = document.getElementById("playerHead");
   if (playerHead) {
-    playerHead.src = minecraftBustUrl(username, 180);
+    playerHead.src = minecraftBustUrl(username, 260);
     playerHead.onerror = () => {
       playerHead.onerror = null;
-      playerHead.src = minecraftBustUrl("Steve", 180);
+      playerHead.src = minecraftBustUrl("Steve", 260);
     };
   }
 

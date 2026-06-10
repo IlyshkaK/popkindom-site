@@ -3654,3 +3654,67 @@ body.is-admin .admin-only {
   transform-origin: center bottom;
   image-rendering: auto;
 }
+
+/* ===== PLAYER RENDER FIX: профиль без рамки вокруг аватара ===== */
+.profile-hero {
+  grid-template-columns: 156px minmax(0, 1fr) minmax(240px, 300px) !important;
+  column-gap: 28px !important;
+}
+
+.skin-head {
+  width: 148px !important;
+  height: 160px !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+}
+
+.skin-head img {
+  width: 172px !important;
+  height: 172px !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  image-rendering: pixelated !important;
+  transform: translateY(6px) scale(1.08) !important;
+  transform-origin: center bottom !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+@media (max-width: 1380px) {
+  .profile-hero {
+    grid-template-columns: 142px minmax(0, 1fr) minmax(220px, 260px) !important;
+  }
+
+  .skin-head {
+    width: 134px !important;
+    height: 150px !important;
+  }
+
+  .skin-head img {
+    width: 160px !important;
+    height: 160px !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .profile-hero {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+  }
+
+  .skin-head {
+    margin: 0 auto !important;
+  }
+}
