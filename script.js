@@ -1152,7 +1152,7 @@ async function loadAdminOverview() {
   const dashboard = document.getElementById("adminDashboard");
   if (!dashboard) return;
 
-  const data = await apiRequest("/api/admin/overview");
+  const data = await apiRequest("/api/admin?section=overview");
   dashboard.hidden = false;
 
   const badge = document.getElementById("adminBadge");
@@ -1180,7 +1180,7 @@ async function loadAdminPlayers() {
   table.innerHTML = `<tr><td colspan="6">Загрузка…</td></tr>`;
 
   try {
-    const data = await apiRequest(`/api/admin/players?search=${encodeURIComponent(search)}`);
+    const data = await apiRequest(`/api/admin?section=players&search=${encodeURIComponent(search)}`);
     adminPlayersCache = data.players || [];
 
     table.innerHTML = adminPlayersCache.length ? adminPlayersCache.map((player) => {
@@ -1299,7 +1299,7 @@ async function submitAdminPlayerAction(username) {
   }
 
   try {
-    const result = await apiRequest("/api/admin/player-action", {
+    const result = await apiRequest("/api/admin?section=player-action", {
       method: "POST",
       body: JSON.stringify({ username, action, duration, reason })
     });
@@ -1325,7 +1325,7 @@ async function loadAdminPlayerHistory(username) {
   box.textContent = "Загрузка…";
 
   try {
-    const data = await apiRequest(`/api/admin/player-history?username=${encodeURIComponent(username)}`);
+    const data = await apiRequest(`/api/admin?section=player-history&username=${encodeURIComponent(username)}`);
     const rows = data.history || [];
 
     box.innerHTML = rows.length ? rows.map((row) => {
@@ -1351,7 +1351,7 @@ async function loadAdminWhitelistRequests() {
   table.innerHTML = `<tr><td colspan="4">Загрузка…</td></tr>`;
 
   try {
-    const data = await apiRequest("/api/admin/whitelist-requests");
+    const data = await apiRequest("/api/admin?section=whitelist-requests");
     const rows = data.requests || [];
 
     table.innerHTML = rows.length ? rows.map((request) => `
@@ -1383,7 +1383,7 @@ async function loadAdminWhitelistRequests() {
 async function reviewWhitelistRequest(id, decision) {
   const reason = decision === "APPROVE" ? "Заявка одобрена через админ-панель" : "Заявка отклонена через админ-панель";
 
-  await apiRequest("/api/admin/whitelist-requests", {
+  await apiRequest("/api/admin?section=whitelist-requests", {
     method: "POST",
     body: JSON.stringify({ id: Number(id), decision, reason })
   });
@@ -1425,7 +1425,7 @@ async function initAdminPanel() {
   }
 
   try {
-    const status = await apiRequest("/api/admin/status");
+    const status = await apiRequest("/api/admin?section=status");
     if (badge) badge.textContent = `${status.user.username} · ${status.user.role}`;
 
     if (status.verified) {
@@ -1477,7 +1477,7 @@ async function initAdminPanel() {
 
       try {
         pinSubmit.disabled = true;
-        await apiRequest(mode === "setup" ? "/api/admin/setup-pin" : "/api/admin/verify-pin", {
+        await apiRequest(mode === "setup" ? "/api/admin?section=setup-pin" : "/api/admin?section=verify-pin", {
           method: "POST",
           body: JSON.stringify({ pin, pinRepeat: pinRepeatValue })
         });

@@ -1,6 +1,6 @@
-const { query } = require('./_lib/db');
-const { sendJson, methodNotAllowed } = require('./_lib/http');
-const { getUserBySession } = require('./_lib/security');
+const { query } = require('../lib/db');
+const { sendJson, methodNotAllowed } = require('../lib/http');
+const { getUserBySession } = require('../lib/security');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {

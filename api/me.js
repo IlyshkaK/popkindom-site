@@ -1,6 +1,6 @@
-const { query, ensureAuthTables } = require('./_lib/db');
-const { sendJson, methodNotAllowed } = require('./_lib/http');
-const { getUserBySession, publicUser } = require('./_lib/security');
+const { query, ensureAuthTables } = require('../lib/db');
+const { sendJson, methodNotAllowed } = require('../lib/http');
+const { getUserBySession, publicUser } = require('../lib/security');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return methodNotAllowed(res);

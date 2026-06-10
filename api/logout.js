@@ -1,12 +1,12 @@
-const { query, ensureAuthTables } = require('./_lib/db');
-const { sendJson, methodNotAllowed, parseCookies } = require('./_lib/http');
+const { query, ensureAuthTables } = require('../lib/db');
+const { sendJson, methodNotAllowed, parseCookies } = require('../lib/http');
 const {
   COOKIE_NAME,
   hashToken,
   getClientIp,
   logSecurity,
   clearSessionCookie,
-} = require('./_lib/security');
+} = require('../lib/security');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return methodNotAllowed(res);

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
-const { query, ensureAuthTables } = require('./_lib/db');
-const { sendJson, methodNotAllowed, readJson } = require('./_lib/http');
+const { query, ensureAuthTables } = require('../lib/db');
+const { sendJson, methodNotAllowed, readJson } = require('../lib/http');
 const {
   getClientIp,
   isValidMinecraftNick,
@@ -8,7 +8,7 @@ const {
   publicUser,
   createWebSession,
   logSecurity,
-} = require('./_lib/security');
+} = require('../lib/security');
 
 const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS || 12);
 
