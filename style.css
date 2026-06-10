@@ -5385,3 +5385,39 @@ body.admin-pin-locked .footer {
     min-width: 640px;
   }
 }
+
+
+/* ===== ADMIN PIN INPUT FIX: не смещать текст при вводе ===== */
+.admin-pin-form input,
+.admin-pin-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  text-align: center !important;
+  text-indent: 8px;
+  letter-spacing: 8px !important;
+  line-height: 56px;
+  caret-color: #8ef052;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-pin-form input::placeholder,
+.admin-pin-input::placeholder {
+  text-align: center;
+  letter-spacing: 8px;
+  text-indent: 8px;
+}
+
+.admin-pin-form input::-ms-reveal,
+.admin-pin-form input::-ms-clear,
+.admin-pin-input::-ms-reveal,
+.admin-pin-input::-ms-clear {
+  display: none;
+}
+
+.admin-pin-input:not(:placeholder-shown) {
+  -webkit-text-security: disc;
+  text-security: disc;
+}

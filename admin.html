@@ -73,8 +73,8 @@
         <p id="adminPinText">Для входа в админ-панель подтвердите 4-значный PIN-код.</p>
 
         <form id="adminPinForm" class="admin-pin-form">
-          <input id="adminPinInput" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="PIN-код" autocomplete="off" required />
-          <input id="adminPinRepeat" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Повторите PIN" autocomplete="off" hidden />
+          <input id="adminPinInput" class="admin-pin-input" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="PIN-код" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" required />
+          <input id="adminPinRepeat" class="admin-pin-input" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Повторите PIN" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" hidden />
           <button type="submit" class="primary-btn" id="adminPinSubmit"><i data-lucide="key-round"></i> Продолжить</button>
         </form>
         <p class="auth-message" id="adminPinMessage"></p>
