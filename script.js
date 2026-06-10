@@ -26,9 +26,9 @@ function minecraftHeadUrl(username, size = 36) {
   return `https://minotar.net/helm/${safeName}/${size}.png`;
 }
 
-function minecraftBustUrl(username, size = 260) {
+function minecraftBustUrl(username, size = 320) {
   const safeName = encodeURIComponent(username || "Steve");
-  // armor/bust отдаёт рендер с включённым внешним 3D-слоем скина: шляпы, рукава, куртка и т.д.
+  // armor/bust отдаёт 3D bust-рендер с включённым outer layer скина: шляпа, рукава, куртка.
   return `https://minotar.net/armor/bust/${safeName}/${size}.png`;
 }
 
@@ -950,31 +950,46 @@ function renderAccountData(data) {
 
   const roleMap = {
     PLAYER: "Игрок",
+    USER: "Игрок",
+    MEMBER: "Игрок",
     MODERATOR: "Модератор",
+    MODER: "Модератор",
     ADMIN: "Администратор",
+    ADMINISTRATOR: "Администратор",
     OWNER: "Владелец"
+  };
+  const roleClassMap = {
+    PLAYER: "player",
+    USER: "player",
+    MEMBER: "player",
+    MODERATOR: "moderator",
+    MODER: "moderator",
+    ADMIN: "admin",
+    ADMINISTRATOR: "admin",
+    OWNER: "owner"
   };
   const roleRaw = String(data.user?.role || player.role || "PLAYER").toUpperCase();
   const roleLabel = roleMap[roleRaw] || roleRaw;
+  const roleClass = roleClassMap[roleRaw] || "player";
   const roleElement = document.getElementById("profileRole");
   if (roleElement) {
     roleElement.textContent = roleLabel;
-    roleElement.className = `role-badge role-${roleRaw.toLowerCase()}`;
+    roleElement.className = `role-badge role-${roleClass}`;
   }
 
   const status = document.getElementById("profileOnlineStatus");
   if (status) {
     const online = player.online === true;
-    status.innerHTML = `<span class="status-dot"></span>${online ? "Онлайн" : "Оффлайн"}`;
+    status.innerHTML = `<span class="status-dot" aria-hidden="true"></span>${online ? "Онлайн" : "Офлайн"}`;
     status.className = online ? "status online" : "status offline";
   }
 
   const playerHead = document.getElementById("playerHead");
   if (playerHead) {
-    playerHead.src = minecraftBustUrl(username, 260);
+    playerHead.src = minecraftBustUrl(username, 320);
     playerHead.onerror = () => {
       playerHead.onerror = null;
-      playerHead.src = minecraftBustUrl("Steve", 260);
+      playerHead.src = minecraftBustUrl("Steve", 320);
     };
   }
 
