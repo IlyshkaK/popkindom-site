@@ -26,8 +26,9 @@ function minecraftHeadUrl(username, size = 36) {
   return `https://minotar.net/helm/${safeName}/${size}.png`;
 }
 
-function minecraftBustUrl(username, size = 180) {
+function minecraftBustUrl(username, size = 260) {
   const safeName = encodeURIComponent(username || "Steve");
+  // armor/bust отдаёт рендер с включённым внешним 3D-слоем скина: шляпы, рукава, куртка и т.д.
   return `https://minotar.net/armor/bust/${safeName}/${size}.png`;
 }
 
@@ -954,12 +955,17 @@ function renderAccountData(data) {
     OWNER: "Владелец"
   };
   const roleRaw = String(data.user?.role || player.role || "PLAYER").toUpperCase();
-  setText("profileRole", `Роль: ${roleMap[roleRaw] || roleRaw}`);
+  const roleLabel = roleMap[roleRaw] || roleRaw;
+  const roleElement = document.getElementById("profileRole");
+  if (roleElement) {
+    roleElement.textContent = roleLabel;
+    roleElement.className = `role-badge role-${roleRaw.toLowerCase()}`;
+  }
 
   const status = document.getElementById("profileOnlineStatus");
   if (status) {
     const online = player.online === true;
-    status.textContent = online ? "Онлайн" : "Оффлайн";
+    status.innerHTML = `<span class="status-dot"></span>${online ? "Онлайн" : "Оффлайн"}`;
     status.className = online ? "status online" : "status offline";
   }
 
