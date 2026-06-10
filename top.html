@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Топ игроков — PopkinDom</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
+
+  <nav class="nav">
+    <a href="index.html">Главная</a>
+    <a href="rules.html">Правила</a>
+    <a href="top.html" class="active">Топ</a>
+    <a href="about.html">Подробней</a>
+  </nav>
+
+  <div class="auth-menu-wrap">
+    <a href="login.html" class="register-btn auth-action-btn" id="authMenuBtn">
+      <span class="auth-action-icon"><i data-lucide="log-in"></i></span>
+      <b class="auth-action-text">Войти</b>
+    </a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="account.html"><i data-lucide="user-round"></i><b>Кабинет</b></a>
+      <a href="security.html"><i data-lucide="shield"></i><b>Безопасность</b></a>
+      <a href="admin.html" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
+    </div>
+  </div>
+
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">Главная</a>
+  <a href="rules.html">Правила</a>
+  <a href="top.html">Топ</a>
+  <a href="about.html">Подробней</a>
+  <a href="login.html" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="account.html" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
+  <a href="security.html" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
+  <a href="admin.html" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
+  <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
+</div>
+
+<main class="top-page">
+  <div class="rules-bg"></div>
+  <div class="rules-dark"></div>
+
+  <section class="top-content">
+    <div class="top-hero glass-card">
+      <div>
+        <span class="about-kicker"><i data-lucide="trophy"></i> Рейтинг сезона</span>
+        <h1>Топ игроков</h1>
+        <p>Минимальная таблица лидеров по данным, которые уже собираются сервером: онлайн, блоки, мобы, смерти, урон, прыжки, крафты и зачарования.</p>
+      </div>
+      <div class="top-hero-badge">
+        <i data-lucide="arrow-down-wide-narrow"></i>
+        <b>Сортировка</b>
+        <span>от большего к меньшему</span>
+      </div>
+    </div>
+
+    <section class="top-panel glass-card">
+      <div class="top-panel-head">
+        <div>
+          <h2><i data-lucide="list-filter"></i> Выбери рейтинг</h2>
+          <p id="topDescription">Данные загружаются из статистики игроков.</p>
+        </div>
+        <button type="button" class="top-refresh-btn" id="topRefreshBtn"><i data-lucide="refresh-cw"></i> Обновить</button>
+      </div>
+
+      <div class="top-filters" id="topFilters">
+        <button type="button" class="active" data-top-category="playtime"><i data-lucide="clock"></i><span>Онлайн</span></button>
+        <button type="button" data-top-category="blocks"><i data-lucide="pickaxe"></i><span>Блоки</span></button>
+        <button type="button" data-top-category="mobs"><i data-lucide="skull"></i><span>Мобы</span></button>
+        <button type="button" data-top-category="deaths"><i data-lucide="heart-crack"></i><span>Смерти</span></button>
+        <button type="button" data-top-category="damage_dealt"><i data-lucide="swords"></i><span>Урон нанесён</span></button>
+        <button type="button" data-top-category="damage_taken"><i data-lucide="shield-alert"></i><span>Урон получен</span></button>
+        <button type="button" data-top-category="jumps"><i data-lucide="footprints"></i><span>Прыжки</span></button>
+        <button type="button" data-top-category="crafts"><i data-lucide="hammer"></i><span>Крафты</span></button>
+        <button type="button" data-top-category="enchants"><i data-lucide="sparkles"></i><span>Зачарования</span></button>
+      </div>
+
+      <div class="top-table-wrap">
+        <table class="top-table">
+          <thead>
+            <tr>
+              <th>Место</th>
+              <th>Игрок</th>
+              <th id="topMetricTitle">Значение</th>
+            </tr>
+          </thead>
+          <tbody id="topTableBody">
+            <tr><td colspan="3" class="top-empty">Загрузка…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
+    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
+    <div class="footer-links">
+      <a href="rules.html">Правила</a>
+      <a href="top.html">Топ</a>
+      <a href="https://discord.gg/88e2Rsp8GT" target="_blank">Discord</a>
+      <a href="https://t.me/popkindomcraft" target="_blank">Telegram</a>
+    </div>
+    <div class="footer-small">Minecraft является товарным знаком Mojang Studios. PopkinDom не связан с Mojang Studios.</div>
+  </div>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>

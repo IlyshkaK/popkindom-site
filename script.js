@@ -1591,3 +1591,84 @@ function bindAdminControls() {
     refreshRequests.addEventListener("click", loadAdminWhitelistRequests);
   }
 }
+
+
+/* ===== TOP PAGE ===== */
+const topTableBody = document.getElementById("topTableBody");
+const topFilters = document.getElementById("topFilters");
+const topRefreshBtn = document.getElementById("topRefreshBtn");
+const topDescription = document.getElementById("topDescription");
+const topMetricTitle = document.getElementById("topMetricTitle");
+let currentTopCategory = "playtime";
+
+function formatTopValue(value, format) {
+  if (format === "ticks") return formatTicks(value);
+  if (format === "damage") return `${formatNumber(value)} ед.`;
+  return formatNumber(value);
+}
+
+function renderTopRows(data) {
+  if (!topTableBody) return;
+
+  const players = data.players || [];
+  if (topDescription) topDescription.textContent = data.description || "Топ игроков сезона.";
+  if (topMetricTitle) topMetricTitle.textContent = data.label || "Значение";
+
+  if (!players.length) {
+    topTableBody.innerHTML = `<tr><td colspan="3" class="top-empty">Пока нет данных для этого рейтинга.</td></tr>`;
+    refreshLucideIcons();
+    return;
+  }
+
+  topTableBody.innerHTML = players.map((player, index) => {
+    const place = index + 1;
+    const medal = place === 1 ? "🥇" : place === 2 ? "🥈" : place === 3 ? "🥉" : `#${place}`;
+    const placeClass = place <= 3 ? `top-place top-place-${place}` : "top-place";
+
+    return `
+      <tr>
+        <td><span class="${placeClass}">${medal}</span></td>
+        <td>
+          <div class="top-player-cell">
+            <img src="${minecraftHeadUrl(player.username, 34)}" alt="${escapeHtml(player.username)}" onerror="this.src='https://minotar.net/helm/Steve/34.png'">
+            <b>${escapeHtml(player.username)}</b>
+          </div>
+        </td>
+        <td><span class="top-value">${formatTopValue(player.value, data.format)}</span></td>
+      </tr>
+    `;
+  }).join("");
+
+  refreshLucideIcons();
+}
+
+async function loadTop(category = currentTopCategory) {
+  if (!topTableBody) return;
+  currentTopCategory = category;
+  topTableBody.innerHTML = `<tr><td colspan="3" class="top-empty">Загрузка…</td></tr>`;
+
+  try {
+    const data = await apiRequest(`/api/top?category=${encodeURIComponent(category)}`);
+    renderTopRows(data);
+  } catch (error) {
+    topTableBody.innerHTML = `<tr><td colspan="3" class="top-empty error">${escapeHtml(error.message || "Ошибка загрузки топа.")}</td></tr>`;
+  }
+}
+
+if (topFilters) {
+  topFilters.querySelectorAll("[data-top-category]").forEach((button) => {
+    button.addEventListener("click", () => {
+      topFilters.querySelectorAll("[data-top-category]").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      loadTop(button.dataset.topCategory);
+    });
+  });
+}
+
+if (topRefreshBtn) {
+  topRefreshBtn.addEventListener("click", () => loadTop(currentTopCategory));
+}
+
+if (topTableBody) {
+  loadTop(currentTopCategory);
+}
