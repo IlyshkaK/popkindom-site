@@ -1435,6 +1435,7 @@ async function reviewWhitelistRequest(id, decision) {
 async function initAdminPanel() {
   if (!document.querySelector(".admin-page")) return;
 
+  const pinOverlay = document.getElementById("adminPinOverlay");
   const pinGate = document.getElementById("adminPinGate");
   const dashboard = document.getElementById("adminDashboard");
   const pinForm = document.getElementById("adminPinForm");
@@ -1452,8 +1453,10 @@ async function initAdminPanel() {
 
   if (!isCurrentUserAdmin()) {
     if (badge) badge.textContent = "Доступ закрыт";
+    if (dashboard) dashboard.hidden = true;
+    document.body.classList.add("admin-pin-locked");
+    if (pinOverlay) pinOverlay.hidden = false;
     if (pinGate) {
-      pinGate.hidden = false;
       pinGate.innerHTML = `
         <div class="admin-pin-icon"><i data-lucide="ban"></i></div>
         <h2>Недостаточно прав</h2>
@@ -1470,14 +1473,17 @@ async function initAdminPanel() {
     if (badge) badge.innerHTML = adminUserBadge(status.user.username, status.user.role);
 
     if (status.verified) {
-      if (pinGate) pinGate.hidden = true;
+      document.body.classList.remove("admin-pin-locked");
+      if (pinOverlay) pinOverlay.hidden = true;
+      if (dashboard) dashboard.hidden = false;
       await loadAdminOverview();
       bindAdminControls();
       return;
     }
 
-    if (dashboard) dashboard.hidden = true;
-    if (pinGate) pinGate.hidden = false;
+    document.body.classList.add("admin-pin-locked");
+    if (dashboard) dashboard.hidden = false;
+    if (pinOverlay) pinOverlay.hidden = false;
 
     if (!status.hasPin) {
       pinTitle.textContent = "Создайте PIN-код";
@@ -1496,7 +1502,8 @@ async function initAdminPanel() {
     refreshLucideIcons();
   } catch (error) {
     setAdminMessage(error.message || "Ошибка проверки доступа.", "error");
-    if (pinGate) pinGate.hidden = false;
+    document.body.classList.add("admin-pin-locked");
+    if (pinOverlay) pinOverlay.hidden = false;
   }
 
   if (pinForm) {
@@ -1526,7 +1533,9 @@ async function initAdminPanel() {
         setAdminMessage(mode === "setup" ? "PIN создан. Открываем панель..." : "Доступ разрешён. Открываем панель...", "success");
         pinInput.value = "";
         pinRepeat.value = "";
-        if (pinGate) pinGate.hidden = true;
+        document.body.classList.remove("admin-pin-locked");
+        if (pinOverlay) pinOverlay.hidden = true;
+        if (dashboard) dashboard.hidden = false;
         await loadAdminOverview();
         bindAdminControls();
       } catch (error) {

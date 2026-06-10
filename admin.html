@@ -64,18 +64,20 @@
       <div class="admin-badge" id="adminBadge">Проверка доступа…</div>
     </div>
 
-    <section class="admin-pin-card glass-card" id="adminPinGate" hidden>
-      <div class="admin-pin-icon"><i data-lucide="lock-keyhole"></i></div>
-      <h2 id="adminPinTitle">Введите PIN-код</h2>
-      <p id="adminPinText">Для входа в админ-панель подтвердите 4-значный PIN-код.</p>
+    <div class="admin-pin-overlay" id="adminPinOverlay" hidden>
+      <section class="admin-pin-card glass-card" id="adminPinGate">
+        <div class="admin-pin-icon"><i data-lucide="lock-keyhole"></i></div>
+        <h2 id="adminPinTitle">Введите PIN-код</h2>
+        <p id="adminPinText">Для входа в админ-панель подтвердите 4-значный PIN-код.</p>
 
-      <form id="adminPinForm" class="admin-pin-form">
-        <input id="adminPinInput" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="PIN-код" autocomplete="off" required />
-        <input id="adminPinRepeat" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Повторите PIN" autocomplete="off" hidden />
-        <button type="submit" class="primary-btn" id="adminPinSubmit"><i data-lucide="key-round"></i> Продолжить</button>
-      </form>
-      <p class="auth-message" id="adminPinMessage"></p>
-    </section>
+        <form id="adminPinForm" class="admin-pin-form">
+          <input id="adminPinInput" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="PIN-код" autocomplete="off" required />
+          <input id="adminPinRepeat" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="Повторите PIN" autocomplete="off" hidden />
+          <button type="submit" class="primary-btn" id="adminPinSubmit"><i data-lucide="key-round"></i> Продолжить</button>
+        </form>
+        <p class="auth-message" id="adminPinMessage"></p>
+      </section>
+    </div>
 
     <section class="admin-dashboard" id="adminDashboard" hidden>
       <div class="admin-grid admin-grid-four">
