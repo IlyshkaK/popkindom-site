@@ -26,6 +26,11 @@ function minecraftHeadUrl(username, size = 36) {
   return `https://minotar.net/helm/${safeName}/${size}.png`;
 }
 
+function minecraftBustUrl(username, size = 180) {
+  const safeName = encodeURIComponent(username || "Steve");
+  return `https://minotar.net/armor/bust/${safeName}/${size}.png`;
+}
+
 function setAuthButtonIcon(iconElement, username) {
   if (!iconElement) return;
   if (username) {
@@ -960,9 +965,10 @@ function renderAccountData(data) {
 
   const playerHead = document.getElementById("playerHead");
   if (playerHead) {
-    playerHead.src = `https://minotar.net/helm/${encodeURIComponent(username)}/120.png`;
+    playerHead.src = minecraftBustUrl(username, 180);
     playerHead.onerror = () => {
-      playerHead.src = `https://minotar.net/helm/Steve/120.png`;
+      playerHead.onerror = null;
+      playerHead.src = minecraftBustUrl("Steve", 180);
     };
   }
 
