@@ -1816,3 +1816,53 @@ document.addEventListener('DOMContentLoaded',()=>{
   modal.addEventListener('click',e=>{if(e.target===modal) modal.classList.remove('show');});
  }
 });
+
+
+/* ===== SECURITY PAGE MODAL CLEAN LOGIC ===== */
+document.addEventListener("DOMContentLoaded", () => {
+  const openResetModal = document.getElementById("openResetModal");
+  const resetModal = document.getElementById("resetModal");
+  const closeResetModal = document.getElementById("closeResetModal");
+
+  function openSecurityResetModal() {
+    if (!resetModal) return;
+    resetModal.classList.add("open", "show");
+    resetModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("security-modal-open");
+    setTimeout(() => document.getElementById("resetPasswordPin")?.focus(), 50);
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function closeSecurityResetModal() {
+    if (!resetModal) return;
+    resetModal.classList.remove("open", "show");
+    resetModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("security-modal-open");
+  }
+
+  if (openResetModal) {
+    openResetModal.onclick = (event) => {
+      event.preventDefault();
+      openSecurityResetModal();
+    };
+  }
+
+  if (closeResetModal) {
+    closeResetModal.addEventListener("click", (event) => {
+      event.preventDefault();
+      closeSecurityResetModal();
+    });
+  }
+
+  if (resetModal) {
+    resetModal.addEventListener("click", (event) => {
+      if (event.target === resetModal) closeSecurityResetModal();
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && resetModal?.classList.contains("open")) {
+      closeSecurityResetModal();
+    }
+  });
+});
