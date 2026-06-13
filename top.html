@@ -53,58 +53,99 @@
   <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
 </div>
 
-<main class="top-page">
+<main class="top-page top-page-v2">
   <div class="rules-bg"></div>
   <div class="rules-dark"></div>
 
-  <section class="top-content">
-    <div class="top-hero glass-card">
-      <div>
-        <span class="about-kicker"><i data-lucide="trophy"></i> Рейтинг сезона</span>
+  <section class="top-content top-content-v2">
+    <section class="top-hero top-hero-v2 glass-card">
+      <div class="top-hero-main">
+        <span class="about-kicker"><i data-lucide="trophy"></i> Рейтинг PopkinDom Summer Season 4</span>
         <h1>Топ игроков</h1>
-        <p>Минимальная таблица лидеров по данным, которые уже собираются сервером: онлайн, блоки, мобы, смерти, урон, прыжки, крафты и зачарования.</p>
-      </div>
-      <div class="top-hero-badge">
-        <i data-lucide="arrow-down-wide-narrow"></i>
-        <b>Сортировка</b>
-        <span>от большего к меньшему</span>
-      </div>
-    </div>
-
-    <section class="top-panel glass-card">
-      <div class="top-panel-head">
-        <div>
-          <h2><i data-lucide="list-filter"></i> Выбери рейтинг</h2>
-          <p id="topDescription">Данные загружаются из статистики игроков.</p>
+        <p>Живая таблица лидеров по статистике сервера: онлайн, добытые блоки, убийства мобов, смерти, урон, прыжки, крафты и зачарования.</p>
+        <div class="top-hero-actions">
+          <a href="#ratingPanel" class="top-anchor-btn"><i data-lucide="bar-chart-3"></i> Смотреть рейтинг</a>
+          <button type="button" class="top-refresh-btn top-refresh-hero" id="topRefreshHeroBtn"><i data-lucide="refresh-cw"></i> Обновить</button>
         </div>
-        <button type="button" class="top-refresh-btn" id="topRefreshBtn"><i data-lucide="refresh-cw"></i> Обновить</button>
       </div>
 
-      <div class="top-filters" id="topFilters">
-        <button type="button" class="active" data-top-category="playtime"><i data-lucide="clock"></i><span>Онлайн</span></button>
-        <button type="button" data-top-category="blocks"><i data-lucide="pickaxe"></i><span>Блоки</span></button>
-        <button type="button" data-top-category="mobs"><i data-lucide="skull"></i><span>Мобы</span></button>
-        <button type="button" data-top-category="deaths"><i data-lucide="heart-crack"></i><span>Смерти</span></button>
-        <button type="button" data-top-category="damage_dealt"><i data-lucide="swords"></i><span>Урон нанесён</span></button>
-        <button type="button" data-top-category="damage_taken"><i data-lucide="shield-alert"></i><span>Урон получен</span></button>
-        <button type="button" data-top-category="jumps"><i data-lucide="footprints"></i><span>Прыжки</span></button>
-        <button type="button" data-top-category="crafts"><i data-lucide="hammer"></i><span>Крафты</span></button>
-        <button type="button" data-top-category="enchants"><i data-lucide="sparkles"></i><span>Зачарования</span></button>
+      <div class="top-hero-side">
+        <div class="top-season-card">
+          <i data-lucide="crown"></i>
+          <span>Лидер категории</span>
+          <b id="topHeroLeader">Загрузка…</b>
+          <small id="topHeroLeaderValue">—</small>
+        </div>
+        <div class="top-mini-grid" id="topStatsGrid">
+          <div><b>—</b><span>игроков</span></div>
+          <div><b>—</b><span>категория</span></div>
+          <div><b>—</b><span>обновлено</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="top-podium-panel glass-card" aria-label="Лучшие игроки категории">
+      <div class="top-section-head">
+        <div>
+          <span class="top-eyebrow"><i data-lucide="medal"></i> Топ-3</span>
+          <h2 id="topPodiumTitle">Лучшие игроки</h2>
+        </div>
+        <p id="topDescription">Данные загружаются из статистики игроков.</p>
+      </div>
+      <div class="top-podium" id="topPodium">
+        <div class="top-podium-empty">Загрузка лидеров…</div>
+      </div>
+    </section>
+
+    <section class="top-panel top-panel-v2 glass-card" id="ratingPanel">
+      <div class="top-panel-head top-panel-head-v2">
+        <div>
+          <span class="top-eyebrow"><i data-lucide="list-filter"></i> Категории</span>
+          <h2 id="topCategoryTitle">Онлайн</h2>
+          <p>Выбери показатель — таблица и пьедестал обновятся автоматически.</p>
+        </div>
+        <div class="top-update-box">
+          <span>Последнее обновление</span>
+          <b id="topUpdatedAt">—</b>
+        </div>
       </div>
 
-      <div class="top-table-wrap">
-        <table class="top-table">
-          <thead>
-            <tr>
-              <th>Место</th>
-              <th>Игрок</th>
-              <th id="topMetricTitle">Значение</th>
-            </tr>
-          </thead>
-          <tbody id="topTableBody">
-            <tr><td colspan="3" class="top-empty">Загрузка…</td></tr>
-          </tbody>
-        </table>
+      <div class="top-filters top-filters-v2" id="topFilters">
+        <button type="button" class="active" data-top-category="playtime" data-title="Онлайн" data-note="Кто провёл больше всего времени на сервере"><i data-lucide="clock"></i><span>Онлайн</span></button>
+        <button type="button" data-top-category="blocks" data-title="Блоки" data-note="Кто добыл больше всего блоков"><i data-lucide="pickaxe"></i><span>Блоки</span></button>
+        <button type="button" data-top-category="mobs" data-title="Мобы" data-note="Кто чаще всего побеждал мобов"><i data-lucide="skull"></i><span>Мобы</span></button>
+        <button type="button" data-top-category="deaths" data-title="Смерти" data-note="Самые опасные приключения сезона"><i data-lucide="heart-crack"></i><span>Смерти</span></button>
+        <button type="button" data-top-category="damage_dealt" data-title="Урон нанесён" data-note="Самые боевые игроки"><i data-lucide="swords"></i><span>Урон нанесён</span></button>
+        <button type="button" data-top-category="damage_taken" data-title="Урон получен" data-note="Кто пережил больше всего испытаний"><i data-lucide="shield-alert"></i><span>Урон получен</span></button>
+        <button type="button" data-top-category="jumps" data-title="Прыжки" data-note="Самые активные путешественники"><i data-lucide="footprints"></i><span>Прыжки</span></button>
+        <button type="button" data-top-category="crafts" data-title="Крафты" data-note="Кто сделал больше всего предметов"><i data-lucide="hammer"></i><span>Крафты</span></button>
+        <button type="button" data-top-category="enchants" data-title="Зачарования" data-note="Кто потратил больше всего уровней"><i data-lucide="sparkles"></i><span>Зачарования</span></button>
+      </div>
+
+      <div class="top-table-card">
+        <div class="top-table-title-row">
+          <div>
+            <h3><i data-lucide="ranking"></i> Полный рейтинг</h3>
+            <p id="topCategoryNote">Кто провёл больше всего времени на сервере</p>
+          </div>
+          <span class="top-sort-pill"><i data-lucide="arrow-down-wide-narrow"></i> Больше → меньше</span>
+        </div>
+
+        <div class="top-table-wrap top-table-wrap-v2">
+          <table class="top-table top-table-v2">
+            <thead>
+              <tr>
+                <th>Место</th>
+                <th>Игрок</th>
+                <th id="topMetricTitle">Значение</th>
+                <th>Статус</th>
+              </tr>
+            </thead>
+            <tbody id="topTableBody">
+              <tr><td colspan="4" class="top-empty">Загрузка…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   </section>

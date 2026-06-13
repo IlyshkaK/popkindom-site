@@ -1732,8 +1732,17 @@ function bindAdminControls() {
 const topTableBody = document.getElementById("topTableBody");
 const topFilters = document.getElementById("topFilters");
 const topRefreshBtn = document.getElementById("topRefreshBtn");
+const topRefreshHeroBtn = document.getElementById("topRefreshHeroBtn");
 const topDescription = document.getElementById("topDescription");
 const topMetricTitle = document.getElementById("topMetricTitle");
+const topPodium = document.getElementById("topPodium");
+const topPodiumTitle = document.getElementById("topPodiumTitle");
+const topCategoryTitle = document.getElementById("topCategoryTitle");
+const topCategoryNote = document.getElementById("topCategoryNote");
+const topUpdatedAt = document.getElementById("topUpdatedAt");
+const topHeroLeader = document.getElementById("topHeroLeader");
+const topHeroLeaderValue = document.getElementById("topHeroLeaderValue");
+const topStatsGrid = document.getElementById("topStatsGrid");
 let currentTopCategory = "playtime";
 
 function formatTopValue(value, format) {
@@ -1742,15 +1751,82 @@ function formatTopValue(value, format) {
   return formatNumber(value);
 }
 
+function getActiveTopButton(category = currentTopCategory) {
+  return topFilters?.querySelector(`[data-top-category="${CSS.escape(category)}"]`) || topFilters?.querySelector(".active");
+}
+
+function setTopMeta(data) {
+  const activeButton = getActiveTopButton(data.category || currentTopCategory);
+  const title = activeButton?.dataset.title || data.label || "Рейтинг";
+  const note = activeButton?.dataset.note || data.description || "Топ игроков сезона.";
+
+  if (topDescription) topDescription.textContent = data.description || note;
+  if (topMetricTitle) topMetricTitle.textContent = data.label || "Значение";
+  if (topPodiumTitle) topPodiumTitle.textContent = `Лучшие: ${title}`;
+  if (topCategoryTitle) topCategoryTitle.textContent = title;
+  if (topCategoryNote) topCategoryNote.textContent = note;
+  if (topUpdatedAt) topUpdatedAt.textContent = new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+}
+
+function renderTopPodium(data) {
+  if (!topPodium) return;
+  const players = data.players || [];
+  const order = [1, 0, 2];
+
+  if (!players.length) {
+    topPodium.innerHTML = `<div class="top-podium-empty">Пока нет данных для пьедестала.</div>`;
+    return;
+  }
+
+  topPodium.innerHTML = order.map((playerIndex) => {
+    const player = players[playerIndex];
+    const place = playerIndex + 1;
+    if (!player) {
+      return `<div class="top-podium-card top-podium-card-empty"><span>#${place}</span><b>Место свободно</b><small>Ждём статистику</small></div>`;
+    }
+
+    const medal = place === 1 ? "🥇" : place === 2 ? "🥈" : "🥉";
+    return `
+      <article class="top-podium-card top-podium-${place}">
+        <div class="top-podium-medal">${medal}</div>
+        <img src="${minecraftHeadUrl(player.username, 72)}" alt="${escapeHtml(player.username)}" onerror="this.src='https://minotar.net/helm/Steve/72.png'">
+        <span>#${place}</span>
+        <b>${escapeHtml(player.username)}</b>
+        <small>${formatTopValue(player.value, data.format)}</small>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderTopStats(data) {
+  const players = data.players || [];
+  const leader = players[0];
+  const total = players.reduce((sum, player) => sum + Number(player.value || 0), 0);
+  const activeButton = getActiveTopButton(data.category || currentTopCategory);
+  const categoryTitle = activeButton?.dataset.title || data.label || "Рейтинг";
+
+  if (topHeroLeader) topHeroLeader.textContent = leader ? leader.username : "Пока нет лидера";
+  if (topHeroLeaderValue) topHeroLeaderValue.textContent = leader ? formatTopValue(leader.value, data.format) : "Нет данных";
+
+  if (topStatsGrid) {
+    topStatsGrid.innerHTML = `
+      <div><b>${players.length}</b><span>игроков</span></div>
+      <div><b>${escapeHtml(categoryTitle)}</b><span>категория</span></div>
+      <div><b>${formatTopValue(total, data.format)}</b><span>всего</span></div>
+    `;
+  }
+}
+
 function renderTopRows(data) {
   if (!topTableBody) return;
 
   const players = data.players || [];
-  if (topDescription) topDescription.textContent = data.description || "Топ игроков сезона.";
-  if (topMetricTitle) topMetricTitle.textContent = data.label || "Значение";
+  setTopMeta(data);
+  renderTopStats(data);
+  renderTopPodium(data);
 
   if (!players.length) {
-    topTableBody.innerHTML = `<tr><td colspan="3" class="top-empty">Пока нет данных для этого рейтинга.</td></tr>`;
+    topTableBody.innerHTML = `<tr><td colspan="4" class="top-empty">Пока нет данных для этого рейтинга.</td></tr>`;
     refreshLucideIcons();
     return;
   }
@@ -1759,17 +1835,19 @@ function renderTopRows(data) {
     const place = index + 1;
     const medal = place === 1 ? "🥇" : place === 2 ? "🥈" : place === 3 ? "🥉" : `#${place}`;
     const placeClass = place <= 3 ? `top-place top-place-${place}` : "top-place";
+    const statusText = place === 1 ? "Лидер" : place <= 3 ? "Топ-3" : place <= 10 ? "Топ-10" : "Участник";
 
     return `
       <tr>
         <td><span class="${placeClass}">${medal}</span></td>
         <td>
           <div class="top-player-cell">
-            <img src="${minecraftHeadUrl(player.username, 34)}" alt="${escapeHtml(player.username)}" onerror="this.src='https://minotar.net/helm/Steve/34.png'">
-            <b>${escapeHtml(player.username)}</b>
+            <img src="${minecraftHeadUrl(player.username, 42)}" alt="${escapeHtml(player.username)}" onerror="this.src='https://minotar.net/helm/Steve/42.png'">
+            <div><b>${escapeHtml(player.username)}</b><small>Игрок сезона</small></div>
           </div>
         </td>
         <td><span class="top-value">${formatTopValue(player.value, data.format)}</span></td>
+        <td><span class="top-row-status top-row-status-${Math.min(place, 4)}">${statusText}</span></td>
       </tr>
     `;
   }).join("");
@@ -1780,13 +1858,15 @@ function renderTopRows(data) {
 async function loadTop(category = currentTopCategory) {
   if (!topTableBody) return;
   currentTopCategory = category;
-  topTableBody.innerHTML = `<tr><td colspan="3" class="top-empty">Загрузка…</td></tr>`;
+  topTableBody.innerHTML = `<tr><td colspan="4" class="top-empty">Загрузка…</td></tr>`;
+  if (topPodium) topPodium.innerHTML = `<div class="top-podium-empty">Загрузка лидеров…</div>`;
 
   try {
     const data = await apiRequest(`/api/top?category=${encodeURIComponent(category)}`);
     renderTopRows(data);
   } catch (error) {
-    topTableBody.innerHTML = `<tr><td colspan="3" class="top-empty error">${escapeHtml(error.message || "Ошибка загрузки топа.")}</td></tr>`;
+    topTableBody.innerHTML = `<tr><td colspan="4" class="top-empty error">${escapeHtml(error.message || "Ошибка загрузки топа.")}</td></tr>`;
+    if (topPodium) topPodium.innerHTML = `<div class="top-podium-empty error">Не удалось загрузить пьедестал.</div>`;
   }
 }
 
@@ -1800,9 +1880,8 @@ if (topFilters) {
   });
 }
 
-if (topRefreshBtn) {
-  topRefreshBtn.addEventListener("click", () => loadTop(currentTopCategory));
-}
+if (topRefreshBtn) topRefreshBtn.addEventListener("click", () => loadTop(currentTopCategory));
+if (topRefreshHeroBtn) topRefreshHeroBtn.addEventListener("click", () => loadTop(currentTopCategory));
 
 if (topTableBody) {
   loadTop(currentTopCategory);
