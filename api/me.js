@@ -1,4 +1,4 @@
-const { query, ensureAuthTables } = require('../lib/db');
+const { query } = require('../lib/db');
 const { sendJson, methodNotAllowed } = require('../lib/http');
 const { getUserBySession, publicUser } = require('../lib/security');
 
@@ -10,6 +10,14 @@ function getQueryParam(req, name) {
   } catch {
     return null;
   }
+}
+
+const ACCOUNT_CACHE = globalThis.__popkindomAccountCache || new Map();
+globalThis.__popkindomAccountCache = ACCOUNT_CACHE;
+const ACCOUNT_CACHE_MS = 2500;
+
+function accountCacheKey(userId) {
+  return String(userId || 'unknown');
 }
 
 module.exports = async function handler(req, res) {
@@ -38,7 +46,13 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    await ensureAuthTables();
+
+    const cacheKey = accountCacheKey(user.id);
+    const cachedAccount = ACCOUNT_CACHE.get(cacheKey);
+    if (cachedAccount && Date.now() - cachedAccount.time < ACCOUNT_CACHE_MS) {
+      res.setHeader('Cache-Control', 'private, max-age=2, stale-while-revalidate=8');
+      return sendJson(res, 200, cachedAccount.payload);
+    }
 
     const [
       playerResult,
@@ -107,8 +121,7 @@ module.exports = async function handler(req, res) {
 
     const player = playerResult.rows[0] || null;
 
-    res.setHeader('Cache-Control', 'private, max-age=3, stale-while-revalidate=10');
-    return sendJson(res, 200, {
+    const payload = {
       user: {
         ...publicUser(user),
         autoLoginEnabled: user.auto_login_enabled !== false,
@@ -119,14 +132,17 @@ module.exports = async function handler(req, res) {
       blocks: blocksResult.rows,
       crafts: craftsResult.rows,
       enchantments: enchantmentsResult.rows[0] || null,
-      inventory: null,
       onlinePlayers: onlineResult.rows,
       securityLogs: logsResult.rows,
       meta: {
         isOnline: Boolean(player && player.online === true),
         updatedAt: player?.updated_at || null,
       },
-    });
+    };
+
+    ACCOUNT_CACHE.set(accountCacheKey(user.id), { time: Date.now(), payload });
+    res.setHeader('Cache-Control', 'private, max-age=2, stale-while-revalidate=8');
+    return sendJson(res, 200, payload);
   } catch (error) {
     console.error(error);
     return sendJson(res, 500, { message: 'Ошибка получения аккаунта.' });
