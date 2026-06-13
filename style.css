@@ -6622,3 +6622,987 @@ body.security-modal-open {
     min-width: 760px;
   }
 }
+
+
+/* ===== MAIN / RULES / SERVER 2026 REDESIGN ===== */
+.nav {
+  gap: clamp(18px, 3vw, 38px);
+}
+
+.home-page-v2,
+.server-page-v2,
+.rules-page-v2 {
+  position: relative;
+  min-height: 100vh;
+  padding: 108px 22px 54px;
+  background: #030607;
+  overflow: hidden;
+}
+
+.home-shell-v2,
+.server-shell-v2,
+.rules-content-v2 {
+  position: relative;
+  z-index: 3;
+  width: min(1220px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+.glass-card {
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 18% 5%, rgba(126,226,60,.12), transparent 34%),
+    linear-gradient(135deg, rgba(7,14,11,.88), rgba(4,8,10,.82));
+  box-shadow:
+    inset 0 0 0 1px rgba(126,226,60,.03),
+    0 24px 60px rgba(0,0,0,.36);
+  backdrop-filter: blur(14px);
+}
+
+.home-hero-v2,
+.server-hero-v2,
+.rules-hero-v2 {
+  position: relative;
+  overflow: hidden;
+  min-height: 330px;
+  padding: 34px 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: stretch;
+  gap: 26px;
+}
+
+.home-hero-v2::before,
+.server-hero-v2::before,
+.rules-hero-v2::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(126,226,60,.055) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(126,226,60,.035) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(90deg, rgba(0,0,0,.68), transparent 76%);
+  pointer-events: none;
+}
+
+.home-hero-left,
+.home-hero-panel,
+.server-hero-v2 > *,
+.rules-hero-v2 > * {
+  position: relative;
+  z-index: 1;
+}
+
+.home-hero-v2 h1,
+.server-hero-v2 h1,
+.rules-hero-v2 h1 {
+  margin: 16px 0 14px;
+  max-width: 850px;
+  font-size: clamp(44px, 6.2vw, 82px);
+  line-height: .92;
+  letter-spacing: -.06em;
+  text-transform: uppercase;
+  text-shadow: 0 16px 34px rgba(0,0,0,.52);
+}
+
+.home-hero-v2 p,
+.server-hero-v2 p,
+.rules-hero-v2 p {
+  max-width: 780px;
+  color: rgba(255,255,255,.74);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.home-hero-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.home-status-card,
+.server-ip-card,
+.rules-hero-note {
+  min-height: 152px;
+  padding: 24px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(35,92,15,.46), rgba(5,13,7,.78));
+  border: 1px solid rgba(126,226,60,.28);
+  display: grid;
+  align-content: center;
+  gap: 8px;
+}
+
+.home-status-card i,
+.server-ip-card i,
+.rules-hero-note i {
+  width: 42px;
+  height: 42px;
+  color: #84ff43;
+}
+
+.home-status-card span,
+.server-ip-card span,
+.rules-hero-note span {
+  color: rgba(255,255,255,.68);
+  font-weight: 800;
+}
+
+.home-status-card b,
+.server-ip-card b,
+.rules-hero-note b {
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.home-mini-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.home-mini-grid div {
+  min-height: 116px;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  display: grid;
+  align-content: center;
+  gap: 6px;
+}
+
+.home-mini-grid i {
+  color: #7ee23c;
+}
+
+.home-mini-grid b {
+  font-size: 22px;
+  text-transform: uppercase;
+}
+
+.home-mini-grid span {
+  color: rgba(255,255,255,.58);
+  font-weight: 800;
+}
+
+.home-section-grid,
+.server-info-grid,
+.rules-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.home-feature-card,
+.server-info-card {
+  padding: 24px;
+  min-height: 230px;
+}
+
+.home-feature-card > i,
+.server-card-head i,
+.rules-summary-card i,
+.rule-panel-head i,
+.server-note-v2 > i {
+  color: #7ee23c;
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 0 14px rgba(126,226,60,.45));
+}
+
+.home-feature-card h2,
+.server-info-card h2,
+.rule-panel-v2 h2,
+.home-roadmap h2,
+.worlds-panel-v2 h2,
+.server-note-v2 h2 {
+  margin: 14px 0 10px;
+  font-size: 28px;
+  letter-spacing: -.03em;
+}
+
+.home-feature-card p,
+.server-info-card p,
+.rule-panel-v2 p,
+.server-note-v2 p {
+  color: rgba(255,255,255,.68);
+  line-height: 1.55;
+}
+
+.home-roadmap,
+.server-note-v2 {
+  padding: 28px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.home-roadmap-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 12px;
+}
+
+.home-roadmap-list p {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  color: rgba(255,255,255,.82);
+  font-weight: 850;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.home-roadmap-list i {
+  color: #7ee23c;
+  flex: 0 0 auto;
+}
+
+/* Rules v2 */
+.rules-hero-v2 {
+  grid-template-columns: minmax(0, 1fr) 330px;
+}
+
+.rules-hero-note {
+  min-height: 100%;
+}
+
+.rules-summary-grid {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.rules-summary-card {
+  min-height: 132px;
+  padding: 18px;
+  border-radius: 20px;
+  text-decoration: none;
+  color: #fff;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  transition: .2s ease;
+}
+
+.rules-summary-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(126,226,60,.42);
+  background: rgba(126,226,60,.10);
+}
+
+.rules-summary-card b {
+  font-size: 20px;
+}
+
+.rules-summary-card span {
+  color: rgba(255,255,255,.58);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.rules-summary-card.danger i {
+  color: #ff6262;
+}
+
+.rules-list-v2 {
+  display: grid;
+  gap: 16px;
+}
+
+.rule-panel-v2 {
+  padding: 24px;
+  border-radius: 22px;
+  background: rgba(4,9,8,.78);
+  border: 1px solid rgba(255,255,255,.09);
+  box-shadow: inset 0 0 0 1px rgba(126,226,60,.03);
+}
+
+.rule-panel-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.rule-panel-v2 h2 {
+  margin: 0;
+}
+
+.rule-panel-v2 ul {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 9px;
+  color: rgba(255,255,255,.76);
+  line-height: 1.5;
+}
+
+.rule-panel-v2 li::marker {
+  color: #7ee23c;
+}
+
+.rule-panel-v2.danger {
+  border-color: rgba(255,80,80,.26);
+  background: linear-gradient(135deg, rgba(58,11,11,.56), rgba(4,9,8,.82));
+}
+
+.rule-panel-v2.danger .rule-panel-head i,
+.rule-panel-v2.danger li::marker {
+  color: #ff5f5f;
+}
+
+.rule-panel-v2.good {
+  border-color: rgba(126,226,60,.28);
+  background: linear-gradient(135deg, rgba(42,103,17,.34), rgba(4,9,8,.82));
+}
+
+/* Server page */
+.server-hero-v2 {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+
+.server-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.server-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.server-tags span {
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(126,226,60,.10);
+  border: 1px solid rgba(126,226,60,.28);
+  color: #baff92;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+.server-clean-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.server-clean-list li {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  display: grid;
+  gap: 4px;
+}
+
+.server-clean-list b {
+  color: #fff;
+}
+
+.server-clean-list span {
+  color: rgba(255,255,255,.62);
+}
+
+.worlds-panel-v2 {
+  padding: 28px;
+}
+
+.worlds-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.worlds-grid-v2 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.world-card-v2 {
+  min-height: 300px;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.045);
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.world-card-v2 i {
+  width: 42px;
+  height: 42px;
+  color: #7ee23c;
+}
+
+.world-card-v2 h3 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.world-card-v2 p {
+  margin: 0 0 8px;
+  color: rgba(255,255,255,.66);
+  line-height: 1.5;
+}
+
+.world-card-v2 div {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.22);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.world-card-v2 span {
+  color: rgba(255,255,255,.58);
+  font-weight: 800;
+}
+
+.world-card-v2 b {
+  color: #fff;
+}
+
+.world-card-v2.nether {
+  background: linear-gradient(145deg, rgba(91,25,12,.42), rgba(255,255,255,.035));
+}
+
+.world-card-v2.nether i {
+  color: #ff7b30;
+}
+
+.world-card-v2.end {
+  background: linear-gradient(145deg, rgba(79,50,126,.34), rgba(255,255,255,.035));
+}
+
+.world-card-v2.end i {
+  color: #b78cff;
+}
+
+.server-note-v2 {
+  grid-template-columns: auto 1fr;
+}
+
+@media (max-width: 1060px) {
+  .header {
+    grid-template-columns: 220px 1fr 210px;
+  }
+
+  .nav a {
+    font-size: 16px;
+  }
+
+  .home-hero-v2,
+  .server-hero-v2,
+  .rules-hero-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .rules-summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .server-info-grid,
+  .home-section-grid,
+  .worlds-grid-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .home-roadmap {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .home-page-v2,
+  .server-page-v2,
+  .rules-page-v2 {
+    padding: 96px 14px 34px;
+  }
+
+  .home-hero-v2,
+  .server-hero-v2,
+  .rules-hero-v2,
+  .home-roadmap,
+  .worlds-panel-v2,
+  .server-note-v2,
+  .home-feature-card,
+  .server-info-card,
+  .rule-panel-v2 {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .home-mini-grid,
+  .home-roadmap-list,
+  .rules-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero-v2 h1,
+  .server-hero-v2 h1,
+  .rules-hero-v2 h1 {
+    font-size: 42px;
+  }
+
+  .world-card-v2 div {
+    display: grid;
+  }
+}
+
+
+/* ===== MAIN PAGE CLEAN REDESIGN =====
+   Возвращает главную к компактной старой структуре, но подгоняет визуал под новый стиль страниц. */
+.hero {
+  min-height: 100vh;
+  padding: 118px 5vw 48px;
+}
+
+.hero-content {
+  width: min(1240px, 100%);
+}
+
+.logo-image {
+  width: min(760px, 86vw);
+  margin-bottom: 2px;
+}
+
+.subtitle {
+  max-width: 780px;
+  margin: -4px auto 22px;
+  color: rgba(255,255,255,.84);
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+
+.soon-box {
+  width: min(230px, 78vw);
+  height: 58px;
+  border-radius: 999px;
+  font-size: 22px;
+  background: linear-gradient(135deg, rgba(126,226,60,.16), rgba(5,10,8,.68));
+  border: 1px solid rgba(126,226,60,.38);
+  box-shadow: inset 0 0 22px rgba(126,226,60,.08), 0 18px 42px rgba(0,0,0,.34);
+}
+
+.clock {
+  font-size: 28px;
+}
+
+.main-buttons {
+  margin-bottom: 28px;
+}
+
+.btn {
+  min-width: 205px;
+  min-height: 58px;
+  border-radius: 999px;
+  padding: 15px 24px;
+  font-size: 16px;
+  letter-spacing: .02em;
+}
+
+.btn span {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+}
+
+.btn-green {
+  background: linear-gradient(180deg, #86f244 0%, #45bb18 100%);
+  border: 1px solid rgba(190,255,140,.62);
+  box-shadow: 0 18px 45px rgba(72,194,24,.28), inset 0 0 18px rgba(255,255,255,.12);
+}
+
+.btn-dark {
+  background: rgba(7,12,10,.72);
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: 0 18px 45px rgba(0,0,0,.35), inset 0 0 20px rgba(255,255,255,.04);
+}
+
+.cards {
+  width: min(1180px, 100%);
+  gap: 16px;
+}
+
+.card {
+  min-height: 156px;
+  padding: 20px;
+  border-radius: 24px;
+  grid-template-columns: 58px minmax(0, 1fr);
+  background:
+    linear-gradient(145deg, rgba(9,16,13,.88), rgba(4,8,8,.68)),
+    radial-gradient(circle at 50% 0%, rgba(126,226,60,.12), transparent 55%);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 24px 70px rgba(0,0,0,.35), inset 0 0 25px rgba(126,226,60,.035);
+  backdrop-filter: blur(16px);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(126,226,60,.32);
+  box-shadow: 0 28px 80px rgba(0,0,0,.44), 0 0 0 1px rgba(126,226,60,.06);
+}
+
+.card-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(126,226,60,.18), rgba(6,12,8,.75));
+  border: 1px solid rgba(126,226,60,.28);
+  display: grid;
+  place-items: center;
+  color: #87f047;
+  box-shadow: inset 0 0 18px rgba(126,226,60,.08);
+}
+
+.card-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.card p {
+  margin: 0;
+  color: rgba(255,255,255,.68);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+@media (max-width: 1050px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 104px 18px 34px;
+  }
+
+  .logo-image {
+    width: min(520px, 96vw);
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .main-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: auto;
+    grid-template-columns: 50px minmax(0,1fr);
+    border-radius: 20px;
+  }
+
+  .card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+  }
+}
+
+
+/* ===== HOME ALIGNMENT + PERFORMANCE FIX =====
+   Выравнивает карточки главной страницы и убирает тяжелые эффекты,
+   из-за которых страница дергалась на слабых ПК/браузерах. */
+.hero {
+  padding-top: 108px;
+  padding-bottom: 42px;
+}
+
+.hero-bg {
+  inset: 0;
+  filter: none;
+  transform: none;
+  opacity: .82;
+  will-change: auto;
+}
+
+.hero-dark {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(126, 226, 60, 0.09), transparent 28%),
+    linear-gradient(180deg, rgba(0,0,0,.28), rgba(0,0,0,.78));
+}
+
+.logo-image {
+  width: min(720px, 84vw);
+  filter: drop-shadow(0 18px 32px rgba(0,0,0,.7));
+}
+
+.main-buttons {
+  gap: 22px;
+  margin: 22px auto 30px;
+}
+
+.btn {
+  width: 320px;
+  min-width: 0;
+  height: 76px;
+  min-height: 0;
+  padding: 0 28px;
+  line-height: 1.15;
+}
+
+.cards {
+  width: min(1180px, 100%);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.card {
+  min-width: 0;
+  min-height: 180px;
+  height: 100%;
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transform: translateZ(0);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card-icon {
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+  height: 72px;
+  min-height: 72px;
+  max-height: 72px;
+  border-radius: 22px;
+  align-self: center;
+}
+
+.card-icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.card > div:last-child {
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.card h3 {
+  max-width: 100%;
+  margin: 0 0 9px;
+  font-size: clamp(16px, 1.25vw, 20px);
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.card p {
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: break-word;
+}
+
+.header,
+.card,
+.auth-card,
+.top-hero,
+.top-board,
+.rules-hero-v2,
+.server-hero-v2,
+.security-modal-card {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+@media (max-width: 1180px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card {
+    min-height: 156px;
+  }
+}
+
+@media (max-width: 700px) {
+  .hero {
+    padding: 102px 16px 34px;
+  }
+
+  .main-buttons {
+    gap: 12px;
+  }
+
+  .btn {
+    width: min(100%, 360px);
+    height: 64px;
+    font-size: 15px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: auto;
+    grid-template-columns: 58px minmax(0, 1fr);
+    padding: 18px;
+    gap: 14px;
+  }
+
+  .card-icon {
+    width: 58px;
+    min-width: 58px;
+    max-width: 58px;
+    height: 58px;
+    min-height: 58px;
+    max-height: 58px;
+  }
+
+  .card h3 {
+    font-size: 18px;
+  }
+}
+
+
+/* ===== 2026 performance + clean home alignment patch ===== */
+.cards {
+  align-items: stretch !important;
+  justify-content: center !important;
+  gap: 16px !important;
+}
+.cards .card {
+  display: grid !important;
+  grid-template-columns: 72px 1fr !important;
+  align-items: center !important;
+  gap: 16px !important;
+  min-height: 150px !important;
+  padding: 24px 20px !important;
+  overflow: hidden !important;
+}
+.cards .card .card-icon {
+  width: 72px !important;
+  height: 72px !important;
+  min-width: 72px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+}
+.cards .card h3 {
+  margin: 0 0 8px !important;
+  line-height: 1.05 !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+.cards .card p {
+  margin: 0 !important;
+  line-height: 1.55 !important;
+}
+
+@media (max-width: 1100px) {
+  .cards { grid-template-columns: repeat(2, minmax(260px, 1fr)) !important; }
+}
+@media (max-width: 640px) {
+  .cards { grid-template-columns: 1fr !important; }
+  .cards .card { grid-template-columns: 60px 1fr !important; min-height: 128px !important; }
+  .cards .card .card-icon { width: 60px !important; height: 60px !important; min-width: 60px !important; }
+}
+
+/* Убираем самые тяжёлые эффекты на слабых устройствах и ускоряем отрисовку длинных страниц. */
+.auth-card,
+.profile-hero,
+.info-card,
+.security-card,
+.admin-card,
+.top-panel,
+.top-hero,
+.server-card,
+.rules-card,
+.about-card,
+.card {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 320px;
+}
+
+.hero-bg,
+.auth-bg {
+  animation: none !important;
+  transform: translateZ(0);
+}
+
+@media (max-width: 900px), (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .header,
+  .auth-dropdown,
+  .mobile-menu,
+  .card,
+  .top-panel,
+  .profile-hero,
+  .security-card,
+  .admin-card {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

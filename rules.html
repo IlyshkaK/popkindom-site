@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PopkinDom 4</title>
+  <title>Правила — PopkinDom</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="favicon.png" />
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
-
 <header class="header">
   <a href="index.html" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
 
@@ -17,6 +16,7 @@
     <a href="index.html">Главная</a>
     <a href="rules.html" class="active">Правила</a>
     <a href="top.html">Топ</a>
+    <a href="server.html">Сервер</a>
     <a href="about.html">Подробней</a>
   </nav>
 
@@ -33,7 +33,7 @@
       <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
     </div>
   </div>
-  
+
   <button class="burger" id="burgerBtn" aria-label="Открыть меню">
     <span></span>
     <span></span>
@@ -45,6 +45,7 @@
   <a href="index.html">Главная</a>
   <a href="rules.html">Правила</a>
   <a href="top.html">Топ</a>
+  <a href="server.html">Сервер</a>
   <a href="about.html">Подробней</a>
   <a href="login.html" class="mobile-register auth-action-mobile">Войти</a>
   <a href="account.html" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
@@ -52,170 +53,127 @@
   <a href="admin.html" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
   <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
 </div>
-
-<main class="rules-page">
+<main class="rules-page rules-page-v2">
   <div class="rules-bg"></div>
   <div class="rules-dark"></div>
 
-  <section class="rules-content">
-
-    <div class="rules-title">
-      
-      <h1>Правила сервера</h1>
-      <p>Перед началом игры внимательно ознакомься с правилами PopkinDom.</p>
-    </div>
-
-    <div class="rules-grid">
-
-      <div class="rule-card">
-        <h2>🟢 Общие правила</h2>
-        <ul>
-          <li>Запрещены призывы и провокации к действиям, нарушающим правила сервера.</li>
-          <li>Запрещено обманывать администрацию или вводить её в заблуждение.</li>
-          <li>Администрация вправе выносить наказания, основываясь на здравом смысле.</li>
-          <li>Запрещено намеренно разжигать конфликты против сервера или администрации.</li>
-          <li>Конструктивная критика принимается через личные сообщения администрации или предложения в Discord.</li>
-          <li>Запрещено скрывать информацию о нарушителях.</li>
-        </ul>
+  <section class="rules-content rules-content-v2">
+    <section class="rules-hero-v2 glass-card">
+      <div>
+        <span class="about-kicker"><i data-lucide="scroll-text"></i> Кодекс PopkinDom</span>
+        <h1>Правила сервера</h1>
+        <p>Коротко: играем честно, не ломаем чужое, не портим атмосферу и решаем спорные моменты через администрацию.</p>
       </div>
+      <div class="rules-hero-note">
+        <i data-lucide="shield-alert"></i>
+        <b>Незнание правил не освобождает от ответственности.</b>
+        <span>Администрация может принимать решение по ситуации, даже если нарушение не описано дословно.</span>
+      </div>
+    </section>
 
-      <div class="rule-card">
-        <h2>🎮 Игровой процесс</h2>
+    <section class="rules-summary-grid">
+      <a href="#common" class="rules-summary-card"><i data-lucide="circle-check"></i><b>Общее</b><span>поведение и честность</span></a>
+      <a href="#gameplay" class="rules-summary-card"><i data-lucide="pickaxe"></i><b>Игра</b><span>читы, баги и лаги</span></a>
+      <a href="#builds" class="rules-summary-card"><i data-lucide="blocks"></i><b>Постройки</b><span>территории и спавн</span></a>
+      <a href="#chat" class="rules-summary-card"><i data-lucide="message-circle"></i><b>Чат</b><span>общение и реклама</span></a>
+      <a href="#punishments" class="rules-summary-card danger"><i data-lucide="gavel"></i><b>Наказания</b><span>варны, баны, апелляции</span></a>
+    </section>
+
+    <section class="rules-list-v2">
+      <article class="rule-panel-v2" id="common">
+        <div class="rule-panel-head"><i data-lucide="circle-check"></i><h2>Общие правила</h2></div>
         <ul>
-          <li>Запрещена продажа, передача или обмен аккаунтов.</li>
-          <li>Запрещено вымогательство данных аккаунта и взлом других игроков.</li>
-          <li>Запрещено выдавать себя за администрацию в любом виде.</li>
-          <li>Запрещено создание твинков и вторых аккаунтов.</li>
-          <li>Запрещено использование приложений с ограниченным доступом к игровому процессу.</li>
-          <li>Запрещено создавать механизмы, вызывающие лаги.</li>
+          <li>Запрещены призывы, провокации и действия, нарушающие правила сервера.</li>
+          <li>Запрещено обманывать администрацию или намеренно вводить её в заблуждение.</li>
+          <li>Запрещено разжигать конфликты против сервера, игроков или администрации.</li>
+          <li>Конструктивная критика принимается через личные сообщения администрации или предложения в Discord.</li>
+          <li>Запрещено скрывать информацию о нарушителях, если это вредит серверу.</li>
+        </ul>
+      </article>
+
+      <article class="rule-panel-v2" id="gameplay">
+        <div class="rule-panel-head"><i data-lucide="pickaxe"></i><h2>Игровой процесс</h2></div>
+        <ul>
+          <li>Запрещена продажа, передача, обмен аккаунтов и создание твинков.</li>
+          <li>Запрещено вымогательство данных аккаунта, взломы и попытки доступа к чужим профилям.</li>
+          <li>Запрещено выдавать себя за администрацию.</li>
+          <li>Запрещено использовать баги, дюпы, читы, автокликеры и стороннее ПО, дающее преимущество.</li>
+          <li>Запрещено создавать механизмы, фермы или схемы, вызывающие лаги сервера.</li>
           <li>Запрещён обмен реальной валюты на игровые услуги, ресурсы или валюту.</li>
-          <li>Запрещено использовать баги, дюпы и действия, не заложенные в механике игры.</li>
-          <li>Запрещены читы, автокликеры, запрещённые моды и стороннее ПО, дающее преимущество.</li>
           <li>Запрещена порча территории спавна.</li>
         </ul>
-      </div>
+      </article>
 
-      <div class="rule-card">
-        <h2>🏠 Постройки и территория</h2>
+      <article class="rule-panel-v2" id="builds">
+        <div class="rule-panel-head"><i data-lucide="blocks"></i><h2>Постройки и территория</h2></div>
         <ul>
-          <li>Запрещены постройки, ущемляющие права или чувства других игроков.</li>
           <li>Запрещены постройки и арты оскорбительного, эротического или запрещённого содержания.</li>
-          <li>Запрещено селиться на территории других игроков без их согласия.</li>
-          <li>Запрещено находиться на территории или в доме игрока после прямого запрета владельца.</li>
-          <li>Администрация оставляет за собой право сносить постройки на спавне.</li>
+          <li>Запрещено селиться на территории других игроков без согласия владельца.</li>
+          <li>Запрещено находиться в доме или на территории игрока после прямого запрета владельца.</li>
+          <li>Администрация может сносить постройки на спавне и рядом с общественными зонами.</li>
         </ul>
-      </div>
+      </article>
 
-      <div class="rule-card">
-        <h2>🗡️ PvP и взаимодействие</h2>
+      <article class="rule-panel-v2">
+        <div class="rule-panel-head"><i data-lucide="swords"></i><h2>PvP и взаимодействие</h2></div>
         <ul>
-          <li>Запрещён PvP и убийство игроков без согласия обеих сторон.</li>
-          <li>PvP разрешено только в согласованных сражениях.</li>
-          <li>На спавне PvP запрещено в любом виде, кроме специально отведённых зон.</li>
-          <li>Запрещено гриферство: разрушение построек, кража предметов и использование чужих ферм.</li>
+          <li>PvP разрешено только по согласию обеих сторон или в специально согласованных событиях.</li>
+          <li>На спавне PvP запрещено, кроме отдельных зон, если они будут созданы.</li>
+          <li>Запрещены гриферство, кражи, разрушение построек и использование чужих ферм.</li>
           <li>Запрещено убивать мобов других игроков без согласия владельца.</li>
-          <li>В случае грифа постройка может быть восстановлена администрацией.</li>
         </ul>
-      </div>
+      </article>
 
-      <div class="rule-card">
-        <h2>💬 Чат и общение</h2>
+      <article class="rule-panel-v2" id="chat">
+        <div class="rule-panel-head"><i data-lucide="message-circle"></i><h2>Чат и общение</h2></div>
         <ul>
-          <li>Запрещён флуд, спам и частый повтор однотипных сообщений.</li>
-          <li>Запрещён флейм — спор ради спора.</li>
-          <li>Запрещён CAPS LOCK, кроме ников, аббревиатур и коротких сообщений.</li>
-          <li>Запрещён организованный спам от группы игроков.</li>
+          <li>Запрещены флуд, спам, флейм, оффтоп и частый CAPS LOCK.</li>
           <li>Запрещена открытая и скрытая реклама других проектов.</li>
-          <li>Запрещено разжигание политических, межнациональных и религиозных конфликтов.</li>
-          <li>Запрещены угрозы, шантаж, клевета, дискриминация и буллинг.</li>
+          <li>Запрещены угрозы, шантаж, клевета, дискриминация, буллинг и публикация личной информации.</li>
+          <li>Запрещено обсуждать или распространять баги и уязвимости сервера.</li>
           <li>Запрещены мат, оскорбления и аморальное поведение.</li>
-          <li>Запрещено обсуждать или афишировать баги и уязвимости сервера.</li>
         </ul>
-      </div>
+      </article>
 
-      <div class="rule-card">
-        <h2>🛒 Рынок и экономика</h2>
+      <article class="rule-panel-v2">
+        <div class="rule-panel-head"><i data-lucide="shopping-basket"></i><h2>Рынок и экономика</h2></div>
         <ul>
           <li>Запрещены любые обманные манипуляции с товаром на рынке.</li>
-          <li>Запрещено засорять рынок дорогим или ненужным товаром.</li>
+          <li>Запрещено засорять рынок дорогим или бесполезным товаром.</li>
           <li>Запрещено копировать, продавать, передавать и дарить арты других игроков без согласия владельцев.</li>
           <li>Запрещено умышленно разрушать экономику сервера.</li>
         </ul>
-      </div>
+      </article>
 
-      <div class="rule-card">
-        <h2>🌐 Правила сообщества</h2>
+      <article class="rule-panel-v2 danger" id="punishments">
+        <div class="rule-panel-head"><i data-lucide="gavel"></i><h2>Наказания</h2></div>
         <ul>
-          <li>Запрещены оскорбления, угрозы и переход на личности.</li>
-          <li>Запрещено вторжение в частную жизнь игроков и публикация личной информации без согласия.</li>
-          <li>Запрещены унижение достоинства игроков и нарушение моральных принципов сообщества.</li>
-          <li>Запрещён спам, флуд, оффтоп и CAPS LOCK.</li>
-          <li>Запрещена реклама сторонних ресурсов, кроме материалов, связанных с сервером.</li>
-        </ul>
-      </div>
-
-      <div class="rule-card warning">
-        <h2>🔨 Наказания</h2>
-        <ul>
-          <li>На сервере используются два основных вида наказаний: варн и бан.</li>
+          <li>Основные наказания: предупреждение, мут, кик и бан.</li>
           <li>Варн выдаётся за существенные нарушения и снимается через 45 дней.</li>
           <li>При получении четвёртого варна игрок получает бан.</li>
-          <li>Бан выдаётся за критические нарушения и действует перманентно.</li>
-          <li>Разбан за деньги невозможен.</li>
-          <li>Разбан возможен только при успешной апелляции.</li>
+          <li>Разбан за деньги невозможен. Апелляции рассматриваются индивидуально.</li>
           <li>Бан в Discord может привести к бану на Minecraft-сервере.</li>
         </ul>
-      </div>
+      </article>
 
-      <div class="rule-card warning">
-        <h2>📦 Имущество игроков</h2>
-        <ul>
-          <li>Постройки и предметы забаненных игроков можно разбирать не раньше чем через 3 дня после бана.</li>
-          <li>Если у забаненного игрока были сожители, его вещи принадлежат им.</li>
-          <li>Если игрок был забанен за незаконную добычу ресурсов, его имущество уничтожается администрацией.</li>
-          <li>Вещи восстанавливаются только при нарушении правила о гриферстве или смерти из-за бага сервера.</li>
-          <li>Смерти из-за особенностей Minecraft не считаются багом сервера.</li>
-        </ul>
-      </div>
-
-      <div class="rule-card good">
-        <h2>🌴 Главное правило</h2>
-        <p>
-          PopkinDom — это ламповый Vanilla+ сервер для спокойной и дружной игры.
-          Уважай других игроков, не порть атмосферу, играй честно и помогай сохранять уютное сообщество.
-        </p>
-      </div>
-
-    </div>
+      <article class="rule-panel-v2 good">
+        <div class="rule-panel-head"><i data-lucide="heart"></i><h2>Главное правило</h2></div>
+        <p>PopkinDom — это ламповый Vanilla+ сервер для спокойной и дружной игры. Уважай других игроков, не порти атмосферу, играй честно и помогай сохранять уютное сообщество.</p>
+      </article>
+    </section>
   </section>
 </main>
-
 <footer class="footer">
   <div class="footer-content">
-
     <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
-
-    <div class="footer-text">
-      © 2026 PopkinDom. Все права защищены.
-    </div>
-
+    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
     <div class="footer-links">
-  <a href="rules.html">Правила</a>
-
-  <a href="https://discord.gg/88e2Rsp8GT" target="_blank">
-    Discord
-  </a>
-
-  <a href="https://t.me/popkindomcraft" target="_blank">
-    Telegram
-  </a>
-</div>
-
-    <div class="footer-small">
-      Minecraft является товарным знаком Mojang Studios.  
-      PopkinDom не связан с Mojang Studios.
+      <a href="rules.html">Правила</a>
+      <a href="server.html">Сервер</a>
+      <a href="https://discord.gg/88e2Rsp8GT" target="_blank">Discord</a>
+      <a href="https://t.me/popkindomcraft" target="_blank">Telegram</a>
     </div>
-
+    <div class="footer-small">Minecraft является товарным знаком Mojang Studios. PopkinDom не связан с Mojang Studios.</div>
   </div>
 </footer>
 <script src="script.js"></script>

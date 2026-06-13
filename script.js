@@ -77,17 +77,70 @@ async function apiRequest(url, options = {}) {
   return data;
 }
 
-async function loadMe() {
+let loadMePromise = null;
+let loadMeMode = null;
+const ME_CACHE_KEY = "pd_me_summary_cache_v2";
+const ME_CACHE_TTL = 7000;
+
+function isAccountPage() {
+  return Boolean(document.querySelector(".account-page"));
+}
+
+function readMeSummaryCache() {
   try {
-    const data = await apiRequest("/api/me");
-    currentUser = data.user;
-    currentAccountData = data;
-    return data;
+    const raw = sessionStorage.getItem(ME_CACHE_KEY);
+    if (!raw) return null;
+    const cached = JSON.parse(raw);
+    if (!cached || Date.now() - cached.time > ME_CACHE_TTL) return null;
+    return cached.data || null;
   } catch {
-    currentUser = null;
-    currentAccountData = null;
     return null;
   }
+}
+
+function writeMeSummaryCache(data) {
+  try {
+    if (data?.user) sessionStorage.setItem(ME_CACHE_KEY, JSON.stringify({ time: Date.now(), data }));
+  } catch {}
+}
+
+async function loadMe(options = {}) {
+  const full = options.full ?? isAccountPage();
+  const mode = full ? "full" : "summary";
+
+  if (!full) {
+    const cached = readMeSummaryCache();
+    if (cached?.user && !options.force) {
+      currentUser = cached.user;
+      currentAccountData = cached;
+      return cached;
+    }
+  }
+
+  if (loadMePromise && loadMeMode === mode && !options.force) return loadMePromise;
+  loadMeMode = mode;
+
+  loadMePromise = (async () => {
+    try {
+      const data = await apiRequest(full ? "/api/me" : "/api/me?summary=1");
+      currentUser = data.user;
+      currentAccountData = data;
+      if (!full) writeMeSummaryCache(data);
+      return data;
+    } catch {
+      currentUser = null;
+      currentAccountData = null;
+      try { sessionStorage.removeItem(ME_CACHE_KEY); } catch {}
+      return null;
+    } finally {
+      setTimeout(() => {
+        loadMePromise = null;
+        loadMeMode = null;
+      }, 250);
+    }
+  })();
+
+  return loadMePromise;
 }
 
 function refreshAuthUI() {
@@ -1045,7 +1098,7 @@ function renderAccountData(data) {
   renderBarList("blocksList", blocks, "block_type", "amount");
   renderSimpleList("craftsList", crafts, "item_type", "amount");
   renderEnchantments(data.enchantments);
-  renderInventory(data.inventory);
+  if (document.getElementById("inventoryGrid")) renderInventory(data.inventory);
   refreshLucideIcons();
 }
 
@@ -1138,8 +1191,9 @@ if (aboutFinalPlayBtn) {
 
 async function refreshAccountRealtime() {
   if (!document.querySelector(".account-page")) return;
+  if (document.hidden) return;
 
-  const data = await loadMe();
+  const data = await loadMe({ full: true, force: true });
   refreshAuthUI();
 
   if (data) {
@@ -1148,21 +1202,23 @@ async function refreshAccountRealtime() {
 }
 
 (async function init() {
-  const data = await loadMe();
+  const needsFullAccount = Boolean(document.querySelector(".account-page"));
+  const needsAuthNow = Boolean(document.querySelector(".protected-page"));
+  const data = await loadMe({ full: needsFullAccount });
   refreshAuthUI();
   refreshLucideIcons();
 
-  if (document.querySelector(".protected-page") && !currentUser) {
+  if (needsAuthNow && !currentUser) {
     window.location.href = "login.html";
     return;
   }
 
-  if (data) renderAccountData(data);
+  if (needsFullAccount && data) renderAccountData(data);
 
   await initAdminPanel();
 
-  if (document.querySelector(".account-page")) {
-    setInterval(refreshAccountRealtime, 3000);
+  if (needsFullAccount) {
+    setInterval(refreshAccountRealtime, 15000);
   }
 })();
 
@@ -1744,6 +1800,8 @@ const topHeroLeader = document.getElementById("topHeroLeader");
 const topHeroLeaderValue = document.getElementById("topHeroLeaderValue");
 const topStatsGrid = document.getElementById("topStatsGrid");
 let currentTopCategory = "playtime";
+let topLoadController = null;
+const topDataCache = new Map();
 
 function formatTopValue(value, format) {
   if (format === "ticks") return formatTicks(value);
@@ -1858,13 +1916,31 @@ function renderTopRows(data) {
 async function loadTop(category = currentTopCategory) {
   if (!topTableBody) return;
   currentTopCategory = category;
+
+  const cached = topDataCache.get(category);
+  if (cached && Date.now() - cached.time < 30000) {
+    renderTopRows(cached.data);
+    return;
+  }
+
   topTableBody.innerHTML = `<tr><td colspan="4" class="top-empty">Загрузка…</td></tr>`;
   if (topPodium) topPodium.innerHTML = `<div class="top-podium-empty">Загрузка лидеров…</div>`;
 
+  if (topLoadController) topLoadController.abort();
+  topLoadController = new AbortController();
+
   try {
-    const data = await apiRequest(`/api/top?category=${encodeURIComponent(category)}`);
+    const response = await fetch(`/api/top?category=${encodeURIComponent(category)}`, {
+      credentials: "include",
+      signal: topLoadController.signal,
+      headers: { "Accept": "application/json" }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || data.error || "Ошибка загрузки топа.");
+    topDataCache.set(category, { time: Date.now(), data });
     renderTopRows(data);
   } catch (error) {
+    if (error.name === "AbortError") return;
     topTableBody.innerHTML = `<tr><td colspan="4" class="top-empty error">${escapeHtml(error.message || "Ошибка загрузки топа.")}</td></tr>`;
     if (topPodium) topPodium.innerHTML = `<div class="top-podium-empty error">Не удалось загрузить пьедестал.</div>`;
   }

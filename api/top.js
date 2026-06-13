@@ -1,4 +1,4 @@
-const { query, ensureAuthTables } = require('../lib/db');
+const { query } = require('../lib/db');
 const { sendJson, methodNotAllowed } = require('../lib/http');
 
 const CATEGORIES = {
@@ -145,22 +145,34 @@ function sanitizeRows(rows) {
     });
 }
 
+const TOP_CACHE = globalThis.__popkindomTopCache || new Map();
+globalThis.__popkindomTopCache = TOP_CACHE;
+const TOP_CACHE_MS = 30000;
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return methodNotAllowed(res);
-  await ensureAuthTables();
-
   const categoryKey = String(req.query?.category || 'playtime').toLowerCase();
   const category = CATEGORIES[categoryKey] || CATEGORIES.playtime;
 
   try {
+    const safeCategoryKey = categoryKey in CATEGORIES ? categoryKey : 'playtime';
+    const cached = TOP_CACHE.get(safeCategoryKey);
+    if (cached && Date.now() - cached.time < TOP_CACHE_MS) {
+      res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
+      return sendJson(res, 200, cached.payload);
+    }
+
     const result = await query(category.sql);
-    return sendJson(res, 200, {
-      category: categoryKey in CATEGORIES ? categoryKey : 'playtime',
+    const payload = {
+      category: safeCategoryKey,
       label: category.label,
       description: category.description,
       format: category.format,
       players: sanitizeRows(result.rows),
-    });
+    };
+    TOP_CACHE.set(safeCategoryKey, { time: Date.now(), payload });
+    res.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate=60');
+    return sendJson(res, 200, payload);
   } catch (error) {
     console.error(error);
     return sendJson(res, 500, {
