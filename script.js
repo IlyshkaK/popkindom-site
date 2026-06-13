@@ -1807,3 +1807,12 @@ if (topRefreshBtn) {
 if (topTableBody) {
   loadTop(currentTopCategory);
 }
+
+document.addEventListener('DOMContentLoaded',()=>{
+ const open=document.getElementById('openResetModal');
+ const modal=document.getElementById('resetModal');
+ if(open&&modal){
+  open.onclick=()=>modal.classList.add('show');
+  modal.addEventListener('click',e=>{if(e.target===modal) modal.classList.remove('show');});
+ }
+});

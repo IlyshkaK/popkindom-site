@@ -5674,3 +5674,32 @@ body.admin-pin-locked .footer {
     grid-template-columns: 1fr !important;
   }
 }
+
+
+.security-actions{
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+.security-actions-top{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+.security-action-btn{
+min-height:72px;
+white-space:normal;
+line-height:1.15;
+text-align:center;
+justify-content:center;
+}
+.security-action-btn.danger{
+background:#dc2626;
+}
+.security-modal{
+position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:9999;
+}
+.security-modal.show{display:flex}
+.security-modal-card{
+width:min(520px,92vw);background:#101010;border:1px solid #2f2f2f;border-radius:20px;padding:24px;
+}
