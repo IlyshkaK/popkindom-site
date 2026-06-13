@@ -5541,3 +5541,11 @@ body.admin-pin-locked .footer {
     grid-template-columns: 1fr;
   }
 }
+
+
+.pin-hint{margin:12px 0 18px;color:#cfd3d6;text-align:center}
+.security-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.security-action-btn{width:100%;font-size:18px;white-space:normal;min-height:64px}
+@media(max-width:800px){.security-actions{grid-template-columns:1fr}}
+.admin-role-select{background:#0b0f0b;border:1px solid #4ade80;border-radius:14px;padding:14px;color:#fff}
+.admin-role-submit{border-radius:14px;font-weight:700}
