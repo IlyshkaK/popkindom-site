@@ -70,7 +70,7 @@
       <p><span><i data-lucide="gamepad-2"></i> Автовход в игре</span><b id="autoLoginStatus">—</b></p>
     </div><div class="pin-hint" id="pinHint" hidden>Если PIN не установлен, задайте его в игре командой администратора аккаунта.</div>
 
-    <button class="auth-submit security-action-btn" type="button" id="openResetModal"><i data-lucide="key-round"></i> Сбросить пароль</button><div class="security-modal" id="resetModal"><div class="security-modal-card"><form class="security-reset-card" id="resetPasswordForm">
+    <button class="auth-submit security-action-btn" type="button" id="openResetModal"><i data-lucide="key-round"></i> Сбросить пароль</button><div class="security-modal" id="resetModal"><div class="security-modal-card"><button type="button" class="modal-back-btn" onclick="document.getElementById('resetModal').classList.remove('open')">Назад</button><form class="security-reset-card" id="resetPasswordForm">
       <div>
         <h2><i data-lucide="rotate-ccw-key"></i> Сбросить пароль</h2>
         <p>Введите PIN-код аккаунта и новый пароль. После сброса старый пароль перестанет работать.</p>
@@ -85,19 +85,13 @@
       </button>
     </form></div></div>
 
-    <div class="security-actions"><div class="security-actions-top">
-      <button class="auth-submit security-action-btn" type="button" id="disableAutoLoginBtn">
-        <i data-lucide="shield-x"></i> Отключить<br>автовход
-      </button>
-
-      </div><button class="auth-submit security-action-btn danger" type="button" id="logoutAllBtn">
-        <i data-lucide="log-out"></i> Завершить все<br>сессии
-      </button>
-
-      <button class="auth-submit security-action-btn danger" type="button" data-logout>
-        <i data-lucide="door-open"></i> Выйти из<br>аккаунта
-      </button>
-    </div>
+    <div class="security-actions">
+<div class="security-actions-top">
+<button class="auth-submit security-action-btn" type="button" id="disableAutoLoginBtn"><i data-lucide="shield-x"></i> Отключить<br>автовход</button>
+<button class="auth-submit security-action-btn" type="button" data-logout><i data-lucide="door-open"></i> Выйти из<br>аккаунта</button>
+</div>
+<button class="auth-submit security-action-btn danger security-full" type="button" id="logoutAllBtn"><i data-lucide="log-out"></i> Завершить все<br>сессии</button>
+</div>
 
     <p class="auth-message" id="securityMessage"></p>
   </section>

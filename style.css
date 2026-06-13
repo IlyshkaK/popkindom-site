@@ -5703,3 +5703,11 @@ position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:cente
 .security-modal-card{
 width:min(520px,92vw);background:#101010;border:1px solid #2f2f2f;border-radius:20px;padding:24px;
 }
+
+.security-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;z-index:9999}
+.security-modal.open{display:flex;align-items:center;justify-content:center}
+.security-modal-card{width:min(700px,90vw);position:relative}
+.modal-back-btn{position:absolute;top:-50px;left:0;padding:10px 20px}
+.security-actions-top{display:flex;gap:16px}
+.security-actions-top .security-action-btn{flex:1}
+.security-full{width:100%;margin-top:16px}
