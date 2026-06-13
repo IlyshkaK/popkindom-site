@@ -7001,3 +7001,61 @@ body.security-modal-open {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* ===== BLUR FIX: убран бесполезный блюр фона и карточек ===== */
+*,
+*::before,
+*::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.auth-bg,
+.hero-bg,
+.rules-bg,
+.account-bg {
+  inset: 0 !important;
+  filter: none !important;
+  transform: none !important;
+  opacity: 0.72 !important;
+  will-change: auto !important;
+}
+
+.auth-dark,
+.hero-dark,
+.rules-dark,
+.account-dark {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.auth-card,
+.glass-card,
+.card,
+.top-hero,
+.top-board,
+.rules-hero-v2,
+.server-hero-v2,
+.security-modal-card,
+.security-reset-card,
+.profile-hero,
+.admin-card,
+.top-panel {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Фон страницы безопасности без размытия внутри центральной области */
+.auth-page .auth-bg {
+  background-image: url("background.webp") !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* Модальные окна затемняют экран без размытия */
+.security-modal,
+.admin-pin-overlay {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
