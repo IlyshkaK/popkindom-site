@@ -5549,3 +5549,128 @@ body.admin-pin-locked .footer {
 @media(max-width:800px){.security-actions{grid-template-columns:1fr}}
 .admin-role-select{background:#0b0f0b;border:1px solid #4ade80;border-radius:14px;padding:14px;color:#fff}
 .admin-role-submit{border-radius:14px;font-weight:700}
+
+/* === PopkinDom security/admin final fixes === */
+.security-list p {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+}
+
+.security-list p > span {
+  min-width: 0;
+}
+
+.security-list p > b {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.pin-hint[hidden] {
+  display: none !important;
+}
+
+.pin-hint {
+  margin: 14px 0 20px;
+  padding: 14px 16px;
+  border: 1px solid rgba(123, 255, 75, .26);
+  border-radius: 18px;
+  background: rgba(4, 16, 10, .42);
+  color: rgba(255, 255, 255, .86);
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.security-reset-card {
+  overflow: hidden;
+}
+
+.security-reset-grid {
+  width: 100%;
+}
+
+.security-reset-grid input {
+  min-width: 0;
+}
+
+.security-actions {
+  align-items: stretch;
+}
+
+.security-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.admin-role-select-wrap {
+  position: relative;
+  padding: 12px;
+  border: 1px solid rgba(123, 255, 75, .36);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(123, 255, 75, .12), rgba(14, 20, 16, .72));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 12px 32px rgba(0,0,0,.25);
+}
+
+.admin-role-select-wrap[hidden] {
+  display: none !important;
+}
+
+.admin-role-select-wrap::before {
+  content: "Установить роль";
+  display: block;
+  margin: 0 0 8px;
+  color: rgba(255,255,255,.72);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.admin-role-select {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid rgba(123, 255, 75, .58) !important;
+  border-radius: 14px !important;
+  background: rgba(6, 12, 8, .92) !important;
+  color: #fff !important;
+  font-weight: 900;
+  padding: 0 16px !important;
+  outline: none;
+}
+
+.admin-role-select option {
+  background: #111;
+  color: #fff;
+}
+
+.admin-action-form button[type="submit"] {
+  min-height: 56px;
+  white-space: normal;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .security-list p {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .security-list p > b {
+    text-align: left;
+    white-space: normal;
+    padding-left: 34px;
+  }
+
+  .security-reset-grid,
+  .security-actions {
+    grid-template-columns: 1fr !important;
+  }
+}

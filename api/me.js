@@ -90,6 +90,7 @@ module.exports = async function handler(req, res) {
       user: {
         ...publicUser(user),
         autoLoginEnabled: user.auto_login_enabled !== false,
+        hasPin: Boolean(user.pin_hash),
       },
       player,
       stats: statsResult.rows[0] || null,

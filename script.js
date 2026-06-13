@@ -136,6 +136,18 @@ function refreshAuthUI() {
     autoLoginStatus.textContent = enabled ? "Включён" : "Отключён";
     autoLoginStatus.className = enabled ? "green-text" : "red-text";
   }
+
+  const pinStatus = document.getElementById("pinStatus");
+  const pinHint = document.getElementById("pinHint");
+  if (pinStatus && isAuth) {
+    const hasPin = currentUser.hasPin === true;
+    pinStatus.textContent = hasPin ? "Установлен" : "Не установлен";
+    pinStatus.className = hasPin ? "green-text" : "red-text";
+    if (pinHint) {
+      pinHint.hidden = hasPin;
+      pinHint.textContent = "Если PIN не установлен, задайте его в игре командой администратора аккаунта.";
+    }
+  }
 }
 
 const authMenuBtn = document.getElementById("authMenuBtn");
@@ -1318,7 +1330,7 @@ function renderAdminPlayerPanel(player) {
     { action: "WHITELIST_REMOVE", icon: "user-minus", label: "Удалить из WL", cls: "" },
     { action: "RESET_PASSWORD", icon: "rotate-ccw-key", label: "Сбросить пароль", cls: "danger" },
     { action: "RESET_PIN", icon: "key-round", label: "Сбросить PIN", cls: "danger" },
-    { action: "SET_ROLE", icon: "crown", label: "Выдать роль", cls: "safe owner-only" }
+    { action: "SET_ROLE", icon: "crown", label: "Установить роль", cls: "safe owner-only" }
   ].filter((item) => adminActionAllowedForCurrentUser(item.action));
 
   panel.innerHTML = `
@@ -1365,12 +1377,14 @@ function renderAdminPlayerPanel(player) {
         </div>
 
         <label id="adminRoleLabel" hidden>Новая роль</label>
-        <select id="adminNewRole" hidden>
+        <div id="adminRoleSelectWrap" class="admin-role-select-wrap" hidden>
+          <select id="adminNewRole" class="admin-role-select">
           <option value="PLAYER">Игрок</option>
           <option value="MODERATOR">Модератор</option>
           <option value="ADMIN">Администратор</option>
           <option value="OWNER">Владелец</option>
-        </select>
+          </select>
+        </div>
 
         <label id="adminDurationLabel" hidden>Срок</label>
         <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
@@ -1406,7 +1420,9 @@ function renderAdminPlayerPanel(player) {
   const reason = document.getElementById("adminActionReason");
   const reasonLabel = document.getElementById("adminReasonLabel");
   const roleSelect = document.getElementById("adminNewRole");
+  const roleWrap = document.getElementById("adminRoleSelectWrap");
   const roleLabel = document.getElementById("adminRoleLabel");
+  const submitButton = document.querySelector("#adminActionForm button[type='submit']");
   const buttons = panel.querySelectorAll("[data-admin-action]");
 
   function syncActionFields() {
@@ -1424,8 +1440,16 @@ function renderAdminPlayerPanel(player) {
     privateMessageLabel.hidden = !isPrivateMessage;
     if (!isPrivateMessage) privateMessage.value = "";
 
-    roleSelect.hidden = !isRole;
+    if (roleSelect) roleSelect.hidden = !isRole;
+    if (roleWrap) roleWrap.hidden = !isRole;
     roleLabel.hidden = !isRole;
+
+    if (submitButton) {
+      submitButton.innerHTML = isRole
+        ? `<i data-lucide="crown"></i> Установить роль`
+        : `<i data-lucide="gavel"></i> Выполнить действие`;
+      refreshLucideIcons();
+    }
 
     reason.hidden = noReason || isPrivateMessage;
     reasonLabel.hidden = noReason || isPrivateMessage;
