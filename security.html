@@ -58,31 +58,48 @@
 
   <section class="auth-card">
     <div class="auth-logo"><img src="logo.png" alt="PopkinDom"></div>
+    
     <h1>Безопасность</h1>
-    <p class="auth-subtitle">Здесь позже появятся смена пароля, активные сессии и защита аккаунта.</p>
+    <p class="auth-subtitle">Контроль доступа к аккаунту: автовход, активные сессии и сброс пароля через PIN-код.</p>
 
-    <div class="security-list">
-      <p><span>Аккаунт</span><b id="securityUsername">—</b></p>
-      <p><span>Сессия сайта</span><b>48 часов</b></p>
-      <p><span>Статус</span><b class="green-text">Авторизован</b></p>
-	  <p><span>Автовход в игре</span><b id="autoLoginStatus">—</b></p>
+    <div class="security-list security-list-rich">
+      <p><span><i data-lucide="user-round"></i> Аккаунт</span><b id="securityUsername">—</b></p>
+      <p><span><i data-lucide="clock-3"></i> Сессия сайта</span><b>48 часов</b></p>
+      <p><span><i data-lucide="shield-check"></i> Статус</span><b class="green-text">Авторизован</b></p>
+      <p><span><i data-lucide="key-round"></i> Защита PIN</span><b>Требуется для сброса пароля</b></p>
+      <p><span><i data-lucide="gamepad-2"></i> Автовход в игре</span><b id="autoLoginStatus">—</b></p>
     </div>
 
+    <form class="security-reset-card" id="resetPasswordForm">
+      <div>
+        <h2><i data-lucide="rotate-ccw-key"></i> Сбросить пароль</h2>
+        <p>Введите PIN-код аккаунта и новый пароль. После сброса старый пароль перестанет работать.</p>
+      </div>
+      <div class="security-reset-grid">
+        <input id="resetPasswordPin" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="PIN-код" autocomplete="one-time-code" required />
+        <input id="resetNewPassword" type="password" placeholder="Новый пароль" autocomplete="new-password" required />
+        <input id="resetNewPasswordRepeat" type="password" placeholder="Повторите пароль" autocomplete="new-password" required />
+      </div>
+      <button class="auth-submit security-action-btn reset-password-btn" type="submit">
+        <i data-lucide="key-round"></i> Сбросить пароль
+      </button>
+    </form>
+
     <div class="security-actions">
-  <button class="auth-submit security-action-btn" type="button" id="disableAutoLoginBtn">
-    Отключить автовход
-  </button>
+      <button class="auth-submit security-action-btn" type="button" id="disableAutoLoginBtn">
+        <i data-lucide="shield-x"></i> Отключить автовход
+      </button>
 
-  <button class="auth-submit security-action-btn" type="button" id="logoutAllBtn">
-    Завершить все сессии
-  </button>
+      <button class="auth-submit security-action-btn" type="button" id="logoutAllBtn">
+        <i data-lucide="log-out"></i> Завершить все сессии
+      </button>
 
-  <button class="auth-submit security-action-btn danger" type="button" data-logout>
-    Выйти из аккаунта
-  </button>
-</div>
+      <button class="auth-submit security-action-btn danger" type="button" data-logout>
+        <i data-lucide="door-open"></i> Выйти из аккаунта
+      </button>
+    </div>
 
-<p class="auth-message" id="securityMessage"></p>
+    <p class="auth-message" id="securityMessage"></p>
   </section>
 </main>
 

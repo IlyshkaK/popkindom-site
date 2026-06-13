@@ -5421,3 +5421,123 @@ body.admin-pin-locked .footer {
   -webkit-text-security: disc;
   text-security: disc;
 }
+
+
+/* ===== PopkinDom update: account inventory removed / security / admin roles ===== */
+.security-list-rich p span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.security-list-rich p span svg {
+  width: 20px;
+  height: 20px;
+  color: #79e446;
+}
+
+.security-reset-card {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(126, 226, 60, 0.2);
+  background: rgba(7, 13, 10, 0.54);
+  box-shadow: inset 0 0 22px rgba(126, 226, 60, 0.05);
+}
+
+.security-reset-card h2 {
+  margin: 0 0 7px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+}
+
+.security-reset-card h2 svg {
+  width: 22px;
+  height: 22px;
+  color: #7ee23c;
+}
+
+.security-reset-card p {
+  margin: 0 0 16px;
+  color: rgba(255, 255, 255, 0.68);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.security-reset-grid {
+  display: grid;
+  grid-template-columns: 130px 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.security-reset-grid input,
+.admin-action-form select {
+  width: 100%;
+  height: 50px;
+  border-radius: 12px;
+  border: 1px solid rgba(126, 226, 60, 0.22);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  padding: 0 14px;
+  font-weight: 800;
+  outline: none;
+}
+
+.security-reset-grid input:focus,
+.admin-action-form select:focus {
+  border-color: rgba(126, 226, 60, 0.82);
+  box-shadow: 0 0 0 3px rgba(126, 226, 60, 0.12);
+}
+
+.security-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 16px;
+}
+
+.security-action-btn {
+  min-height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.security-action-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.reset-password-btn {
+  width: 100%;
+  margin-top: 0;
+}
+
+.admin-limited .admin-full-only {
+  display: none !important;
+}
+
+.admin-action-form select[hidden],
+.admin-action-form textarea[hidden],
+.admin-action-form input[hidden],
+.admin-action-form label[hidden] {
+  display: none !important;
+}
+
+.admin-action-picker .owner-only {
+  border-color: rgba(255, 70, 70, 0.35);
+}
+
+@media (max-width: 860px) {
+  .security-reset-grid,
+  .security-actions {
+    grid-template-columns: 1fr;
+  }
+}

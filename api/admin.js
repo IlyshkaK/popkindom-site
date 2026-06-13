@@ -2,10 +2,14 @@ const bcrypt = require('bcryptjs');
 const { query, ensureAuthTables } = require('../lib/db');
 const { sendJson, methodNotAllowed, readJson } = require('../lib/http');
 const { getClientIp, getUserBySession, publicUser, logSecurity } = require('../lib/security');
-const { isAdminRole, isValidPin, createAdminSession, getAdminUser } = require('../lib/admin');
+const { isAdminRole, isFullAdminRole, isOwnerRole, isValidPin, createAdminSession, getAdminUser } = require('../lib/admin');
 
 const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS || 12);
-const PLAYER_ACTIONS = new Set(['BAN', 'TEMP_BAN', 'MUTE', 'TEMP_MUTE', 'UNBAN', 'UNMUTE', 'KICK', 'WHITELIST_REMOVE']);
+const PLAYER_ACTIONS = new Set(['BAN', 'TEMP_BAN', 'MUTE', 'TEMP_MUTE', 'UNBAN', 'UNMUTE', 'KICK', 'WHITELIST_REMOVE', 'RESET_PASSWORD', 'RESET_PIN', 'PRIVATE_MESSAGE', 'SET_ROLE']);
+const MODERATOR_ACTIONS = new Set(['MUTE', 'TEMP_MUTE', 'KICK', 'PRIVATE_MESSAGE']);
+const FULL_ADMIN_ACTIONS = new Set(['BAN', 'TEMP_BAN', 'MUTE', 'TEMP_MUTE', 'UNBAN', 'UNMUTE', 'KICK', 'WHITELIST_REMOVE', 'RESET_PASSWORD', 'RESET_PIN', 'PRIVATE_MESSAGE']);
+const OWNER_ACTIONS = new Set(['SET_ROLE']);
+const ALLOWED_ROLES = new Set(['PLAYER', 'MODERATOR', 'ADMIN', 'OWNER']);
 
 async function safeCount(sql) {
   try {
@@ -24,6 +28,38 @@ function parseDurationToDate(raw) {
   if (!Number.isFinite(amount) || amount <= 0) return null;
   const multipliers = { s: 1000, m: 60000, h: 3600000, d: 86400000 };
   return new Date(Date.now() + amount * multipliers[match[2]]);
+}
+
+
+function generateTempPassword() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  let value = 'PD-';
+  for (let i = 0; i < 10; i += 1) value += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return value;
+}
+
+function normalizeRole(raw) {
+  const value = String(raw || '').trim().toUpperCase();
+  if (['PLAYER', 'MODERATOR', 'ADMIN', 'OWNER'].includes(value)) return value;
+  if (value === 'ИГРОК') return 'PLAYER';
+  if (value === 'МОДЕРАТОР') return 'MODERATOR';
+  if (value === 'АДМИНИСТРАТОР') return 'ADMIN';
+  if (value === 'ВЛАДЕЛЕЦ') return 'OWNER';
+  return null;
+}
+
+async function ensurePlayerMessagesTable() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS moderation_private_messages (
+      id BIGSERIAL PRIMARY KEY,
+      player_name TEXT NOT NULL,
+      player_name_lower TEXT NOT NULL,
+      sender_name TEXT NOT NULL,
+      message TEXT NOT NULL,
+      delivered BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 }
 
 async function audit(action, target, executor, details) {
@@ -239,85 +275,198 @@ async function handlePlayerAction(req, res) {
   const username = String(body.username || '').trim();
   const usernameLower = username.toLowerCase();
   const action = String(body.action || '').trim().toUpperCase();
-  const reason = String(body.reason || '').trim() || 'Действие выполнено администрацией сайта';
+  const reason = String(body.reason || '').trim() || 'Действие выполнено через админ-панель сайта';
+  const durationRaw = String(body.duration || '').trim();
+  const messageText = String(body.message || body.privateMessage || '').trim();
+  const newRole = normalizeRole(body.role || body.newRole);
 
-  if (!/^[a-zA-Z0-9_]{3,16}$/.test(username)) return sendJson(res, 400, { message: 'Некорректный ник игрока.' });
-  if (!PLAYER_ACTIONS.has(action)) return sendJson(res, 400, { message: 'Неизвестное действие.' });
+  if (!/^[a-zA-Z0-9_]{3,16}$/.test(username)) {
+    return sendJson(res, 400, { message: 'Некорректный ник игрока.' });
+  }
 
-  if (['BAN', 'TEMP_BAN', 'MUTE', 'TEMP_MUTE', 'KICK'].includes(action)) {
-    let expiresAt = null;
-    if (action === 'TEMP_BAN' || action === 'TEMP_MUTE') {
-      expiresAt = parseDurationToDate(body.duration);
-      if (!expiresAt) return sendJson(res, 400, { message: 'Укажи срок в формате 10m, 2h или 7d.' });
+  if (!PLAYER_ACTIONS.has(action)) {
+    return sendJson(res, 400, { message: 'Неизвестное действие.' });
+  }
+
+  const adminRole = String(admin.role || '').toUpperCase();
+
+  if (adminRole === 'MODERATOR' && !MODERATOR_ACTIONS.has(action)) {
+    return sendJson(res, 403, { message: 'Модератор может выдавать мут, временный мут, кикать и писать игрокам.' });
+  }
+
+  if (['ADMIN', 'OWNER'].includes(adminRole) && !FULL_ADMIN_ACTIONS.has(action) && !OWNER_ACTIONS.has(action)) {
+    return sendJson(res, 403, { message: 'Недостаточно прав для этого действия.' });
+  }
+
+  if (OWNER_ACTIONS.has(action) && !isOwnerRole(admin)) {
+    return sendJson(res, 403, { message: 'Выдавать роли может только OWNER.' });
+  }
+
+  if (action === 'SET_ROLE') {
+    if (!newRole || !ALLOWED_ROLES.has(newRole)) {
+      return sendJson(res, 400, { message: 'Выберите корректную роль: PLAYER, MODERATOR, ADMIN или OWNER.' });
     }
 
-    if (action === 'BAN' || action === 'TEMP_BAN') {
-      await query(
-        `UPDATE moderation_punishments
-         SET active = FALSE, removed_by = $2, removed_at = NOW(), remove_reason = 'Заменено новым баном с сайта'
-         WHERE player_name_lower = $1 AND active = TRUE AND type IN ('BAN', 'TEMP_BAN');`,
-        [usernameLower, admin.username]
-      );
+    const result = await query(
+      `UPDATE pd_users
+       SET role = $1
+       WHERE username_lower = $2
+       RETURNING username, role;`,
+      [newRole, usernameLower]
+    );
+
+    if (!result.rows.length) {
+      return sendJson(res, 404, { message: 'Игрок не найден на сайте.' });
     }
 
-    if (action === 'MUTE' || action === 'TEMP_MUTE') {
-      await query(
-        `UPDATE moderation_punishments
-         SET active = FALSE, removed_by = $2, removed_at = NOW(), remove_reason = 'Заменено новым мутом с сайта'
-         WHERE player_name_lower = $1 AND active = TRUE AND type IN ('MUTE', 'TEMP_MUTE');`,
-        [usernameLower, admin.username]
-      );
+    await audit('SET_ROLE', username, admin.username, `Роль изменена на ${newRole}`);
+    return sendJson(res, 200, { message: `Роль игрока ${username} изменена на ${newRole}.`, role: newRole });
+  }
+
+  if (action === 'RESET_PASSWORD') {
+    if (!isFullAdminRole(admin)) {
+      return sendJson(res, 403, { message: 'Сброс пароля доступен только ADMIN и OWNER.' });
+    }
+
+    const tempPassword = generateTempPassword();
+    const passwordHash = await bcrypt.hash(tempPassword, BCRYPT_ROUNDS);
+    const result = await query(
+      `UPDATE pd_users
+       SET password_hash = $1
+       WHERE username_lower = $2
+       RETURNING username;`,
+      [passwordHash, usernameLower]
+    );
+
+    if (!result.rows.length) {
+      return sendJson(res, 404, { message: 'Игрок не найден на сайте.' });
     }
 
     await query(
-      `INSERT INTO moderation_punishments
-       (player_name, player_name_lower, type, reason, moderator_name, moderator_uuid, expires_at, source)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'WEBSITE');`,
-      [username, usernameLower, action, reason, admin.username, String(admin.id), expiresAt]
+      `UPDATE pd_auth_sessions
+       SET revoked = TRUE
+       WHERE user_id = (SELECT id FROM pd_users WHERE username_lower = $1);`,
+      [usernameLower]
     );
-    await audit(action, username, admin.username, `Причина: ${reason}`);
-    return sendJson(res, 200, { message: action === 'KICK' ? 'Кик записан в историю.' : 'Действие выполнено.' });
+
+    await audit('RESET_PASSWORD', username, admin.username, 'Сброшен пароль игрока через админ-панель');
+    return sendJson(res, 200, {
+      message: `Пароль игрока ${username} сброшен. Новый временный пароль: ${tempPassword}`,
+      temporaryPassword: tempPassword
+    });
   }
 
-  if (action === 'UNBAN') {
+  if (action === 'RESET_PIN') {
+    if (!isFullAdminRole(admin)) {
+      return sendJson(res, 403, { message: 'Сброс PIN доступен только ADMIN и OWNER.' });
+    }
+
     const result = await query(
-      `UPDATE moderation_punishments
-       SET active = FALSE, removed_by = $2, removed_at = NOW(), remove_reason = $3
-       WHERE player_name_lower = $1 AND active = TRUE AND type IN ('BAN', 'TEMP_BAN');`,
-      [usernameLower, admin.username, reason]
+      `UPDATE pd_users
+       SET pin_hash = NULL,
+           failed_pin_attempts = 0,
+           pin_locked_until = NULL
+       WHERE username_lower = $1
+       RETURNING username;`,
+      [usernameLower]
     );
-    await audit('UNBAN', username, admin.username, `Причина: ${reason}`);
-    return sendJson(res, 200, { message: result.rowCount ? 'Бан снят.' : 'Активный бан не найден.' });
+
+    if (!result.rows.length) {
+      return sendJson(res, 404, { message: 'Игрок не найден на сайте.' });
+    }
+
+    await query(
+      `UPDATE pd_auth_sessions
+       SET revoked = TRUE
+       WHERE user_id = (SELECT id FROM pd_users WHERE username_lower = $1)
+         AND session_type = 'ADMIN_PANEL';`,
+      [usernameLower]
+    );
+
+    await audit('RESET_PIN', username, admin.username, 'Сброшен PIN игрока через админ-панель');
+    return sendJson(res, 200, { message: `PIN-код игрока ${username} сброшен.` });
   }
 
-  if (action === 'UNMUTE') {
-    const result = await query(
-      `UPDATE moderation_punishments
-       SET active = FALSE, removed_by = $2, removed_at = NOW(), remove_reason = $3
-       WHERE player_name_lower = $1 AND active = TRUE AND type IN ('MUTE', 'TEMP_MUTE');`,
-      [usernameLower, admin.username, reason]
+  if (action === 'PRIVATE_MESSAGE') {
+    if (!messageText) {
+      return sendJson(res, 400, { message: 'Введите текст личного сообщения.' });
+    }
+
+    await ensurePlayerMessagesTable();
+    await query(
+      `INSERT INTO moderation_private_messages (player_name, player_name_lower, sender_name, message)
+       VALUES ($1, $2, $3, $4);`,
+      [username, usernameLower, admin.username, messageText]
     );
-    await audit('UNMUTE', username, admin.username, `Причина: ${reason}`);
-    return sendJson(res, 200, { message: result.rowCount ? 'Мут снят.' : 'Активный мут не найден.' });
+
+    await audit('PRIVATE_MESSAGE', username, admin.username, messageText);
+    return sendJson(res, 200, { message: `Личное сообщение для ${username} сохранено в очереди.` });
+  }
+
+  let expiresAt = null;
+  if (['TEMP_BAN', 'TEMP_MUTE'].includes(action)) {
+    expiresAt = parseDurationToDate(durationRaw);
+    if (!expiresAt) return sendJson(res, 400, { message: 'Укажите срок в формате 10m, 2h или 7d.' });
+  }
+
+  if (action === 'KICK') {
+    await audit('KICK', username, admin.username, reason);
+    await query(
+      `INSERT INTO moderation_commands (command_type, player_name, player_name_lower, executor, reason, source)
+       VALUES ('KICK', $1, $2, $3, $4, 'WEBSITE');`,
+      [username, usernameLower, admin.username, reason]
+    ).catch(async () => {
+      await query(
+        `INSERT INTO moderation_audit_log (action, target_player, executor, details, source)
+         VALUES ('KICK_COMMAND', $1, $2, $3, 'WEBSITE');`,
+        [username, admin.username, reason]
+      );
+    });
+    return sendJson(res, 200, { message: `Команда KICK для ${username} отправлена.` });
   }
 
   if (action === 'WHITELIST_REMOVE') {
-    const result = await query(
-      `UPDATE moderation_whitelist
-       SET active = FALSE, removed_by = $2, removed_at = NOW()
-       WHERE player_name_lower = $1 AND active = TRUE;`,
-      [usernameLower, admin.username]
-    );
-    await audit('WHITELIST_REMOVE', username, admin.username, reason);
-    return sendJson(res, 200, { message: result.rowCount ? 'Игрок удалён из whitelist.' : 'Игрока не было в whitelist.' });
+    await query(`DELETE FROM moderation_whitelist WHERE player_name_lower = $1;`, [usernameLower]);
+    await audit(action, username, admin.username, reason);
+    return sendJson(res, 200, { message: `${username} удалён из whitelist.` });
   }
 
-  return sendJson(res, 400, { message: 'Действие не обработано.' });
+  if (action === 'UNBAN') {
+    await query(
+      `UPDATE moderation_punishments
+       SET active = FALSE, removed_by = $2, removed_at = CURRENT_TIMESTAMP, remove_reason = $3
+       WHERE player_name_lower = $1 AND active = TRUE AND type IN ('BAN', 'TEMP_BAN');`,
+      [usernameLower, admin.username, reason]
+    );
+    await audit(action, username, admin.username, reason);
+    return sendJson(res, 200, { message: `Бан игрока ${username} снят.` });
+  }
+
+  if (action === 'UNMUTE') {
+    await query(
+      `UPDATE moderation_punishments
+       SET active = FALSE, removed_by = $2, removed_at = CURRENT_TIMESTAMP, remove_reason = $3
+       WHERE player_name_lower = $1 AND active = TRUE AND type IN ('MUTE', 'TEMP_MUTE');`,
+      [usernameLower, admin.username, reason]
+    );
+    await audit(action, username, admin.username, reason);
+    return sendJson(res, 200, { message: `Мут игрока ${username} снят.` });
+  }
+
+  await query(
+    `INSERT INTO moderation_punishments
+     (player_name, player_name_lower, type, reason, moderator_name, moderator_uuid, expires_at, source)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, 'WEBSITE');`,
+    [username, usernameLower, action, reason, admin.username, String(admin.id), expiresAt]
+  );
+  await audit(action, username, admin.username, reason);
+  return sendJson(res, 200, { message: `Действие ${action} для ${username} выполнено.` });
 }
 
 async function handleWhitelistRequests(req, res) {
   const admin = await requireAdmin(req, res);
   if (!admin) return;
+  if (!isFullAdminRole(admin)) return sendJson(res, 403, { message: 'Whitelist доступен только ADMIN и OWNER.' });
 
   if (req.method === 'GET') {
     const result = await query(

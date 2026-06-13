@@ -125,7 +125,7 @@ function refreshAuthUI() {
   const securityUsername = document.getElementById("securityUsername");
   if (securityUsername && isAuth) securityUsername.textContent = currentUser.username;
 
-  const isAdmin = isAuth && ["ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase());
+  const isAdmin = isAuth && ["MODERATOR", "ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase());
   document.body.classList.toggle("is-admin", isAdmin);
 
   refreshLucideIcons();
@@ -1072,6 +1072,42 @@ if (logoutAllBtn) {
   });
 }
 
+
+const resetPasswordForm = document.getElementById("resetPasswordForm");
+if (resetPasswordForm) {
+  resetPasswordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const pin = document.getElementById("resetPasswordPin")?.value?.trim() || "";
+    const password = document.getElementById("resetNewPassword")?.value || "";
+    const passwordRepeat = document.getElementById("resetNewPasswordRepeat")?.value || "";
+    const message = document.getElementById("securityMessage");
+
+    if (!/^\d{4}$/.test(pin)) {
+      setAuthMessage(message, "PIN должен состоять из 4 цифр.", "error");
+      return;
+    }
+
+    if (password !== passwordRepeat) {
+      setAuthMessage(message, "Пароли не совпадают.", "error");
+      return;
+    }
+
+    try {
+      const result = await apiRequest("/api/security?action=reset-password", {
+        method: "POST",
+        body: JSON.stringify({ pin, password, passwordRepeat })
+      });
+
+      setAuthMessage(message, result.message || "Пароль сброшен.", "success");
+      resetPasswordForm.reset();
+    } catch (error) {
+      setAuthMessage(message, error.message || "Ошибка сброса пароля.", "error");
+    }
+  });
+}
+
+
 /* ===== PLAY BUTTON AUTH REDIRECT ===== */
 function goToStartDestination(event) {
   if (event) event.preventDefault();
@@ -1124,7 +1160,7 @@ let adminSelectedPlayer = null;
 let adminPlayersCache = [];
 
 function isCurrentUserAdmin() {
-  return Boolean(currentUser && ["ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase()));
+  return Boolean(currentUser && ["MODERATOR", "ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase()));
 }
 
 function resolveAdminRole(raw) {
@@ -1153,6 +1189,32 @@ function adminRoleBadge(raw) {
 function adminUserBadge(username, roleRaw) {
   return `<span class="admin-user-badge-name">${username || "Администратор"}</span>${adminRoleBadge(roleRaw)}`;
 }
+
+
+function currentAdminRole() {
+  return String(currentUser?.role || "").toUpperCase();
+}
+
+function canUseFullAdminActions() {
+  return ["ADMIN", "OWNER"].includes(currentAdminRole());
+}
+
+function canUseOwnerActions() {
+  return currentAdminRole() === "OWNER";
+}
+
+function adminActionAllowedForCurrentUser(action) {
+  const role = currentAdminRole();
+  if (role === "OWNER") return true;
+  if (role === "ADMIN") return !["SET_ROLE"].includes(action);
+  if (role === "MODERATOR") return ["MUTE", "TEMP_MUTE", "KICK", "PRIVATE_MESSAGE"].includes(action);
+  return false;
+}
+
+function adminDefaultActionForCurrentUser() {
+  return currentAdminRole() === "MODERATOR" ? "MUTE" : "BAN";
+}
+
 
 function setAdminMessage(text, type = "error") {
   const message = document.getElementById("adminPinMessage");
@@ -1243,6 +1305,22 @@ function renderAdminPlayerPanel(player) {
   const panel = document.getElementById("adminPlayerPanel");
   if (!panel) return;
 
+  const defaultAction = adminDefaultActionForCurrentUser();
+  const actionButtons = [
+    { action: "BAN", icon: "ban", label: "Бан", cls: "danger" },
+    { action: "TEMP_BAN", icon: "timer-off", label: "Временный бан", cls: "danger" },
+    { action: "MUTE", icon: "message-circle-off", label: "Мут", cls: "warn" },
+    { action: "TEMP_MUTE", icon: "clock-3", label: "Временный мут", cls: "warn" },
+    { action: "UNBAN", icon: "shield-check", label: "Снять бан", cls: "safe" },
+    { action: "UNMUTE", icon: "message-circle", label: "Снять мут", cls: "safe" },
+    { action: "KICK", icon: "log-out", label: "Кикнуть", cls: "" },
+    { action: "PRIVATE_MESSAGE", icon: "send", label: "ЛС игроку", cls: "" },
+    { action: "WHITELIST_REMOVE", icon: "user-minus", label: "Удалить из WL", cls: "" },
+    { action: "RESET_PASSWORD", icon: "rotate-ccw-key", label: "Сбросить пароль", cls: "danger" },
+    { action: "RESET_PIN", icon: "key-round", label: "Сбросить PIN", cls: "danger" },
+    { action: "SET_ROLE", icon: "crown", label: "Выдать роль", cls: "safe owner-only" }
+  ].filter((item) => adminActionAllowedForCurrentUser(item.action));
+
   panel.innerHTML = `
     <div class="admin-player-profile admin-player-profile-wide">
       <div class="admin-info-col">
@@ -1277,22 +1355,30 @@ function renderAdminPlayerPanel(player) {
     <div class="admin-selected-grid">
       <form class="admin-action-form" id="adminActionForm">
         <label>Действие</label>
-        <input id="adminActionType" type="hidden" value="BAN" />
+        <input id="adminActionType" type="hidden" value="${defaultAction}" />
         <div class="admin-action-picker" role="radiogroup" aria-label="Выбор действия">
-          <button type="button" class="active danger" data-admin-action="BAN"><i data-lucide="ban"></i><span>Бан</span></button>
-          <button type="button" class="danger" data-admin-action="TEMP_BAN"><i data-lucide="timer-off"></i><span>Временный бан</span></button>
-          <button type="button" class="warn" data-admin-action="MUTE"><i data-lucide="message-circle-off"></i><span>Мут</span></button>
-          <button type="button" class="warn" data-admin-action="TEMP_MUTE"><i data-lucide="clock-3"></i><span>Временный мут</span></button>
-          <button type="button" class="safe" data-admin-action="UNBAN"><i data-lucide="shield-check"></i><span>Снять бан</span></button>
-          <button type="button" class="safe" data-admin-action="UNMUTE"><i data-lucide="message-circle"></i><span>Снять мут</span></button>
-          <button type="button" data-admin-action="KICK"><i data-lucide="log-out"></i><span>Кикнуть</span></button>
-          <button type="button" data-admin-action="WHITELIST_REMOVE"><i data-lucide="user-minus"></i><span>Удалить из WL</span></button>
+          ${actionButtons.map((item) => `
+            <button type="button" class="${item.action === defaultAction ? "active " : ""}${item.cls}" data-admin-action="${item.action}">
+              <i data-lucide="${item.icon}"></i><span>${item.label}</span>
+            </button>
+          `).join("")}
         </div>
+
+        <label id="adminRoleLabel" hidden>Новая роль</label>
+        <select id="adminNewRole" hidden>
+          <option value="PLAYER">Игрок</option>
+          <option value="MODERATOR">Модератор</option>
+          <option value="ADMIN">Администратор</option>
+          <option value="OWNER">Владелец</option>
+        </select>
 
         <label id="adminDurationLabel" hidden>Срок</label>
         <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
 
-        <label>Причина</label>
+        <label id="adminMessageLabel" hidden>Сообщение игроку</label>
+        <textarea id="adminPrivateMessage" rows="3" placeholder="Текст личного сообщения игроку" hidden></textarea>
+
+        <label id="adminReasonLabel">Причина</label>
         <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
 
         <button type="submit" class="primary-btn"><i data-lucide="gavel"></i> Выполнить действие</button>
@@ -1315,26 +1401,47 @@ function renderAdminPlayerPanel(player) {
   const actionType = document.getElementById("adminActionType");
   const duration = document.getElementById("adminActionDuration");
   const durationLabel = document.getElementById("adminDurationLabel");
-  const actionButtons = panel.querySelectorAll("[data-admin-action]");
+  const privateMessage = document.getElementById("adminPrivateMessage");
+  const privateMessageLabel = document.getElementById("adminMessageLabel");
+  const reason = document.getElementById("adminActionReason");
+  const reasonLabel = document.getElementById("adminReasonLabel");
+  const roleSelect = document.getElementById("adminNewRole");
+  const roleLabel = document.getElementById("adminRoleLabel");
+  const buttons = panel.querySelectorAll("[data-admin-action]");
 
-  function syncDurationVisibility() {
-    const needDuration = ["TEMP_BAN", "TEMP_MUTE"].includes(actionType.value);
+  function syncActionFields() {
+    const action = actionType.value;
+    const needDuration = ["TEMP_BAN", "TEMP_MUTE"].includes(action);
+    const isPrivateMessage = action === "PRIVATE_MESSAGE";
+    const isRole = action === "SET_ROLE";
+    const noReason = ["RESET_PASSWORD", "RESET_PIN", "SET_ROLE"].includes(action);
+
     duration.hidden = !needDuration;
     durationLabel.hidden = !needDuration;
     if (!needDuration) duration.value = "";
+
+    privateMessage.hidden = !isPrivateMessage;
+    privateMessageLabel.hidden = !isPrivateMessage;
+    if (!isPrivateMessage) privateMessage.value = "";
+
+    roleSelect.hidden = !isRole;
+    roleLabel.hidden = !isRole;
+
+    reason.hidden = noReason || isPrivateMessage;
+    reasonLabel.hidden = noReason || isPrivateMessage;
   }
 
   function setAdminAction(action) {
     actionType.value = action;
-    actionButtons.forEach((button) => button.classList.toggle("active", button.dataset.adminAction === action));
-    syncDurationVisibility();
+    buttons.forEach((button) => button.classList.toggle("active", button.dataset.adminAction === action));
+    syncActionFields();
   }
 
-  actionButtons.forEach((button) => {
+  buttons.forEach((button) => {
     button.addEventListener("click", () => setAdminAction(button.dataset.adminAction));
   });
 
-  syncDurationVisibility();
+  setAdminAction(defaultAction);
 
   document.getElementById("adminActionForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1352,6 +1459,8 @@ async function submitAdminPlayerAction(username) {
   const action = document.getElementById("adminActionType")?.value;
   const duration = document.getElementById("adminActionDuration")?.value?.trim() || "";
   const reason = document.getElementById("adminActionReason")?.value?.trim() || "Действие выполнено через админ-панель сайта";
+  const privateMessage = document.getElementById("adminPrivateMessage")?.value?.trim() || "";
+  const role = document.getElementById("adminNewRole")?.value || "";
   const message = document.getElementById("adminActionMessage");
 
   if (message) {
@@ -1362,7 +1471,7 @@ async function submitAdminPlayerAction(username) {
   try {
     const result = await apiRequest("/api/admin?section=player-action", {
       method: "POST",
-      body: JSON.stringify({ username, action, duration, reason })
+      body: JSON.stringify({ username, action, duration, reason, message: privateMessage, role })
     });
 
     if (message) {
@@ -1480,7 +1589,7 @@ async function initAdminPanel() {
       pinGate.innerHTML = `
         <div class="admin-pin-icon"><i data-lucide="ban"></i></div>
         <h2>Недостаточно прав</h2>
-        <p>Админ-панель доступна только ролям ADMIN и OWNER.</p>
+        <p>Админ-панель доступна ролям MODERATOR, ADMIN и OWNER.</p>
         <a class="primary-btn" href="account.html"><i data-lucide="user-round"></i> Вернуться в кабинет</a>
       `;
     }
@@ -1491,6 +1600,8 @@ async function initAdminPanel() {
   try {
     const status = await apiRequest("/api/admin?section=status");
     if (badge) badge.innerHTML = adminUserBadge(status.user.username, status.user.role);
+    document.body.classList.toggle("admin-limited", String(status.user.role || "").toUpperCase() === "MODERATOR");
+    document.body.classList.toggle("admin-full", ["ADMIN", "OWNER"].includes(String(status.user.role || "").toUpperCase()));
 
     if (status.verified) {
       document.body.classList.remove("admin-pin-locked");
