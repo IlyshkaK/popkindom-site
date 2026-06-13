@@ -18,8 +18,20 @@ let currentAccountData = null;
 function refreshLucideIcons() {
   if (window.lucide && typeof window.lucide.createIcons === "function") {
     window.lucide.createIcons({ attrs: { "stroke-width": 2.4 } });
+    return true;
   }
+  return false;
 }
+
+window.refreshLucideIcons = refreshLucideIcons;
+
+function ensureLucideIcons(attempt = 0) {
+  if (refreshLucideIcons() || attempt >= 20) return;
+  setTimeout(() => ensureLucideIcons(attempt + 1), 100);
+}
+
+ensureLucideIcons();
+window.addEventListener("load", () => ensureLucideIcons());
 
 function minecraftHeadUrl(username, size = 36) {
   const safeName = encodeURIComponent(username || "Steve");
