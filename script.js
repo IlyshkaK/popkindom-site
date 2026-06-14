@@ -12,6 +12,108 @@ if (burgerBtn && mobileMenu) {
   });
 }
 
+
+/* ===== Переключение обычной / мобильной версии ===== */
+const SITE_VIEW_KEY = "popkindom_site_view_mode";
+const viewportMeta = document.querySelector('meta[name="viewport"]');
+
+function getPreferredViewMode() {
+  try {
+    return localStorage.getItem(SITE_VIEW_KEY) || "auto";
+  } catch {
+    return "auto";
+  }
+}
+
+function setPreferredViewMode(mode) {
+  try {
+    localStorage.setItem(SITE_VIEW_KEY, mode);
+  } catch {}
+  applyViewMode(mode);
+}
+
+function applyViewMode(mode = getPreferredViewMode()) {
+  const body = document.body;
+  if (!body) return;
+
+  body.classList.remove("force-desktop", "force-mobile");
+
+  if (mode === "desktop") {
+    body.classList.add("force-desktop");
+    if (viewportMeta) viewportMeta.setAttribute("content", "width=1280");
+  } else if (mode === "mobile") {
+    body.classList.add("force-mobile");
+    if (viewportMeta) viewportMeta.setAttribute("content", "width=device-width, initial-scale=1.0");
+  } else if (viewportMeta) {
+    viewportMeta.setAttribute("content", "width=device-width, initial-scale=1.0");
+  }
+
+  updateViewToggleLabels(mode);
+}
+
+function getNextViewMode() {
+  const mode = getPreferredViewMode();
+  if (mode === "desktop") return "mobile";
+  if (mode === "mobile") return "desktop";
+  return window.matchMedia("(max-width: 820px)").matches ? "desktop" : "mobile";
+}
+
+function updateViewToggleLabels(mode = getPreferredViewMode()) {
+  const isMobileMode = mode === "mobile" || (mode === "auto" && window.matchMedia("(max-width: 820px)").matches);
+  const text = isMobileMode ? "Обычная версия" : "Мобильная версия";
+  document.querySelectorAll("[data-view-toggle]").forEach((button) => {
+    const label = button.querySelector("b") || button;
+    label.textContent = text;
+    button.setAttribute("aria-label", text);
+  });
+}
+
+function initViewSwitcher() {
+  const header = document.querySelector(".header");
+  const mobileMenuEl = document.getElementById("mobileMenu");
+
+  if (header && !header.querySelector("[data-view-toggle]")) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "view-toggle-btn";
+    button.setAttribute("data-view-toggle", "");
+    button.innerHTML = '<i data-lucide="smartphone"></i><b>Мобильная версия</b>';
+    const authWrap = header.querySelector(".auth-menu-wrap");
+    header.insertBefore(button, authWrap || header.lastElementChild);
+  }
+
+  if (mobileMenuEl && !mobileMenuEl.querySelector("[data-view-toggle]")) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "mobile-auth-link view-toggle-mobile";
+    button.setAttribute("data-view-toggle", "");
+    button.innerHTML = '<i data-lucide="monitor-smartphone"></i> <b>Обычная версия</b>';
+    mobileMenuEl.appendChild(button);
+  }
+
+  document.querySelectorAll("[data-view-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setPreferredViewMode(getNextViewMode());
+      if (mobileMenu) mobileMenu.classList.remove("open");
+      if (burgerBtn) burgerBtn.classList.remove("open");
+      refreshLucideIcons();
+    });
+  });
+
+  applyViewMode();
+  refreshLucideIcons();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initViewSwitcher);
+} else {
+  initViewSwitcher();
+}
+
+window.addEventListener("resize", () => {
+  if (getPreferredViewMode() === "auto") updateViewToggleLabels("auto");
+});
+
 let currentUser = null;
 let currentAccountData = null;
 
