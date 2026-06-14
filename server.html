@@ -55,42 +55,71 @@
   <a href="admin.html" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
   <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
 </div>
-<main class="server-page-v2">
+
+<main class="server-page-v2 server-page-full">
   <div class="rules-bg"></div>
   <div class="rules-dark"></div>
 
   <section class="server-shell-v2">
-    <section class="server-hero-v2 glass-card">
+    <section class="server-hero-v2 glass-card server-hero-technical">
       <div>
         <span class="about-kicker"><i data-lucide="server"></i> Информация о сервере</span>
         <h1>Плагины, моды, дата-паки и миры</h1>
-        <p>Здесь собрана техническая информация сезона: что работает на сервере, какие клиентские моды поддерживаются и какие границы у миров.</p>
+        <p>Техническая карта PopkinDom Summer Season 4: серверные плагины, уникальные системы, разрешённые моды, дата-паки и актуальная информация по мирам.</p>
       </div>
       <div class="server-ip-card">
         <i data-lucide="plug-zap"></i>
         <span>IP сервера</span>
-        <b>скоро</b>
+        <b>скоро...</b>
       </div>
     </section>
 
-    <section class="server-info-grid">
-      <article class="server-info-card glass-card">
-        <div class="server-card-head"><i data-lucide="plug"></i><h2>Плагины сервера</h2></div>
-        <div class="server-tags">
-          <span>PopkinAuth</span>
-          <span>PopkinDom-WebBridge</span>
-          <span>PopkinDom-Moderation</span>
-          <span>PopkinDom Death</span>
-          <span>PopkinCorpses</span>
-        </div>
-        <p>Плагины отвечают за аккаунты, авторизацию, статистику сайта, наказания, систему смерти и будущие игровые улучшения.</p>
-      </article>
+    <section class="server-section-v2 glass-card">
+      <div class="server-section-title">
+        <span class="about-kicker"><i data-lucide="plug"></i> Основа сервера</span>
+        <h2>Плагины сервера</h2>
+        <p>Публичные и служебные плагины, которые отвечают за защиту, оптимизацию, права, скины, музыку и удобство игры.</p>
+      </div>
 
+      <div class="server-plugin-grid">
+        <article><i data-lucide="beer"></i><h3>BreweryX</h3><p>Система варки напитков и рецептов для атмосферного выживания.</p></article>
+        <article><i data-lucide="map"></i><h3>Chunky</h3><p>Предварительная генерация чанков, чтобы мир грузился стабильнее и без лишних лагов.</p></article>
+        <article><i data-lucide="shield-check"></i><h3>CoreProtect</h3><p>Логи действий игроков: блоки, сундуки и откаты при гриферстве или ошибках.</p></article>
+        <article><i data-lucide="music"></i><h3>GMusic</h3><p>Музыкальная атмосфера и звуковое оформление событий на сервере.</p></article>
+        <article><i data-lucide="armchair"></i><h3>GSit</h3><p>Сидение, лежание и дополнительные позы для лампового общения.</p></article>
+        <article><i data-lucide="key-round"></i><h3>LuckPerms</h3><p>Права, группы, роли и доступы игроков и администрации.</p></article>
+        <article><i data-lucide="braces"></i><h3>PlaceholderAPI</h3><p>Подстановка данных игрока для меню, сообщений, таба и других систем.</p></article>
+        <article><i data-lucide="radio-tower"></i><h3>ProtocolLib</h3><p>Техническая библиотека для расширенной работы плагинов с пакетами Minecraft.</p></article>
+        <article><i data-lucide="user-round"></i><h3>SkinsRestorer</h3><p>Отображение скинов игроков на сервере без обязательной лицензии Minecraft.</p></article>
+        <article><i data-lucide="activity"></i><h3>Spark</h3><p>Профилирование производительности и поиск причин лагов на сервере.</p></article>
+      </div>
+    </section>
+
+    <section class="server-section-v2 glass-card server-popkin-section">
+      <div class="server-section-title">
+        <span class="about-kicker"><i data-lucide="crown"></i> PopkinDom Core</span>
+        <h2>Уникальные плагины PopkinDom</h2>
+        <p>Собственные системы проекта, связанные с сайтом, аккаунтами, наказаниями, трупами мобов и переработанной смертью.</p>
+      </div>
+
+      <div class="server-plugin-grid server-plugin-grid-featured">
+        <article><i data-lucide="log-in"></i><h3>PopkinAuth</h3><p>Авторизация игроков, регистрация, сессии, PIN-код и связь аккаунта игры с сайтом.</p></article>
+        <article><i data-lucide="skull"></i><h3>PopkinCorpses</h3><p>Система трупов мобов, отображение добычи и защита от лишних сущностей.</p></article>
+        <article><i data-lucide="heart-crack"></i><h3>PopkinDeath</h3><p>Уникальная переработка смерти, возврат предметов и будущая система жетонов.</p></article>
+        <article><i data-lucide="database-zap"></i><h3>PopkinDom WebBridge</h3><p>Мост между сервером и сайтом: статистика, онлайн, роли, профиль и данные игрока.</p></article>
+        <article><i data-lucide="gavel"></i><h3>PopkinDom Moderation</h3><p>Баны, муты, кики, история наказаний, whitelist и инструменты администрации.</p></article>
+      </div>
+    </section>
+
+    <section class="server-info-grid server-info-grid-wide">
       <article class="server-info-card glass-card">
-        <div class="server-card-head"><i data-lucide="puzzle"></i><h2>Поддерживаемые моды</h2></div>
+        <div class="server-card-head"><i data-lucide="puzzle"></i><h2>Поддержка модов</h2></div>
         <ul class="server-clean-list">
-          <li><b>Simple Voice Chat</b><span>голосовой чат, если установлен у игрока.</span></li>
-          <li><b>Оптимизационные моды</b><span>Sodium, Iris, Lithium и аналоги без преимущества.</span></li>
+          <li><b>Simple Voice Chat</b><span>голосовой чат для общения на сервере.</span></li>
+          <li><b>EmoteCraft</b><span>эмоции и анимации для красивого взаимодействия игроков.</span></li>
+          <li><b>Sodium</b><span>оптимизация FPS без игрового преимущества.</span></li>
+          <li><b>Iris</b><span>поддержка шейдеров, если они не дают нечестного преимущества.</span></li>
+          <li><b>Lithium и аналоги</b><span>оптимизационные моды разрешены, если не ломают механику сервера.</span></li>
           <li><b>Косметика и миникарта</b><span>разрешены, если не показывают скрытые ресурсы и игроков нечестно.</span></li>
         </ul>
       </article>
@@ -98,9 +127,11 @@
       <article class="server-info-card glass-card">
         <div class="server-card-head"><i data-lucide="package-check"></i><h2>Дата-паки</h2></div>
         <ul class="server-clean-list">
-          <li><b>Vanilla Tweaks</b><span>небольшие удобства без ломания баланса.</span></li>
-          <li><b>Сезонные улучшения</b><span>могут меняться по ходу Summer Season 4.</span></li>
-          <li><b>Баланс выживания</b><span>всё, что влияет на прогресс, добавляется только после обсуждения.</span></li>
+          <li><b>BlazeandCave's Advancements</b><span>расширенная система достижений и целей для долгого прохождения.</span></li>
+          <li><b>Incendium</b><span>переработанный Незер с новыми структурами, биомами и испытаниями.</span></li>
+          <li><b>NullScape</b><span>обновлённый Энд с более интересной генерацией и атмосферой.</span></li>
+          <li><b>Structory</b><span>дополнительные структуры в обычном мире для исследования.</span></li>
+          <li><b>Terralith</b><span>красивые биомы и разнообразная генерация обычного мира.</span></li>
         </ul>
       </article>
     </section>
@@ -109,31 +140,32 @@
       <div class="worlds-head">
         <span class="about-kicker"><i data-lucide="map"></i> Миры сезона</span>
         <h2>Границы и вайпы</h2>
+        <p>Пока точные размеры миров не утверждены. Информация будет обновлена перед стартом или после финальной настройки сервера.</p>
       </div>
 
       <div class="worlds-grid-v2">
         <article class="world-card-v2 main">
           <i data-lucide="trees"></i>
           <h3>Основной мир</h3>
-          <p>Главный мир для базы, городов, построек и истории сезона.</p>
-          <div><span>Граница</span><b>±10 000 блоков</b></div>
-          <div><span>Последний вайп</span><b>Старт сезона</b></div>
+          <p>Главный мир для баз, городов, построек и истории сезона.</p>
+          <div><span>Размер мира</span><b>неизвестно</b></div>
+          <div><span>Последний вайп</span><b>старт сезона</b></div>
         </article>
 
         <article class="world-card-v2 nether">
           <i data-lucide="flame"></i>
           <h3>Ад</h3>
-          <p>Ресурсы, крепости и быстрые перемещения. Может вайпаться отдельно.</p>
-          <div><span>Граница</span><b>±5 000 блоков</b></div>
-          <div><span>Последний вайп</span><b>Не указан</b></div>
+          <p>Ресурсы, крепости, опасные биомы и быстрые перемещения.</p>
+          <div><span>Размер мира</span><b>неизвестно</b></div>
+          <div><span>Последний вайп</span><b>неизвестно</b></div>
         </article>
 
         <article class="world-card-v2 end">
           <i data-lucide="orbit"></i>
           <h3>Энд</h3>
-          <p>Элитры, шалкеры и острова. Вайп возможен при нехватке ресурсов.</p>
-          <div><span>Граница</span><b>±5 000 блоков</b></div>
-          <div><span>Последний вайп</span><b>Не указан</b></div>
+          <p>Элитры, шалкеры, острова и поздний этап развития сезона.</p>
+          <div><span>Размер мира</span><b>неизвестно</b></div>
+          <div><span>Последний вайп</span><b>неизвестно</b></div>
         </article>
       </div>
     </section>
@@ -142,7 +174,7 @@
       <i data-lucide="info"></i>
       <div>
         <h2>Информация будет обновляться</h2>
-        <p>Границы миров, список дата-паков и поддерживаемые моды можно менять по ходу сезона. Эта страница подготовлена так, чтобы быстро обновлять данные без переделки дизайна.</p>
+        <p>Список плагинов, дата-паков, поддерживаемых модов и параметры миров могут меняться по ходу сезона. Эта страница подготовлена как единый технический паспорт сервера.</p>
       </div>
     </section>
   </section>
