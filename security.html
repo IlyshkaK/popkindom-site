@@ -131,6 +131,21 @@
       <span>Назад</span>
     </button>
 
+
+    <div class="security-pin-missing" id="pinMissingNotice" hidden>
+      <div class="security-pin-missing-icon"><i data-lucide="key-round"></i></div>
+      <h2>PIN-код не установлен</h2>
+      <p>Для сброса пароля сначала установите PIN-код аккаунта в игре.</p>
+      <div class="security-pin-command">
+        <span>Команда в игре</span>
+        <b>/pin set 1234</b>
+      </div>
+      <button type="button" class="security-reset-submit security-pin-ok" id="pinMissingOk">
+        <i data-lucide="check"></i>
+        <span>Понятно</span>
+      </button>
+    </div>
+
     <form class="security-reset-card" id="resetPasswordForm">
       <div class="security-reset-head">
         <h2 id="resetPasswordTitle"><i data-lucide="rotate-ccw-key"></i> Сбросить пароль</h2>

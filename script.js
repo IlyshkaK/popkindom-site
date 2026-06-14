@@ -1129,7 +1129,7 @@ function adminActionAllowedForCurrentUser(action) {
   const role = currentAdminRole();
   if (role === "OWNER") return true;
   if (role === "ADMIN") return !["SET_ROLE"].includes(action);
-  if (role === "MODERATOR") return ["MUTE", "TEMP_MUTE", "KICK", "PRIVATE_MESSAGE"].includes(action);
+  if (role === "MODERATOR") return ["MUTE", "TEMP_MUTE", "UNMUTE", "KICK", "PRIVATE_MESSAGE"].includes(action);
   return false;
 }
 
@@ -1832,18 +1832,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const openResetModal = document.getElementById("openResetModal");
   const resetModal = document.getElementById("resetModal");
   const closeResetModal = document.getElementById("closeResetModal");
+  const resetPasswordForm = document.getElementById("resetPasswordForm");
+  const pinMissingNotice = document.getElementById("pinMissingNotice");
+  const pinMissingOk = document.getElementById("pinMissingOk");
+
+  function hasCurrentUserPin() {
+    return currentUser?.hasPin === true || currentAccountData?.user?.hasPin === true;
+  }
+
+  function setResetModalMode() {
+    const hasPin = hasCurrentUserPin();
+
+    if (resetPasswordForm) resetPasswordForm.hidden = !hasPin;
+    if (pinMissingNotice) pinMissingNotice.hidden = hasPin;
+
+    if (hasPin) {
+      setTimeout(() => document.getElementById("resetPasswordPin")?.focus(), 50);
+    } else {
+      setTimeout(() => pinMissingOk?.focus(), 50);
+    }
+  }
 
   function openSecurityResetModal() {
     if (!resetModal) return;
+
+    setResetModalMode();
     resetModal.classList.add("open", "show");
     resetModal.setAttribute("aria-hidden", "false");
     document.body.classList.add("security-modal-open");
-    setTimeout(() => document.getElementById("resetPasswordPin")?.focus(), 50);
-    if (window.lucide) window.lucide.createIcons();
+    refreshLucideIcons();
   }
 
   function closeSecurityResetModal() {
     if (!resetModal) return;
+
     resetModal.classList.remove("open", "show");
     resetModal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("security-modal-open");
@@ -1863,6 +1885,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  if (pinMissingOk) {
+    pinMissingOk.addEventListener("click", (event) => {
+      event.preventDefault();
+      closeSecurityResetModal();
+    });
+  }
+
   if (resetModal) {
     resetModal.addEventListener("click", (event) => {
       if (event.target === resetModal) closeSecurityResetModal();
@@ -1875,3 +1904,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
