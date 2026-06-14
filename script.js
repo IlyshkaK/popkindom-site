@@ -79,7 +79,7 @@ function initViewSwitcher() {
     button.setAttribute("data-view-toggle", "");
     button.innerHTML = '<i data-lucide="smartphone"></i><b>Мобильная версия</b>';
     const authWrap = header.querySelector(".auth-menu-wrap");
-    header.insertBefore(button, authWrap || header.lastElementChild);
+    header.insertBefore(button, authWrap ? authWrap.nextSibling : header.lastElementChild);
   }
 
   if (mobileMenuEl && !mobileMenuEl.querySelector("[data-view-toggle]")) {

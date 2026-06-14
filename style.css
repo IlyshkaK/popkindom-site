@@ -23,7 +23,7 @@ body {
   height: 86px;
   padding: 0 32px;
   display: grid;
-  grid-template-columns: 260px 1fr 230px;
+  grid-template-columns: 260px auto 260px;
   align-items: center;
   z-index: 20;
   background: rgba(5, 7, 8, 0.78);
@@ -53,10 +53,11 @@ body {
 }
 
 .nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:42px;
+  margin:0 auto;
 }
 
 .nav a {
@@ -813,7 +814,7 @@ body {
 }
 
 .burger.open span:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
+  transform: translateY(9px) rotate(45deg);
 }
 
 .burger.open span:nth-child(2) {
@@ -821,7 +822,7 @@ body {
 }
 
 .burger.open span:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
+  transform: translateY(-9px) rotate(-45deg);
 }
 
 @media (max-width: 960px) {
@@ -2282,7 +2283,7 @@ body.is-auth .auth-action-mobile::after {
 
 /* ===== NAV BUGFIX V5: compact navigation + stable auth button ===== */
 .header {
-  grid-template-columns: 300px 1fr 230px;
+  grid-template-columns: 300px 1fr 230px auto;
 }
 
 .nav {
@@ -2328,7 +2329,8 @@ body.is-auth .auth-action-mobile::after {
   }
 
   .nav,
-  .auth-menu-wrap {
+  .auth-menu-wrap,
+  .view-toggle-btn {
     display: none;
   }
 }
@@ -7140,7 +7142,7 @@ body.force-desktop {
 
 body.force-desktop .header {
   height: 86px;
-  grid-template-columns: 260px 1fr auto 230px;
+  grid-template-columns: 260px 1fr 230px auto;
   padding: 0 32px;
 }
 
@@ -7259,7 +7261,7 @@ body.force-mobile .card {
 
 @media (max-width: 1180px) {
   .header {
-    grid-template-columns: 220px 1fr auto 190px;
+    grid-template-columns: 220px 1fr 190px auto;
   }
   .view-toggle-btn {
     min-width: 44px;
@@ -7640,5 +7642,42 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
   .btn {
     gap: 14px;
+  }
+}
+
+
+/* ===== FINAL MOBILE BURGER/AUTH HEADER FIX ===== */
+@media (max-width: 960px) {
+  .header {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .burger {
+    display: inline-flex !important;
+    justify-self: end !important;
+    margin-left: auto !important;
+  }
+
+  .view-toggle-btn,
+  .auth-menu-wrap,
+  .nav {
+    display: none !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .burger {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+    border-radius: 15px !important;
+  }
+
+  .burger span {
+    width: 30px !important;
+    height: 3px !important;
   }
 }
