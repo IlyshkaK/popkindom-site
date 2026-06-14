@@ -6,7 +6,7 @@ const { isAdminRole, isFullAdminRole, isOwnerRole, isValidPin, createAdminSessio
 
 const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS || 12);
 const PLAYER_ACTIONS = new Set(['BAN', 'TEMP_BAN', 'MUTE', 'TEMP_MUTE', 'UNBAN', 'UNMUTE', 'KICK', 'WHITELIST_REMOVE', 'RESET_PASSWORD', 'RESET_PIN', 'PRIVATE_MESSAGE', 'SET_ROLE']);
-const MODERATOR_ACTIONS = new Set(['MUTE', 'TEMP_MUTE', 'KICK', 'PRIVATE_MESSAGE']);
+const MODERATOR_ACTIONS = new Set(['MUTE', 'TEMP_MUTE', 'UNMUTE', 'KICK', 'PRIVATE_MESSAGE']);
 const FULL_ADMIN_ACTIONS = new Set(['BAN', 'TEMP_BAN', 'MUTE', 'TEMP_MUTE', 'UNBAN', 'UNMUTE', 'KICK', 'WHITELIST_REMOVE', 'RESET_PASSWORD', 'RESET_PIN', 'PRIVATE_MESSAGE']);
 const OWNER_ACTIONS = new Set(['SET_ROLE']);
 const ALLOWED_ROLES = new Set(['PLAYER', 'MODERATOR', 'ADMIN', 'OWNER']);
@@ -47,6 +47,59 @@ function normalizeRole(raw) {
   if (value === 'ВЛАДЕЛЕЦ') return 'OWNER';
   return null;
 }
+
+function roleRank(raw) {
+  const role = normalizeRole(raw) || String(raw || 'PLAYER').trim().toUpperCase();
+  return { PLAYER: 1, MODERATOR: 2, ADMIN: 3, OWNER: 4 }[role] || 1;
+}
+
+function canActOnTargetRole(executorRoleRaw, targetRoleRaw) {
+  const executorRole = normalizeRole(executorRoleRaw) || String(executorRoleRaw || '').trim().toUpperCase();
+  const targetRole = normalizeRole(targetRoleRaw) || String(targetRoleRaw || 'PLAYER').trim().toUpperCase();
+
+  if (executorRole === 'OWNER') return true;
+  if (executorRole === 'ADMIN') return ['PLAYER', 'MODERATOR'].includes(targetRole);
+  if (executorRole === 'MODERATOR') return targetRole === 'PLAYER';
+  return false;
+}
+
+async function getTargetUserByUsername(usernameLower) {
+  const result = await query(
+    `SELECT id, username, username_lower, role
+     FROM pd_users
+     WHERE username_lower = $1
+     LIMIT 1;`,
+    [usernameLower]
+  );
+  return result.rows[0] || null;
+}
+
+async function ensureModerationCommandsTable() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS moderation_commands (
+      id BIGSERIAL PRIMARY KEY,
+      command_type TEXT NOT NULL,
+      player_name TEXT NOT NULL,
+      player_name_lower TEXT NOT NULL,
+      executor TEXT NOT NULL,
+      reason TEXT,
+      payload JSONB DEFAULT '{}'::jsonb,
+      source TEXT NOT NULL DEFAULT 'WEBSITE',
+      delivered BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+}
+
+async function queueModerationCommand(commandType, username, usernameLower, executor, reason, payload = {}) {
+  await ensureModerationCommandsTable();
+  await query(
+    `INSERT INTO moderation_commands (command_type, player_name, player_name_lower, executor, reason, payload, source)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb, 'WEBSITE');`,
+    [commandType, username, usernameLower, executor, reason, JSON.stringify(payload || {})]
+  );
+}
+
 
 async function ensurePlayerMessagesTable() {
   await query(`
@@ -291,7 +344,7 @@ async function handlePlayerAction(req, res) {
   const adminRole = String(admin.role || '').toUpperCase();
 
   if (adminRole === 'MODERATOR' && !MODERATOR_ACTIONS.has(action)) {
-    return sendJson(res, 403, { message: 'Модератор может выдавать мут, временный мут, кикать и писать игрокам.' });
+    return sendJson(res, 403, { message: 'Модератор может выдавать мут, временный мут, снимать мут, кикать и писать игрокам.' });
   }
 
   if (['ADMIN', 'OWNER'].includes(adminRole) && !FULL_ADMIN_ACTIONS.has(action) && !OWNER_ACTIONS.has(action)) {
@@ -300,6 +353,26 @@ async function handlePlayerAction(req, res) {
 
   if (OWNER_ACTIONS.has(action) && !isOwnerRole(admin)) {
     return sendJson(res, 403, { message: 'Выдавать роли может только OWNER.' });
+  }
+
+  const targetUser = await getTargetUserByUsername(usernameLower);
+  if (!targetUser) {
+    return sendJson(res, 404, { message: 'Игрок не найден на сайте.' });
+  }
+
+  const adminUsernameLower = String(admin.username_lower || admin.username || '').toLowerCase();
+  if (String(targetUser.username_lower || '').toLowerCase() === adminUsernameLower || Number(targetUser.id) === Number(admin.id)) {
+    return sendJson(res, 403, { message: 'Нельзя выполнять действия над своим аккаунтом.' });
+  }
+
+  if (!canActOnTargetRole(adminRole, targetUser.role)) {
+    if (adminRole === 'ADMIN') {
+      return sendJson(res, 403, { message: 'ADMIN может работать только с MODERATOR и PLAYER.' });
+    }
+    if (adminRole === 'MODERATOR') {
+      return sendJson(res, 403, { message: 'MODERATOR может работать только с PLAYER.' });
+    }
+    return sendJson(res, 403, { message: 'Недостаточно прав для выбранного игрока.' });
   }
 
   if (action === 'SET_ROLE') {
@@ -411,17 +484,7 @@ async function handlePlayerAction(req, res) {
 
   if (action === 'KICK') {
     await audit('KICK', username, admin.username, reason);
-    await query(
-      `INSERT INTO moderation_commands (command_type, player_name, player_name_lower, executor, reason, source)
-       VALUES ('KICK', $1, $2, $3, $4, 'WEBSITE');`,
-      [username, usernameLower, admin.username, reason]
-    ).catch(async () => {
-      await query(
-        `INSERT INTO moderation_audit_log (action, target_player, executor, details, source)
-         VALUES ('KICK_COMMAND', $1, $2, $3, 'WEBSITE');`,
-        [username, admin.username, reason]
-      );
-    });
+    await queueModerationCommand('KICK', username, usernameLower, admin.username, reason);
     return sendJson(res, 200, { message: `Команда KICK для ${username} отправлена.` });
   }
 
@@ -439,6 +502,7 @@ async function handlePlayerAction(req, res) {
       [usernameLower, admin.username, reason]
     );
     await audit(action, username, admin.username, reason);
+    await queueModerationCommand('UNBAN', username, usernameLower, admin.username, reason);
     return sendJson(res, 200, { message: `Бан игрока ${username} снят.` });
   }
 
@@ -450,6 +514,7 @@ async function handlePlayerAction(req, res) {
       [usernameLower, admin.username, reason]
     );
     await audit(action, username, admin.username, reason);
+    await queueModerationCommand('UNMUTE', username, usernameLower, admin.username, reason);
     return sendJson(res, 200, { message: `Мут игрока ${username} снят.` });
   }
 
@@ -460,6 +525,10 @@ async function handlePlayerAction(req, res) {
     [username, usernameLower, action, reason, admin.username, String(admin.id), expiresAt]
   );
   await audit(action, username, admin.username, reason);
+  await queueModerationCommand(action, username, usernameLower, admin.username, reason, {
+    expiresAt: expiresAt ? expiresAt.toISOString() : null,
+    duration: durationRaw || null
+  });
   return sendJson(res, 200, { message: `Действие ${action} для ${username} выполнено.` });
 }
 

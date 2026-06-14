@@ -1117,6 +1117,14 @@ function currentAdminRole() {
   return String(currentUser?.role || "").toUpperCase();
 }
 
+function normalizeAdminRole(raw) {
+  const value = String(raw || "PLAYER").trim().toUpperCase();
+  if (value.includes("OWNER") || value.includes("ВЛАДЕЛ")) return "OWNER";
+  if (value.includes("ADMIN") || value.includes("АДМИН")) return "ADMIN";
+  if (value.includes("MODER") || value.includes("МОДЕР")) return "MODERATOR";
+  return "PLAYER";
+}
+
 function canUseFullAdminActions() {
   return ["ADMIN", "OWNER"].includes(currentAdminRole());
 }
@@ -1125,16 +1133,62 @@ function canUseOwnerActions() {
   return currentAdminRole() === "OWNER";
 }
 
-function adminActionAllowedForCurrentUser(action) {
+function canAdminActOnPlayer(player) {
+  if (!player || !currentUser) return false;
+
+  const adminRole = currentAdminRole();
+  const targetRole = normalizeAdminRole(player.role);
+  const adminName = String(currentUser.username || "").toLowerCase();
+  const targetName = String(player.username || "").toLowerCase();
+
+  if (adminName && targetName && adminName === targetName) return false;
+  if (Number(currentUser.id) && Number(player.id) && Number(currentUser.id) === Number(player.id)) return false;
+
+  if (adminRole === "OWNER") return true;
+  if (adminRole === "ADMIN") return ["MODERATOR", "PLAYER"].includes(targetRole);
+  if (adminRole === "MODERATOR") return targetRole === "PLAYER";
+  return false;
+}
+
+function adminActionAllowedForCurrentUser(action, player = null) {
   const role = currentAdminRole();
+
+  if (player && !canAdminActOnPlayer(player)) return false;
+
   if (role === "OWNER") return true;
   if (role === "ADMIN") return !["SET_ROLE"].includes(action);
   if (role === "MODERATOR") return ["MUTE", "TEMP_MUTE", "UNMUTE", "KICK", "PRIVATE_MESSAGE"].includes(action);
   return false;
 }
 
-function adminDefaultActionForCurrentUser() {
-  return currentAdminRole() === "MODERATOR" ? "MUTE" : "BAN";
+function adminDefaultActionForCurrentUser(player = null) {
+  const preferred = currentAdminRole() === "MODERATOR" ? "MUTE" : "BAN";
+  if (adminActionAllowedForCurrentUser(preferred, player)) return preferred;
+
+  const fallbackActions = ["MUTE", "TEMP_MUTE", "UNMUTE", "KICK", "PRIVATE_MESSAGE", "BAN", "TEMP_BAN", "UNBAN", "WHITELIST_REMOVE", "RESET_PASSWORD", "RESET_PIN", "SET_ROLE"];
+  return fallbackActions.find((action) => adminActionAllowedForCurrentUser(action, player)) || "";
+}
+
+function adminRestrictionMessage(player) {
+  if (!player) return "Выберите игрока.";
+  const adminRole = currentAdminRole();
+  const targetRole = normalizeAdminRole(player.role);
+  const adminName = String(currentUser?.username || "").toLowerCase();
+  const targetName = String(player.username || "").toLowerCase();
+
+  if ((adminName && targetName && adminName === targetName) || (Number(currentUser?.id) && Number(player.id) && Number(currentUser.id) === Number(player.id))) {
+    return "Вы не можете выполнять действия над своим аккаунтом.";
+  }
+
+  if (adminRole === "ADMIN" && ["OWNER", "ADMIN"].includes(targetRole)) {
+    return "ADMIN может выполнять действия только с MODERATOR и PLAYER.";
+  }
+
+  if (adminRole === "MODERATOR" && targetRole !== "PLAYER") {
+    return "MODERATOR может выполнять действия только с PLAYER.";
+  }
+
+  return "Недостаточно прав для выбранного игрока.";
 }
 
 
@@ -1227,7 +1281,7 @@ function renderAdminPlayerPanel(player) {
   const panel = document.getElementById("adminPlayerPanel");
   if (!panel) return;
 
-  const defaultAction = adminDefaultActionForCurrentUser();
+  const defaultAction = adminDefaultActionForCurrentUser(player);
   const actionButtons = [
     { action: "BAN", icon: "ban", label: "Бан", cls: "danger" },
     { action: "TEMP_BAN", icon: "timer-off", label: "Временный бан", cls: "danger" },
@@ -1241,7 +1295,9 @@ function renderAdminPlayerPanel(player) {
     { action: "RESET_PASSWORD", icon: "rotate-ccw-key", label: "Сбросить пароль", cls: "danger" },
     { action: "RESET_PIN", icon: "key-round", label: "Сбросить PIN", cls: "danger" },
     { action: "SET_ROLE", icon: "crown", label: "Установить роль", cls: "safe owner-only" }
-  ].filter((item) => adminActionAllowedForCurrentUser(item.action));
+  ].filter((item) => adminActionAllowedForCurrentUser(item.action, player));
+  const canActOnSelected = canAdminActOnPlayer(player);
+  const restrictionText = canActOnSelected ? "" : adminRestrictionMessage(player);
 
   panel.innerHTML = `
     <div class="admin-player-profile admin-player-profile-wide">
@@ -1275,15 +1331,16 @@ function renderAdminPlayerPanel(player) {
     </div>
 
     <div class="admin-selected-grid">
-      <form class="admin-action-form" id="adminActionForm">
+      <form class="admin-action-form ${canActOnSelected ? "" : "admin-action-disabled"}" id="adminActionForm">
         <label>Действие</label>
+        ${!canActOnSelected ? `<div class="admin-restriction-notice"><i data-lucide="shield-alert"></i><span>${restrictionText}</span></div>` : ""}
         <input id="adminActionType" type="hidden" value="${defaultAction}" />
         <div class="admin-action-picker" role="radiogroup" aria-label="Выбор действия">
-          ${actionButtons.map((item) => `
+          ${actionButtons.length ? actionButtons.map((item) => `
             <button type="button" class="${item.action === defaultAction ? "active " : ""}${item.cls}" data-admin-action="${item.action}">
               <i data-lucide="${item.icon}"></i><span>${item.label}</span>
             </button>
-          `).join("")}
+          `).join("") : `<div class="admin-no-actions">Нет доступных действий для выбранного игрока.</div>`}
         </div>
 
         <label id="adminRoleLabel" hidden>Новая роль</label>
@@ -1305,7 +1362,7 @@ function renderAdminPlayerPanel(player) {
         <label id="adminReasonLabel">Причина</label>
         <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
 
-        <button type="submit" class="primary-btn"><i data-lucide="gavel"></i> Выполнить действие</button>
+        <button type="submit" class="primary-btn" ${canActOnSelected ? "" : "disabled"}><i data-lucide="gavel"></i> Выполнить действие</button>
         <p class="auth-message" id="adminActionMessage"></p>
       </form>
 
@@ -1337,6 +1394,7 @@ function renderAdminPlayerPanel(player) {
 
   function syncActionFields() {
     const action = actionType.value;
+    if (!action) return;
     const needDuration = ["TEMP_BAN", "TEMP_MUTE"].includes(action);
     const isPrivateMessage = action === "PRIVATE_MESSAGE";
     const isRole = action === "SET_ROLE";
@@ -1389,6 +1447,66 @@ function renderAdminPlayerPanel(player) {
   refreshLucideIcons();
 }
 
+
+function ensureAdminConfirmModal() {
+  let modal = document.getElementById("adminPunishmentConfirmModal");
+  if (modal) return modal;
+
+  modal = document.createElement("div");
+  modal.id = "adminPunishmentConfirmModal";
+  modal.className = "admin-confirm-modal";
+  modal.innerHTML = `
+    <div class="admin-confirm-card" role="dialog" aria-modal="true">
+      <div class="admin-confirm-icon"><i data-lucide="shield-alert"></i></div>
+      <h2>Подтверждение наказания</h2>
+      <p>Вы уверены что хотите наказать игрока?</p>
+      <div class="admin-confirm-actions">
+        <button type="button" class="admin-confirm-yes"><i data-lucide="check"></i> Да</button>
+        <button type="button" class="admin-confirm-no"><i data-lucide="x"></i> Нет</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  refreshLucideIcons();
+  return modal;
+}
+
+function confirmAdminPunishmentAction() {
+  return new Promise((resolve) => {
+    const modal = ensureAdminConfirmModal();
+    const yes = modal.querySelector(".admin-confirm-yes");
+    const no = modal.querySelector(".admin-confirm-no");
+
+    function cleanup(result) {
+      modal.classList.remove("open");
+      yes?.removeEventListener("click", onYes);
+      no?.removeEventListener("click", onNo);
+      modal.removeEventListener("click", onBackdrop);
+      document.removeEventListener("keydown", onEsc);
+      resolve(result);
+    }
+
+    function onYes() { cleanup(true); }
+    function onNo() { cleanup(false); }
+    function onBackdrop(event) {
+      if (event.target === modal) cleanup(false);
+    }
+    function onEsc(event) {
+      if (event.key === "Escape") cleanup(false);
+    }
+
+    yes?.addEventListener("click", onYes);
+    no?.addEventListener("click", onNo);
+    modal.addEventListener("click", onBackdrop);
+    document.addEventListener("keydown", onEsc);
+
+    modal.classList.add("open");
+    refreshLucideIcons();
+    setTimeout(() => no?.focus(), 30);
+  });
+}
+
+
 async function submitAdminPlayerAction(username) {
   const action = document.getElementById("adminActionType")?.value;
   const duration = document.getElementById("adminActionDuration")?.value?.trim() || "";
@@ -1396,6 +1514,34 @@ async function submitAdminPlayerAction(username) {
   const privateMessage = document.getElementById("adminPrivateMessage")?.value?.trim() || "";
   const role = document.getElementById("adminNewRole")?.value || "";
   const message = document.getElementById("adminActionMessage");
+
+  if (!action) {
+    if (message) {
+      message.className = "auth-message error";
+      message.textContent = "Нет доступного действия для выбранного игрока.";
+    }
+    return;
+  }
+
+  if (adminSelectedPlayer && !canAdminActOnPlayer(adminSelectedPlayer)) {
+    if (message) {
+      message.className = "auth-message error";
+      message.textContent = adminRestrictionMessage(adminSelectedPlayer);
+    }
+    return;
+  }
+
+  const needsConfirm = ["BAN", "TEMP_BAN", "MUTE", "TEMP_MUTE", "KICK"].includes(action);
+  if (needsConfirm) {
+    const confirmed = await confirmAdminPunishmentAction();
+    if (!confirmed) {
+      if (message) {
+        message.className = "auth-message";
+        message.textContent = "Действие отменено.";
+      }
+      return;
+    }
+  }
 
   if (message) {
     message.className = "auth-message";
