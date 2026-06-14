@@ -7681,3 +7681,119 @@ html, body { max-width: 100%; overflow-x: hidden; }
     height: 3px !important;
   }
 }
+
+
+/* ===== FINAL HEADER DESKTOP CENTER + AUTH RESTORE ===== */
+@media (min-width: 961px) {
+  .header {
+    display: flex !important;
+    grid-template-columns: none !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    height: 86px !important;
+    padding: 0 32px !important;
+    position: fixed !important;
+  }
+
+  .header .brand {
+    position: relative !important;
+    z-index: 32 !important;
+    flex: 0 0 auto !important;
+  }
+
+  .header .nav {
+    position: absolute !important;
+    left: 50% !important;
+    top: 0 !important;
+    height: 100% !important;
+    transform: translateX(-50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: clamp(28px, 2.6vw, 52px) !important;
+    margin: 0 !important;
+    z-index: 25 !important;
+    white-space: nowrap !important;
+  }
+
+  .header .auth-menu-wrap {
+    display: flex !important;
+    position: absolute !important;
+    right: 32px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 35 !important;
+    justify-self: auto !important;
+  }
+
+  .header .auth-menu-wrap .register-btn {
+    display: inline-flex !important;
+    min-width: 190px !important;
+    height: 54px !important;
+  }
+
+  .header .view-toggle-btn {
+    display: inline-flex !important;
+    position: absolute !important;
+    right: 252px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    z-index: 34 !important;
+  }
+
+  .header .burger {
+    display: none !important;
+  }
+}
+
+@media (min-width: 961px) and (max-width: 1400px) {
+  .header {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .header .nav {
+    gap: 28px !important;
+  }
+
+  .header .nav a {
+    font-size: 15px !important;
+  }
+
+  .header .auth-menu-wrap {
+    right: 24px !important;
+  }
+
+  .header .view-toggle-btn {
+    right: 226px !important;
+    min-width: 44px !important;
+    width: 44px !important;
+    padding: 0 !important;
+  }
+
+  .header .view-toggle-btn b {
+    display: none !important;
+  }
+
+  .header .auth-menu-wrap .register-btn {
+    min-width: 176px !important;
+  }
+}
+
+@media (max-width: 960px) {
+  .header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+  }
+
+  .auth-menu-wrap,
+  .view-toggle-btn,
+  .nav {
+    display: none !important;
+  }
+
+  .burger {
+    display: inline-flex !important;
+  }
+}
