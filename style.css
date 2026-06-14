@@ -733,22 +733,34 @@ body {
 
 .burger {
   display: none;
-  width: 46px;
-  height: 46px;
+  width: 56px;
+  height: 56px;
+
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
   border: 1px solid rgba(126, 226, 60, 0.5);
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(5, 9, 10, 0.65);
+
   cursor: pointer;
   z-index: 30;
+
+  padding: 0;
 }
 
 .burger span {
   display: block;
-  width: 24px;
+
+  width: 26px;
   height: 3px;
-  margin: 5px auto;
-  border-radius: 10px;
+
+  margin: 3px 0;
+
+  border-radius: 999px;
   background: #8ef052;
+
   transition: 0.25s ease;
 }
 
@@ -812,11 +824,27 @@ body {
   transform: translateY(-8px) rotate(-45deg);
 }
 
-@media (max-width: 820px) {
-  .burger {
-    display: block;
-    justify-self: end;
+@media (max-width: 960px) {
+
+  .header {
+    grid-template-columns: 1fr auto;
+    padding: 0 18px;
   }
+
+  .burger {
+    display: flex;
+    margin-left: auto;
+  }
+
+}
+
+.brand {
+  min-width: 0;
+}
+
+.brand-logo-img {
+  width: 190px;
+}
 
   .register-btn {
     display: none;
@@ -2152,10 +2180,11 @@ body.is-auth .auth-action-mobile::after {
 }
 
 @media (max-width: 820px) {
+
   .brand-logo-img {
-    width: 180px;
-    height: 54px;
+    width: 170px;
   }
+
 }
 
 /* ===== FINAL HEADER/FOOTER BRAND + VISUAL INFO CARDS ===== */
