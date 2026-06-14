@@ -1905,3 +1905,43 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+
+
+/* ===== SERVER OPENING COUNTDOWN / IP REVEAL ===== */
+const POPKINDOM_SERVER_OPEN_AT = Date.UTC(2026, 5, 20, 14, 0, 0); // 20.06.2026 17:00 МСК
+const POPKINDOM_SERVER_ADDRESS = "pdcraft.aboba.host";
+
+function formatOpeningCountdown(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days > 0) return `${days} д. ${hours} ч. ${minutes} мин.`;
+  if (hours > 0) return `${hours} ч. ${minutes} мин. ${seconds} сек.`;
+  return `${minutes} мин. ${seconds} сек.`;
+}
+
+function updateServerAddressCountdown() {
+  const nodes = document.querySelectorAll("[data-server-address]");
+  if (!nodes.length) return;
+
+  const remaining = POPKINDOM_SERVER_OPEN_AT - Date.now();
+  const isOpen = remaining <= 0;
+  const value = isOpen ? POPKINDOM_SERVER_ADDRESS : formatOpeningCountdown(remaining);
+  const title = isOpen ? "IP сервера" : "До открытия сервера";
+
+  nodes.forEach((node) => {
+    node.textContent = value;
+    node.classList.toggle("is-open", isOpen);
+    node.classList.toggle("is-countdown", !isOpen);
+
+    const card = node.closest(".server-ip-card, .server-info-row");
+    const label = card?.querySelector("span");
+    if (label) label.textContent = title;
+  });
+}
+
+updateServerAddressCountdown();
+setInterval(updateServerAddressCountdown, 1000);
