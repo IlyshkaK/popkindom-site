@@ -60,6 +60,9 @@ module.exports = async function handler(req, res) {
       blocksResult,
       craftsResult,
       enchantmentsResult,
+      deathsResult,
+      achievementsResult,
+      achievementsCountResult,
       onlineResult,
       logsResult,
     ] = await Promise.all([
@@ -104,6 +107,28 @@ module.exports = async function handler(req, res) {
         [user.id]
       ),
       query(
+        `SELECT death_reason, world_name, x, y, z, created_at
+         FROM player_death_history
+         WHERE auth_user_id = $1
+         ORDER BY created_at DESC
+         LIMIT 8;`,
+        [user.id]
+      ),
+      query(
+        `SELECT advancement_key, advancement_title, created_at
+         FROM player_advancements
+         WHERE auth_user_id = $1
+         ORDER BY created_at DESC
+         LIMIT 8;`,
+        [user.id]
+      ),
+      query(
+        `SELECT COUNT(*)::BIGINT AS total
+         FROM player_advancements
+         WHERE auth_user_id = $1;`,
+        [user.id]
+      ),
+      query(
         `SELECT nickname, online, updated_at
          FROM players
          ORDER BY online DESC, updated_at DESC
@@ -132,6 +157,12 @@ module.exports = async function handler(req, res) {
       blocks: blocksResult.rows,
       crafts: craftsResult.rows,
       enchantments: enchantmentsResult.rows[0] || null,
+      deathsHistory: deathsResult.rows,
+      recentDeaths: deathsResult.rows,
+      achievements: achievementsResult.rows,
+      recentAchievements: achievementsResult.rows,
+      achievementsCount: Number(achievementsCountResult.rows[0]?.total || 0),
+      achievements_count: Number(achievementsCountResult.rows[0]?.total || 0),
       onlinePlayers: onlineResult.rows,
       securityLogs: logsResult.rows,
       meta: {

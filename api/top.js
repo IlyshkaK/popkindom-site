@@ -116,6 +116,22 @@ const CATEGORIES = {
       LIMIT 50;
     `,
   },
+
+  achievements: {
+    label: 'Достижения',
+    description: 'Топ игроков по количеству полученных достижений.',
+    format: 'number',
+    sql: `
+      SELECT COALESCE(pa.nickname, p.nickname, u.username, 'Игрок') AS username,
+             COUNT(pa.id)::BIGINT AS value
+      FROM player_advancements pa
+      LEFT JOIN pd_users u ON u.id = pa.auth_user_id
+      LEFT JOIN players p ON p.auth_user_id = pa.auth_user_id
+      GROUP BY COALESCE(pa.nickname, p.nickname, u.username, 'Игрок')
+      ORDER BY value DESC
+      LIMIT 50;
+    `,
+  },
   enchants: {
     label: 'Потрачено уровней',
     description: 'Топ игроков по уровням, потраченным на зачарования.',

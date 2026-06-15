@@ -862,6 +862,39 @@ function currentLevelXpFromProgress(level, progress) {
   return Math.round(required * normalized);
 }
 
+function renderDeathHistory(items = []) {
+  const list = document.getElementById("deathList");
+  if (!list) return;
+
+  if (!items.length) {
+    list.innerHTML = `<article><b>Пока нет данных</b><span>История смертей появится после первой смерти игрока.</span></article>`;
+    return;
+  }
+
+  list.innerHTML = items.map((item) => {
+    const reason = item.death_reason || item.reason || "Игрок погиб";
+    const date = formatLastLogin(item.created_at || item.createdAt);
+    const world = item.world_name ? ` · ${escapeHtml(item.world_name)}` : "";
+    return `<article><b>☠ ${escapeHtml(reason)}</b><span>${escapeHtml(date)}${world}</span></article>`;
+  }).join("");
+}
+
+function renderRecentAchievements(items = []) {
+  const list = document.getElementById("achievementList");
+  if (!list) return;
+
+  if (!items.length) {
+    list.innerHTML = `<p><span>Пока нет данных</span><b>—</b></p>`;
+    return;
+  }
+
+  list.innerHTML = items.map((item) => {
+    const title = item.advancement_title || item.title || item.advancement_key || "Достижение";
+    const date = formatLastLogin(item.created_at || item.createdAt);
+    return `<p><span>🏆 ${escapeHtml(title)}</span><b>${escapeHtml(date)}</b></p>`;
+  }).join("");
+}
+
 function renderAccountData(data) {
   if (!data) return;
 
@@ -953,6 +986,8 @@ function renderAccountData(data) {
   renderBarList("blocksList", blocks, "block_type", "amount");
   renderSimpleList("craftsList", crafts, "item_type", "amount");
   renderEnchantments(data.enchantments);
+  renderDeathHistory(data.recentDeaths || data.deathsHistory || []);
+  renderRecentAchievements(data.recentAchievements || data.achievements || []);
   refreshLucideIcons();
 }
 
