@@ -87,7 +87,7 @@ module.exports = async function handler(req, res) {
          FROM player_blocks
          WHERE auth_user_id = $1
          ORDER BY amount DESC
-         LIMIT 12;`,
+         LIMIT 3;`,
         [user.id]
       ),
       query(
@@ -95,7 +95,7 @@ module.exports = async function handler(req, res) {
          FROM player_crafts
          WHERE auth_user_id = $1
          ORDER BY amount DESC
-         LIMIT 12;`,
+         LIMIT 3;`,
         [user.id]
       ),
       query(
@@ -111,7 +111,7 @@ module.exports = async function handler(req, res) {
          FROM player_death_history
          WHERE auth_user_id = $1
          ORDER BY created_at DESC
-         LIMIT 8;`,
+         LIMIT 3;`,
         [user.id]
       ),
       query(
@@ -119,7 +119,7 @@ module.exports = async function handler(req, res) {
          FROM player_advancements
          WHERE auth_user_id = $1
          ORDER BY created_at DESC
-         LIMIT 8;`,
+         LIMIT 5;`,
         [user.id]
       ),
       query(

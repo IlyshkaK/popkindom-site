@@ -920,8 +920,8 @@ function renderAccountData(data) {
 
   const player = data.player || {};
   const stats = data.stats || data.player || {};
-  const blocks = data.blocks || [];
-  const crafts = data.crafts || [];
+  const blocks = (data.blocks || data.minedBlocks || data.topBlocks || []).slice(0, 3);
+  const crafts = (data.crafts || data.craftedItems || data.topCrafts || []).slice(0, 3);
   const blocksTotal = blocks.reduce((sum, block) => sum + Number(block.amount || 0), 0);
 
   const username = data.user?.username || player.nickname || "Игрок";
@@ -1006,8 +1006,8 @@ function renderAccountData(data) {
   renderBarList("blocksList", blocks, "block_type", "amount", 3);
   renderSimpleList("craftsList", crafts, "item_type", "amount", 3);
   renderEnchantments(data.enchantments);
-  renderDeathHistory(data.recentDeaths || data.deathsHistory || []);
-  renderRecentAchievements(data.recentAchievements || data.achievements || []);
+  renderDeathHistory((data.recentDeaths || data.deathsHistory || []).slice(0, 3));
+  renderRecentAchievements((data.recentAchievements || data.achievements || []).slice(0, 5));
   refreshLucideIcons();
 }
 
