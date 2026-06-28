@@ -9981,3 +9981,30 @@ body.force-mobile .nav-more-wrap {
 }
 
 body.home-page .footer{margin-top:0!important;clear:both;position:relative;} .home-page{display:flex;flex-direction:column;min-height:100vh;} .home-page main{flex:1;}
+
+
+/* ===== ACCOUNT SERVER BOX CENTER FIX ===== */
+.account-sidebar .server-info-row {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.account-sidebar .server-info-row > i,
+.account-sidebar .server-info-row > svg {
+  display: none !important;
+}
+
+.account-sidebar .server-info-row > div {
+  width: 100% !important;
+  display: grid !important;
+  justify-items: center !important;
+  gap: 3px !important;
+}
+
+.account-sidebar .server-box strong,
+.account-sidebar .server-box .green,
+.account-sidebar .server-address-value {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+}
