@@ -356,7 +356,7 @@ if (registerForm) {
     const message = document.getElementById("registerMessage");
 
     if (!isValidMinecraftNick(username)) {
-      setAuthMessage(message, "Ник должен быть 3–16 символов: буквы, цифры и _", "error");
+      setAuthMessage(message, "Ник должен быть 3-16 символов: буквы, цифры и _", "error");
       return;
     }
 
@@ -483,7 +483,7 @@ function cmToKm(value) {
 }
 
 function formatDate(value) {
-  if (!value) return "—";
+  if (!value) return "-";
   return new Date(value).toLocaleString("ru-RU", {
     day: "2-digit",
     month: "2-digit",
@@ -494,7 +494,7 @@ function formatDate(value) {
 }
 
 function formatServerSince(value) {
-  if (!value) return "—";
+  if (!value) return "-";
   return new Date(value).toLocaleDateString("ru-RU", {
     day: "numeric",
     month: "long",
@@ -503,7 +503,7 @@ function formatServerSince(value) {
 }
 
 function formatLastLogin(value) {
-  if (!value) return "—";
+  if (!value) return "-";
   const date = new Date(value);
   const now = new Date();
   const isToday = date.toDateString() === now.toDateString();
@@ -524,7 +524,7 @@ function formatLastLogin(value) {
 }
 
 function prettyMaterial(type) {
-  if (!type) return "—";
+  if (!type) return "-";
 
   const normalized = String(type)
     .trim()
@@ -783,33 +783,49 @@ function renderStatsList(stats, blocksTotal) {
   list.innerHTML = rows.map(([label, value]) => `<p><span>${label}</span><b>${value}</b></p>`).join("");
 }
 
-function renderBarList(id, rows, typeKey, amountKey) {
+function sortByAmountDesc(rows, amountKey) {
+  return [...(rows || [])].sort((a, b) => Number(b?.[amountKey] || 0) - Number(a?.[amountKey] || 0));
+}
+
+function sortByDateDesc(rows) {
+  return [...(rows || [])].sort((a, b) => {
+    const dateA = new Date(a?.created_at || a?.createdAt || a?.updated_at || a?.updatedAt || 0).getTime() || 0;
+    const dateB = new Date(b?.created_at || b?.createdAt || b?.updated_at || b?.updatedAt || 0).getTime() || 0;
+    return dateB - dateA;
+  });
+}
+
+function renderBarList(id, rows, typeKey, amountKey, limit = null) {
   const list = document.getElementById(id);
   if (!list) return;
 
-  if (!rows || rows.length === 0) {
-    list.innerHTML = `<p><span>Пока нет данных</span><i><em style="width:0%"></em></i><b>—</b></p>`;
+  const preparedRows = sortByAmountDesc(rows, amountKey).slice(0, limit || undefined);
+
+  if (!preparedRows.length) {
+    list.innerHTML = `<p><span>Пока нет данных</span><i><em style="width:0%"></em></i><b>-</b></p>`;
     return;
   }
 
-  const max = Math.max(...rows.map((row) => Number(row[amountKey] || 0)), 1);
-  list.innerHTML = rows.map((row) => {
+  const max = Math.max(...preparedRows.map((row) => Number(row[amountKey] || 0)), 1);
+  list.innerHTML = preparedRows.map((row) => {
     const amount = Number(row[amountKey] || 0);
     const width = Math.max(8, Math.round((amount / max) * 100));
     return `<p><span>${prettyMaterial(row[typeKey])}</span><i><em style="width:${width}%"></em></i><b>${formatNumber(amount)}</b></p>`;
   }).join("");
 }
 
-function renderSimpleList(id, rows, typeKey, amountKey) {
+function renderSimpleList(id, rows, typeKey, amountKey, limit = null) {
   const list = document.getElementById(id);
   if (!list) return;
 
-  if (!rows || rows.length === 0) {
-    list.innerHTML = `<p><span>Пока нет данных</span><b>—</b></p>`;
+  const preparedRows = sortByAmountDesc(rows, amountKey).slice(0, limit || undefined);
+
+  if (!preparedRows.length) {
+    list.innerHTML = `<p><span>Пока нет данных</span><b>-</b></p>`;
     return;
   }
 
-  list.innerHTML = rows.map((row) => {
+  list.innerHTML = preparedRows.map((row) => {
     return `<p><span>${prettyMaterial(row[typeKey])}</span><b>${formatNumber(row[amountKey])}</b></p>`;
   }).join("");
 }
@@ -819,7 +835,7 @@ function renderEnchantments(enchantments) {
   if (!list) return;
 
   if (!enchantments) {
-    list.innerHTML = `<p><span>Пока нет данных</span><b>—</b></p>`;
+    list.innerHTML = `<p><span>Пока нет данных</span><b>-</b></p>`;
     return;
   }
 
@@ -839,7 +855,7 @@ function renderOnlinePlayers(players) {
   if (count) count.textContent = `${onlineCount} / 20 игроков`;
 
   if (!players || players.length === 0) {
-    list.innerHTML = `<p><span>Пока никого нет</span><b>—</b></p>`;
+    list.innerHTML = `<p><span>Пока никого нет</span><b>-</b></p>`;
     return;
   }
 
@@ -866,12 +882,14 @@ function renderDeathHistory(items = []) {
   const list = document.getElementById("deathList");
   if (!list) return;
 
-  if (!items.length) {
+  const preparedItems = sortByDateDesc(items).slice(0, 3);
+
+  if (!preparedItems.length) {
     list.innerHTML = `<article><b>Пока нет данных</b><span>История смертей появится после первой смерти игрока.</span></article>`;
     return;
   }
 
-  list.innerHTML = items.map((item) => {
+  list.innerHTML = preparedItems.map((item) => {
     const reason = item.death_reason || item.reason || "Игрок погиб";
     const date = formatLastLogin(item.created_at || item.createdAt);
     const world = item.world_name ? ` · ${escapeHtml(item.world_name)}` : "";
@@ -883,12 +901,14 @@ function renderRecentAchievements(items = []) {
   const list = document.getElementById("achievementList");
   if (!list) return;
 
-  if (!items.length) {
-    list.innerHTML = `<p><span>Пока нет данных</span><b>—</b></p>`;
+  const preparedItems = sortByDateDesc(items).slice(0, 5);
+
+  if (!preparedItems.length) {
+    list.innerHTML = `<p><span>Пока нет данных</span><b>-</b></p>`;
     return;
   }
 
-  list.innerHTML = items.map((item) => {
+  list.innerHTML = preparedItems.map((item) => {
     const title = item.advancement_title || item.title || item.advancement_key || "Достижение";
     const date = formatLastLogin(item.created_at || item.createdAt);
     return `<p><span>🏆 ${escapeHtml(title)}</span><b>${escapeHtml(date)}</b></p>`;
@@ -977,14 +997,14 @@ function renderAccountData(data) {
   setText("profileRegisteredAt", formatServerSince(data.user?.registeredAt || data.user?.registered_at || player.first_join_at || player.created_at || player.updated_at));
   setText("profileLastLogin", formatLastLogin(data.user?.lastServerLogin || data.user?.last_server_login || player.last_login_at || player.updated_at || data.meta?.updatedAt));
   setText("quickPlaytime", formatTicks(stats.play_time_ticks || player.play_time_ticks));
-  setText("quickAchievements", achievementsTotal > 0 ? formatNumber(achievementsTotal) : "—");
+  setText("quickAchievements", achievementsTotal > 0 ? formatNumber(achievementsTotal) : "-");
   setText("quickDeaths", formatNumber(stats.deaths || player.deaths));
   setText("quickMobKills", formatNumber(stats.mob_kills || player.mob_kills));
 
   renderStatsList(stats, blocksTotal);
   renderOnlinePlayers(data.onlinePlayers || []);
-  renderBarList("blocksList", blocks, "block_type", "amount");
-  renderSimpleList("craftsList", crafts, "item_type", "amount");
+  renderBarList("blocksList", blocks, "block_type", "amount", 3);
+  renderSimpleList("craftsList", crafts, "item_type", "amount", 3);
   renderEnchantments(data.enchantments);
   renderDeathHistory(data.recentDeaths || data.deathsHistory || []);
   renderRecentAchievements(data.recentAchievements || data.achievements || []);
@@ -1287,7 +1307,7 @@ async function loadAdminPlayers() {
       const online = player.online === true;
       return `
         <tr class="${adminSelectedPlayer?.username_lower === player.username_lower ? "selected" : ""}">
-          <td><span class="admin-player-cell"><img src="${minecraftHeadUrl(player.username, 28)}" alt=""> ${player.username || "—"}</span></td>
+          <td><span class="admin-player-cell"><img src="${minecraftHeadUrl(player.username, 28)}" alt=""> ${player.username || "-"}</span></td>
           <td>${adminRoleBadge(player.role)}</td>
           <td><span class="admin-status ${online ? "online" : "offline"}">${online ? "Онлайн" : "Офлайн"}</span></td>
           <td>${adminWhitelistBadge(player)}</td>
@@ -1620,7 +1640,7 @@ async function loadAdminPlayerHistory(username) {
         <div class="admin-history-item">
           <div><b>${row.type}</b> <span class="admin-tag ${active ? "ok" : "muted"}">${active ? "Активно" : "Снято"}</span></div>
           <p>${row.reason || "Без причины"}</p>
-          <small>${formatDate(row.created_at)} · ${until} · ${row.moderator_name || "—"} · ${row.source || "SERVER"}</small>
+          <small>${formatDate(row.created_at)} · ${until} · ${row.moderator_name || "-"} · ${row.source || "SERVER"}</small>
         </div>
       `;
     }).join("") : `<div class="admin-empty-mini">Истории наказаний нет.</div>`;
@@ -2126,3 +2146,61 @@ function updateServerAddressCountdown() {
 
 updateServerAddressCountdown();
 setInterval(updateServerAddressCountdown, 1000);
+
+/* ===== Mega menu touch support ===== */
+(function initMegaMenu() {
+  const wrap = document.querySelector('.nav-more-wrap');
+  const btn = document.querySelector('.nav-more-btn');
+  if (!wrap || !btn) return;
+
+  btn.addEventListener('click', (event) => {
+    event.preventDefault();
+    const isOpen = wrap.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  document.addEventListener('click', (event) => {
+    if (wrap.contains(event.target)) return;
+    wrap.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  });
+})();
+
+(function initNavPlayButton() {
+  const navPlayBtn = document.getElementById('playNavBtn');
+  const playBtn = document.getElementById('playBtn');
+  if (!navPlayBtn) return;
+
+  navPlayBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (playBtn) {
+      playBtn.click();
+      return;
+    }
+    window.location.href = '/login';
+  });
+})();
+
+
+/* ===== Копирование Discord на странице команды ===== */
+document.querySelectorAll("[data-copy]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    const value = button.getAttribute("data-copy") || "";
+    const label = button.querySelector("span");
+    const oldText = label ? label.innerHTML : "";
+
+    try {
+      await navigator.clipboard.writeText(value);
+      button.classList.add("copied");
+      if (label) label.innerHTML = "Discord скопирован";
+      setTimeout(() => {
+        button.classList.remove("copied");
+        if (label) label.innerHTML = oldText;
+      }, 1400);
+    } catch {
+      if (label) label.innerHTML = "Скопируй: <b>" + value + "</b>";
+    }
+  });
+});

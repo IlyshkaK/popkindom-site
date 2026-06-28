@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ - PopkinDom</title>
+  <link rel="stylesheet" href="style.css?v=nav-align-news" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="dns-prefetch" href="//unpkg.com" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="inner-page faq-page-body">
+
+<header class="header">
+  <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
+
+  <nav class="nav main-nav" aria-label="Основная навигация">
+    <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
+    <a href="/news"><i data-lucide="newspaper"></i><span>Новости</span></a>
+    <a href="/faq" class="active"><i data-lucide="circle-help"></i><span>FAQ</span></a>
+    <div class="nav-more-wrap">
+      <button type="button" class="nav-more-btn" aria-haspopup="true" aria-expanded="false">
+        <i data-lucide="grid-2x2"></i><span>Прочее</span>
+      </button>
+      <div class="mega-menu" aria-label="Прочее меню">
+        <div class="mega-col">
+          <span class="mega-title">Основное</span>
+          <a href="#" id="playNavBtn"><i data-lucide="gamepad-2"></i><b>Начать игру</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Активность</span>
+          <a href="/top"><i data-lucide="trophy"></i><b>Топы игроков</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Наши соцсети</span>
+          <a href="https://discord.gg/88e2Rsp8GT" target="_blank" rel="noopener"><i data-lucide="message-circle"></i><b>Discord</b></a>
+          <a href="https://t.me/popkindomcraft" target="_blank" rel="noopener"><i data-lucide="send"></i><b>Telegram</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Прочее</span>
+          <a href="/rules"><i data-lucide="book-open"></i><b>Правила сообщества</b></a>
+          <a href="/server"><i data-lucide="server"></i><b>Сервер</b></a>
+          <a href="/about"><i data-lucide="info"></i><b>Подробней</b></a>
+          <a href="/team"><i data-lucide="users-round"></i><b>Команда проекта</b></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="auth-menu-wrap">
+    <a href="/login" class="register-btn auth-action-btn" id="authMenuBtn">
+      <span class="auth-action-icon"><i data-lucide="log-in"></i></span>
+      <b class="auth-action-text">Войти</b>
+    </a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="/account"><i data-lucide="user-round"></i><b>Кабинет</b></a>
+      <a href="/security"><i data-lucide="shield"></i><b>Безопасность</b></a>
+      <a href="/admin" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
+    </div>
+  </div>
+  
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/index"><i data-lucide="home"></i> Главная</a>
+  <a href="/news"><i data-lucide="newspaper"></i> Новости</a>
+  <a href="/faq"><i data-lucide="circle-help"></i> FAQ</a>
+  <a href="/top"><i data-lucide="trophy"></i> Топы игроков</a>
+  <a href="/rules"><i data-lucide="book-open"></i> Правила</a>
+  <a href="/server"><i data-lucide="server"></i> Сервер</a>
+  <a href="/about"><i data-lucide="info"></i> Подробней</a>
+  <a href="/team"><i data-lucide="users-round"></i> Команда проекта</a>
+  <a href="/login" class="mobile-register auth-action-mobile"><i data-lucide="log-in"></i> Войти</a>
+  <a href="/account" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
+  <a href="/security" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
+  <a href="/admin" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
+  <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
+</div>
+<main class="rules-page rules-page-v2 faq-page faq-page-v2">
+  <div class="rules-bg"></div>
+  <div class="rules-dark"></div>
+
+  <section class="rules-content rules-content-v2 faq-content-v2">
+    <section class="rules-hero-v2 glass-card page-hero-unified">
+      <div>
+        <span class="about-kicker"><i data-lucide="circle-help"></i> Помощь игрокам</span>
+        <h1>FAQ</h1>
+        <p>Собрали ответы на частые вопросы о входе на сервер, аккаунте, безопасности, модах и связи с командой проекта.</p>
+      </div>
+      <div class="rules-hero-note page-hero-note-unified">
+        <i data-lucide="message-circle-question"></i>
+        <b>Не нашёл ответ?</b>
+        <span>Напиши администрации в Discord или Telegram - поможем разобраться с вопросом быстрее.</span>
+      </div>
+    </section>
+
+    <section class="rules-summary-grid page-summary-grid faq-summary-grid">
+      <a href="#start" class="rules-summary-card"><i data-lucide="gamepad-2"></i><b>Старт</b><span>как начать играть</span></a>
+      <a href="#account" class="rules-summary-card"><i data-lucide="key-round"></i><b>Аккаунт</b><span>пароль и вход</span></a>
+      <a href="#security" class="rules-summary-card"><i data-lucide="shield-check"></i><b>Безопасность</b><span>сеансы и автологин</span></a>
+      <a href="#mods" class="rules-summary-card"><i data-lucide="package-check"></i><b>Моды</b><span>что можно ставить</span></a>
+      <a href="#contacts" class="rules-summary-card"><i data-lucide="users-round"></i><b>Связь</b><span>куда писать</span></a>
+      <a href="#versions" class="rules-summary-card"><i data-lucide="monitor-smartphone"></i><b>Версия</b><span>лаунчер и клиент</span></a>
+    </section>
+
+    <section class="rules-list-v2 faq-list-v2">
+      <article class="rule-panel-v2 faq-panel" id="start">
+        <div class="rule-panel-head"><i data-lucide="gamepad-2"></i><h2>Как начать играть?</h2></div>
+        <p>Зарегистрируй аккаунт на сайте или в игре, дождись подтверждения White‑List и заходи на сервер по адресу, указанному на главной странице.</p>
+      </article>
+
+      <article class="rule-panel-v2 faq-panel" id="account">
+        <div class="rule-panel-head"><i data-lucide="key-round"></i><h2>Что делать, если забыл пароль?</h2></div>
+        <p>Открой страницу входа и используй восстановление. Если доступ не получается вернуть, напиши администрации в Discord или Telegram.</p>
+      </article>
+
+      <article class="rule-panel-v2 faq-panel" id="security">
+        <div class="rule-panel-head"><i data-lucide="shield-check"></i><h2>Зачем нужна страница безопасности?</h2></div>
+        <p>На странице безопасности можно управлять автологином, завершать активные сеансы, менять пароль и проверять важные действия аккаунта.</p>
+      </article>
+
+      <article class="rule-panel-v2 faq-panel" id="mods">
+        <div class="rule-panel-head"><i data-lucide="package-check"></i><h2>Нужны ли моды?</h2></div>
+        <p>Обязательных модов нет. Разрешены клиентские улучшения без нечестного преимущества: оптимизация, голосовой чат, эмоции и косметика.</p>
+      </article>
+
+      <article class="rule-panel-v2 faq-panel" id="contacts">
+        <div class="rule-panel-head"><i data-lucide="users-round"></i><h2>Как связаться с проектом?</h2></div>
+        <p>Основные каналы связи - Discord и Telegram. Ссылки находятся в меню «Прочее» и в футере сайта.</p>
+      </article>
+
+      <article class="rule-panel-v2 faq-panel good">
+        <div class="rule-panel-head"><i data-lucide="book-open"></i><h2>Где посмотреть правила?</h2></div>
+        <p>Все правила находятся на отдельной странице «Правила сообщества». Перед игрой лучше внимательно их прочитать.</p>
+      </article>
+    
+<article class="rule-panel-v2 faq-panel" id="account">
+<div class="rule-panel-head"><i data-lucide="user-round"></i><h2>Что делать если я хочу поменять ник?</h2></div>
+<p>К сожалению, смена ника воспринимается системой как создание нового игрового аккаунта. Поэтому после смены ника потребуется заново пройти регистрацию на сайте и привязать новый игровой профиль.</p></article>
+<article class="rule-panel-v2 faq-panel" id="start">
+<div class="rule-panel-head"><i data-lucide="monitor-smartphone"></i><h2>На какой версии работает сервер?</h2></div>
+<p>Сервер работает исключительно на версии <b>26.1.2</b>. Для стабильной работы рекомендуем использовать именно эту версию клиента.</p></article>
+<article class="rule-panel-v2 faq-panel" id="start">
+<div class="rule-panel-head"><i data-lucide="download"></i><h2>С какого лаунчера можно зайти на сервер?</h2></div>
+<p>PopkinDom Craft является общедоступным сервером, поэтому вы можете использовать любой удобный лаунчер. Главное - запускать игру на версии <b>26.1.2</b>.</p></article>
+
+</section>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
+    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
+    <div class="footer-links">
+      <a href="/rules">Правила</a>
+      <a href="https://discord.gg/88e2Rsp8GT" target="_blank">Discord</a>
+      <a href="https://t.me/popkindomcraft" target="_blank">Telegram</a>
+    </div>
+    <div class="footer-small">Minecraft является товарным знаком Mojang Studios. PopkinDom не связан с Mojang Studios.</div>
+  </div>
+</footer>
+<script src="script.js"></script>
+

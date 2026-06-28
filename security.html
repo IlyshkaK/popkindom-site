@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Безопасность — PopkinDom 4</title>
-  <link rel="stylesheet" href="style.css?v=footer-final-fix" />
+  <title>Безопасность - PopkinDom 4</title>
+  <link rel="stylesheet" href="style.css?v=nav-align-news" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
   <link rel="dns-prefetch" href="//unpkg.com" />
@@ -12,16 +12,39 @@
 </head>
 <body class="inner-page">
 <header class="header">
-  <a href="/index" class="brand" aria-label="PopkinDom 4">
-    <i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span>
-  </a>
+  <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
 
-  <nav class="nav">
-    <a href="/index">Главная</a>
-    <a href="/rules">Правила</a>
-    <a href="/top">Топ</a>
-    <a href="/server">Сервер</a>
-    <a href="/about">Подробней</a>
+  <nav class="nav main-nav" aria-label="Основная навигация">
+    <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
+    <a href="/news"><i data-lucide="newspaper"></i><span>Новости</span></a>
+    <a href="/faq"><i data-lucide="circle-help"></i><span>FAQ</span></a>
+    <div class="nav-more-wrap">
+      <button type="button" class="nav-more-btn" aria-haspopup="true" aria-expanded="false">
+        <i data-lucide="grid-2x2"></i><span>Прочее</span>
+      </button>
+      <div class="mega-menu" aria-label="Прочее меню">
+        <div class="mega-col">
+          <span class="mega-title">Основное</span>
+          <a href="#" id="playNavBtn"><i data-lucide="gamepad-2"></i><b>Начать игру</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Активность</span>
+          <a href="/top"><i data-lucide="trophy"></i><b>Топы игроков</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Наши соцсети</span>
+          <a href="https://discord.gg/88e2Rsp8GT" target="_blank" rel="noopener"><i data-lucide="message-circle"></i><b>Discord</b></a>
+          <a href="https://t.me/popkindomcraft" target="_blank" rel="noopener"><i data-lucide="send"></i><b>Telegram</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Прочее</span>
+          <a href="/rules"><i data-lucide="book-open"></i><b>Правила сообщества</b></a>
+          <a href="/server"><i data-lucide="server"></i><b>Сервер</b></a>
+          <a href="/about"><i data-lucide="info"></i><b>Подробней</b></a>
+          <a href="/team"><i data-lucide="users-round"></i><b>Команда проекта</b></a>
+        </div>
+      </div>
+    </div>
   </nav>
 
   <div class="auth-menu-wrap">
@@ -34,30 +57,32 @@
       <a href="/security"><i data-lucide="shield"></i><b>Безопасность</b></a>
       <a href="/admin" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a>
       <span class="auth-dropdown-divider"></span>
-      <button type="button" class="auth-dropdown-logout" data-logout>
-        <i data-lucide="log-out"></i><b>Выйти из<br>аккаунта</b>
-      </button>
+      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
     </div>
   </div>
-
+  
   <button class="burger" id="burgerBtn" aria-label="Открыть меню">
-    <span></span><span></span><span></span>
+    <span></span>
+    <span></span>
+    <span></span>
   </button>
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="/index">Главная</a>
-  <a href="/rules">Правила</a>
-  <a href="/top">Топ</a>
-  <a href="/server">Сервер</a>
-  <a href="/about">Подробней</a>
-  <a href="/login" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="/index"><i data-lucide="home"></i> Главная</a>
+  <a href="/news"><i data-lucide="newspaper"></i> Новости</a>
+  <a href="/faq"><i data-lucide="circle-help"></i> FAQ</a>
+  <a href="/top"><i data-lucide="trophy"></i> Топы игроков</a>
+  <a href="/rules"><i data-lucide="book-open"></i> Правила</a>
+  <a href="/server"><i data-lucide="server"></i> Сервер</a>
+  <a href="/about"><i data-lucide="info"></i> Подробней</a>
+  <a href="/team"><i data-lucide="users-round"></i> Команда проекта</a>
+  <a href="/login" class="mobile-register auth-action-mobile"><i data-lucide="log-in"></i> Войти</a>
   <a href="/account" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
   <a href="/security" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
   <a href="/admin" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
   <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
 </div>
-
 <main class="auth-page protected-page security-page">
   <div class="auth-bg"></div>
   <div class="auth-dark"></div>
@@ -73,7 +98,7 @@
     <div class="security-list security-list-rich">
       <p>
         <span><i data-lucide="user-round"></i> Аккаунт</span>
-        <b id="securityUsername">—</b>
+        <b id="securityUsername">-</b>
       </p>
       <p>
         <span><i data-lucide="clock-3"></i> Сессия сайта</span>
@@ -89,7 +114,7 @@
       </p>
       <p>
         <span><i data-lucide="gamepad-2"></i> Автовход в игре</span>
-        <b id="autoLoginStatus">—</b>
+        <b id="autoLoginStatus">-</b>
       </p>
     </div>
 

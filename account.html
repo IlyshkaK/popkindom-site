@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PopkinDom 4</title>
-  <link rel="stylesheet" href="style.css?v=footer-final-fix" />
+  <link rel="stylesheet" href="style.css?v=nav-align-news" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
   <link rel="dns-prefetch" href="//unpkg.com" />
@@ -14,12 +14,37 @@
 <header class="header">
   <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
 
-  <nav class="nav">
-    <a href="/index">Главная</a>
-    <a href="/rules">Правила</a>
-    <a href="/top">Топ</a>
-    <a href="/server">Сервер</a>
-    <a href="/about">Подробней</a>
+  <nav class="nav main-nav" aria-label="Основная навигация">
+    <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
+    <a href="/news"><i data-lucide="newspaper"></i><span>Новости</span></a>
+    <a href="/faq"><i data-lucide="circle-help"></i><span>FAQ</span></a>
+    <div class="nav-more-wrap">
+      <button type="button" class="nav-more-btn" aria-haspopup="true" aria-expanded="false">
+        <i data-lucide="grid-2x2"></i><span>Прочее</span>
+      </button>
+      <div class="mega-menu" aria-label="Прочее меню">
+        <div class="mega-col">
+          <span class="mega-title">Основное</span>
+          <a href="#" id="playNavBtn"><i data-lucide="gamepad-2"></i><b>Начать игру</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Активность</span>
+          <a href="/top"><i data-lucide="trophy"></i><b>Топы игроков</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Наши соцсети</span>
+          <a href="https://discord.gg/88e2Rsp8GT" target="_blank" rel="noopener"><i data-lucide="message-circle"></i><b>Discord</b></a>
+          <a href="https://t.me/popkindomcraft" target="_blank" rel="noopener"><i data-lucide="send"></i><b>Telegram</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Прочее</span>
+          <a href="/rules"><i data-lucide="book-open"></i><b>Правила сообщества</b></a>
+          <a href="/server"><i data-lucide="server"></i><b>Сервер</b></a>
+          <a href="/about"><i data-lucide="info"></i><b>Подробней</b></a>
+          <a href="/team"><i data-lucide="users-round"></i><b>Команда проекта</b></a>
+        </div>
+      </div>
+    </div>
   </nav>
 
   <div class="auth-menu-wrap">
@@ -44,18 +69,20 @@
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="/index">Главная</a>
-  <a href="/rules">Правила</a>
-  <a href="/top">Топ</a>
-  <a href="/server">Сервер</a>
-  <a href="/about">Подробней</a>
-  <a href="/login" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="/index"><i data-lucide="home"></i> Главная</a>
+  <a href="/news"><i data-lucide="newspaper"></i> Новости</a>
+  <a href="/faq"><i data-lucide="circle-help"></i> FAQ</a>
+  <a href="/top"><i data-lucide="trophy"></i> Топы игроков</a>
+  <a href="/rules"><i data-lucide="book-open"></i> Правила</a>
+  <a href="/server"><i data-lucide="server"></i> Сервер</a>
+  <a href="/about"><i data-lucide="info"></i> Подробней</a>
+  <a href="/team"><i data-lucide="users-round"></i> Команда проекта</a>
+  <a href="/login" class="mobile-register auth-action-mobile"><i data-lucide="log-in"></i> Войти</a>
   <a href="/account" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
   <a href="/security" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
   <a href="/admin" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
   <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
 </div>
-
 <main class="account-page protected-page">
   <div class="account-bg"></div>
   <div class="account-dark"></div>
@@ -84,7 +111,7 @@
           <i data-lucide="users-round"></i>
           <div>
             <span>Онлайн</span>
-            <strong class="green" id="serverOnlineCount">— / 20 игроков</strong>
+            <strong class="green" id="serverOnlineCount">- / 20 игроков</strong>
           </div>
         </div>
       </div>
@@ -98,8 +125,8 @@
             <h1 id="profileUsername">Игрок</h1>
             <p class="role-badge role-player" id="profileRole">Игрок</p>
           </div>
-          <span class="status" id="profileOnlineStatus">—</span>
-          <div class="level-line"><span id="profileXpText">Уровень: —</span><b id="profileXpProgress">— / — XP</b></div>
+          <span class="status" id="profileOnlineStatus">-</span>
+          <div class="level-line"><span id="profileXpText">Уровень: -</span><b id="profileXpProgress">- / - XP</b></div>
           <div class="progress"><i style="width: 52%"></i></div>
         </div>
         <div class="profile-history" aria-label="История аккаунта">
@@ -107,59 +134,59 @@
             <i data-lucide="calendar-days"></i>
             <div>
               <span>На сервере с:</span>
-              <strong id="profileRegisteredAt">—</strong>
+              <strong id="profileRegisteredAt">-</strong>
             </div>
           </div>
           <div class="history-item">
             <i data-lucide="gamepad-2"></i>
             <div>
               <span>Последний вход:</span>
-              <strong id="profileLastLogin">—</strong>
+              <strong id="profileLastLogin">-</strong>
             </div>
           </div>
         </div>
       </div>
 
       <div class="quick-grid">
-        <div class="stat-card glass-card"><i data-lucide="clock-3"></i><b id="quickPlaytime">—</b><p>Время в игре</p></div>
-        <div class="stat-card glass-card"><i data-lucide="trophy"></i><b id="quickAchievements">—</b><p>Достижения</p></div>
-        <div class="stat-card glass-card"><i data-lucide="skull"></i><b id="quickDeaths">—</b><p>Смерти</p></div>
-        <div class="stat-card glass-card"><i data-lucide="swords"></i><b id="quickMobKills">—</b><p>Убийства мобов</p></div>
+        <div class="stat-card glass-card"><i data-lucide="clock-3"></i><b id="quickPlaytime">-</b><p>Время в игре</p></div>
+        <div class="stat-card glass-card"><i data-lucide="trophy"></i><b id="quickAchievements">-</b><p>Достижения</p></div>
+        <div class="stat-card glass-card"><i data-lucide="skull"></i><b id="quickDeaths">-</b><p>Смерти</p></div>
+        <div class="stat-card glass-card"><i data-lucide="swords"></i><b id="quickMobKills">-</b><p>Убийства мобов</p></div>
       </div>
 
       <div class="dashboard-grid">
         <section class="panel glass-card large" id="stats">
           <h2><i data-lucide="chart-column"></i> Подробная статистика</h2>
           <div class="stats-list two-cols" id="detailedStatsList">
-            <p><span>Загрузка...</span><b>—</b></p>
+            <p><span>Загрузка...</span><b>-</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="community">
           <h2><i data-lucide="users-round"></i> Кто онлайн</h2>
           <div class="player-list" id="onlinePlayersList">
-            <p><span>Загрузка...</span><b>—</b></p>
+            <p><span>Загрузка...</span><b>-</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="blocks">
           <h2><i data-lucide="pickaxe"></i> Добытые блоки</h2>
           <div class="bar-list" id="blocksList">
-            <p><span>Загрузка...</span><i><em style="width:0%"></em></i><b>—</b></p>
+            <p><span>Загрузка...</span><i><em style="width:0%"></em></i><b>-</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="crafts">
           <h2><i data-lucide="hammer"></i> Скрафченные предметы</h2>
           <div class="stats-list" id="craftsList">
-            <p><span>Загрузка...</span><b>—</b></p>
+            <p><span>Загрузка...</span><b>-</b></p>
           </div>
         </section>
 
         <section class="panel glass-card" id="enchants">
           <h2><i data-lucide="sparkles"></i> Зачарования</h2>
           <div class="stats-list" id="enchantsList">
-            <p><span>Загрузка...</span><b>—</b></p>
+            <p><span>Загрузка...</span><b>-</b></p>
           </div>
         </section>
 
@@ -173,7 +200,7 @@
         <section class="panel glass-card" id="achievements">
           <h2><i data-lucide="trophy"></i> Последние достижения</h2>
           <div class="achievement-list" id="achievementList">
-            <p><span>Пока нет данных</span><b>—</b></p>
+            <p><span>Пока нет данных</span><b>-</b></p>
           </div>
         </section>
       </div>

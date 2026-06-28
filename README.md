@@ -4,10 +4,10 @@
 
 ## Что внутри
 
-- `server.js` — новый основной сервер.
-- `backend/index.js` — регистрация API-маршрутов.
-- `backend/lib/*` — общие модули БД, cookie, сессий, admin utils.
-- `backend/routes/*` — разделенные API-маршруты:
+- `server.js` - новый основной сервер.
+- `backend/index.js` - регистрация API-маршрутов.
+- `backend/lib/*` - общие модули БД, cookie, сессий, admin utils.
+- `backend/routes/*` - разделенные API-маршруты:
   - `auth`
   - `account`
   - `top`
@@ -45,7 +45,7 @@ curl https://popkindomcraft.ru/api/top
 curl -i https://popkindomcraft.ru/api/me
 ```
 
-`/api/me` без входа должен вернуть `401 Не авторизован.` — это нормально.
+`/api/me` без входа должен вернуть `401 Не авторизован.` - это нормально.
 
 ## Важное изменение
 

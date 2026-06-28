@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Команда проекта - PopkinDom</title>
+  <link rel="stylesheet" href="style.css?v=team-page" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="dns-prefetch" href="//unpkg.com" />
+  <link rel="preconnect" href="https://mc-heads.net" crossorigin />
+  <link rel="dns-prefetch" href="//mc-heads.net" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="inner-page team-page-body">
+
+<header class="header">
+  <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
+
+  <nav class="nav main-nav" aria-label="Основная навигация">
+    <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
+    <a href="/news"><i data-lucide="newspaper"></i><span>Новости</span></a>
+    <a href="/faq"><i data-lucide="circle-help"></i><span>FAQ</span></a>
+    <div class="nav-more-wrap">
+      <button type="button" class="nav-more-btn active" aria-haspopup="true" aria-expanded="false">
+        <i data-lucide="grid-2x2"></i><span>Прочее</span>
+      </button>
+      <div class="mega-menu" aria-label="Прочее меню">
+        <div class="mega-col">
+          <span class="mega-title">Основное</span>
+          <a href="#" id="playNavBtn"><i data-lucide="gamepad-2"></i><b>Начать игру</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Активность</span>
+          <a href="/top"><i data-lucide="trophy"></i><b>Топы игроков</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Наши соцсети</span>
+          <a href="https://discord.gg/88e2Rsp8GT" target="_blank" rel="noopener"><i data-lucide="message-circle"></i><b>Discord</b></a>
+          <a href="https://t.me/popkindomcraft" target="_blank" rel="noopener"><i data-lucide="send"></i><b>Telegram</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Прочее</span>
+          <a href="/rules"><i data-lucide="book-open"></i><b>Правила сообщества</b></a>
+          <a href="/server"><i data-lucide="server"></i><b>Сервер</b></a>
+          <a href="/about"><i data-lucide="info"></i><b>Подробней</b></a>
+          <a href="/team"><i data-lucide="users-round"></i><b>Команда проекта</b></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="auth-menu-wrap">
+    <a href="/login" class="register-btn auth-action-btn" id="authMenuBtn">
+      <span class="auth-action-icon"><i data-lucide="log-in"></i></span>
+      <b class="auth-action-text">Войти</b>
+    </a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="/account"><i data-lucide="user-round"></i><b>Кабинет</b></a>
+      <a href="/security"><i data-lucide="shield"></i><b>Безопасность</b></a>
+      <a href="/admin" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
+    </div>
+  </div>
+  
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/index"><i data-lucide="home"></i> Главная</a>
+  <a href="/news"><i data-lucide="newspaper"></i> Новости</a>
+  <a href="/faq"><i data-lucide="circle-help"></i> FAQ</a>
+  <a href="/top"><i data-lucide="trophy"></i> Топы игроков</a>
+  <a href="/rules"><i data-lucide="book-open"></i> Правила</a>
+  <a href="/server"><i data-lucide="server"></i> Сервер</a>
+  <a href="/about"><i data-lucide="info"></i> Подробней</a>
+  <a href="/team"><i data-lucide="users-round"></i> Команда проекта</a>
+  <a href="/login" class="mobile-register auth-action-mobile"><i data-lucide="log-in"></i> Войти</a>
+  <a href="/account" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
+  <a href="/security" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
+  <a href="/admin" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
+  <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
+</div>
+
+<main class="team-page">
+  <div class="hero-bg"></div>
+  <div class="hero-dark"></div>
+
+  <section class="team-content">
+    <div class="team-hero glass-card">
+      <div class="team-hero-icon"><i data-lucide="users-round"></i></div>
+      <div>
+        <span class="team-kicker">PopkinDom Craft</span>
+        <h1>Команда проекта</h1>
+        <p>Люди, которые развивают сервер, следят за порядком, помогают игрокам и делают PopkinDom Craft комфортным местом для сообщества.</p>
+      </div>
+    </div>
+
+    <div class="team-grid">
+      <article class="team-card glass-card team-role-founder">
+        <div class="team-avatar-wrap">
+          <img class="team-avatar" src="https://mc-heads.net/avatar/h4nty/128" alt="h4nty" loading="lazy">
+          <span class="team-role-icon"><i data-lucide="crown"></i></span>
+        </div>
+        <div class="team-card-body">
+          <div class="team-card-top">
+            <h2>h4nty</h2>
+            <span class="team-role-badge">Основатель проекта</span>
+          </div>
+          <p>Автор идеи и главный вдохновитель PopkinDom Craft. Задаёт направление развития проекта, собирает вокруг сервера людей и превращает идеи в полноценные обновления.</p>
+          <button type="button" class="discord-copy" data-copy="h4nty" aria-label="Скопировать Discord h4nty">
+            <i data-lucide="copy"></i>
+            <span>Discord: <b>h4nty</b></span>
+          </button>
+        </div>
+      </article>
+      <article class="team-card glass-card team-role-headadmin">
+        <div class="team-avatar-wrap">
+          <img class="team-avatar" src="https://mc-heads.net/avatar/justthefox/128" alt="justthefox" loading="lazy">
+          <span class="team-role-icon"><i data-lucide="shield-check"></i></span>
+        </div>
+        <div class="team-card-body">
+          <div class="team-card-top">
+            <h2>justthefox</h2>
+            <span class="team-role-badge">Главный администратор проекта</span>
+          </div>
+          <p>Координирует работу администрации и помогает держать проект в порядке. Берёт на себя сложные организационные вопросы и следит, чтобы команда работала как единое целое.</p>
+          <button type="button" class="discord-copy" data-copy="justthefox" aria-label="Скопировать Discord justthefox">
+            <i data-lucide="copy"></i>
+            <span>Discord: <b>justthefox</b></span>
+          </button>
+        </div>
+      </article>
+      <article class="team-card glass-card team-role-tech">
+        <div class="team-avatar-wrap">
+          <img class="team-avatar" src="https://mc-heads.net/avatar/Ilolka/128" alt="Ilolka" loading="lazy">
+          <span class="team-role-icon"><i data-lucide="wrench"></i></span>
+        </div>
+        <div class="team-card-body">
+          <div class="team-card-top">
+            <h2>Ilolka</h2>
+            <span class="team-role-badge">Технический администратор проекта</span>
+          </div>
+          <p>Отвечает за техническую сторону PopkinDom: сайт, серверную инфраструктуру, собственные системы и стабильность работы. Делает так, чтобы идеи проекта становились реальными функциями.</p>
+          <button type="button" class="discord-copy" data-copy="elijah_blin" aria-label="Скопировать Discord elijah_blin">
+            <i data-lucide="copy"></i>
+            <span>Discord: <b>elijah_blin</b></span>
+          </button>
+        </div>
+      </article>
+      <article class="team-card glass-card team-role-admin">
+        <div class="team-avatar-wrap">
+          <img class="team-avatar" src="https://mc-heads.net/avatar/Philinos/128" alt="Philinos" loading="lazy">
+          <span class="team-role-icon"><i data-lucide="badge-check"></i></span>
+        </div>
+        <div class="team-card-body">
+          <div class="team-card-top">
+            <h2>Philinos</h2>
+            <span class="team-role-badge">Администратор проекта</span>
+          </div>
+          <p>Помогает поддерживать порядок на сервере, разбирает спорные ситуации и следит за комфортной атмосферой. Умеет спокойно разобраться там, где другим уже хочется спорить.</p>
+          <button type="button" class="discord-copy" data-copy="philin" aria-label="Скопировать Discord philin">
+            <i data-lucide="copy"></i>
+            <span>Discord: <b>philin</b></span>
+          </button>
+        </div>
+      </article>
+      <article class="team-card glass-card team-role-moderator">
+        <div class="team-avatar-wrap">
+          <img class="team-avatar" src="https://mc-heads.net/avatar/ddyxxy/128" alt="ddyxxy" loading="lazy">
+          <span class="team-role-icon"><i data-lucide="user-check"></i></span>
+        </div>
+        <div class="team-card-body">
+          <div class="team-card-top">
+            <h2>ddyxxy</h2>
+            <span class="team-role-badge">Модератор проекта</span>
+          </div>
+          <p>Следит за соблюдением правил и помогает игрокам не теряться в жизни сервера. Быстро замечает проблемы и помогает сохранить дружелюбную атмосферу.</p>
+          <button type="button" class="discord-copy" data-copy=".hasskori" aria-label="Скопировать Discord .hasskori">
+            <i data-lucide="copy"></i>
+            <span>Discord: <b>.hasskori</b></span>
+          </button>
+        </div>
+      </article>
+      <article class="team-card glass-card team-role-moderator">
+        <div class="team-avatar-wrap">
+          <img class="team-avatar" src="https://mc-heads.net/avatar/m0nstercat/128" alt="m0nstercat" loading="lazy">
+          <span class="team-role-icon"><i data-lucide="cat"></i></span>
+        </div>
+        <div class="team-card-body">
+          <div class="team-card-top">
+            <h2>m0nstercat</h2>
+            <span class="team-role-badge">Модератор проекта</span>
+          </div>
+          <p>Активный участник команды, который помогает игрокам с вопросами и поддерживает порядок в сообществе. Делает модерацию спокойной, понятной и без лишней строгости.</p>
+          <button type="button" class="discord-copy" data-copy="m0nstercat" aria-label="Скопировать Discord m0nstercat">
+            <i data-lucide="copy"></i>
+            <span>Discord: <b>m0nstercat</b></span>
+          </button>
+        </div>
+      </article>
+      <article class="team-card glass-card team-role-moderator">
+        <div class="team-avatar-wrap">
+          <img class="team-avatar" src="https://mc-heads.net/avatar/SonCerber/128" alt="SonCerber" loading="lazy">
+          <span class="team-role-icon"><i data-lucide="shield"></i></span>
+        </div>
+        <div class="team-card-body">
+          <div class="team-card-top">
+            <h2>SonCerber</h2>
+            <span class="team-role-badge">Модератор проекта</span>
+          </div>
+          <p>Помогает администрации следить за честной игрой и безопасностью сообщества. Всегда готов подключиться, если игрокам нужна помощь или ситуация требует внимания.</p>
+          <button type="button" class="discord-copy" data-copy="soncerber" aria-label="Скопировать Discord soncerber">
+            <i data-lucide="copy"></i>
+            <span>Discord: <b>soncerber</b></span>
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
+    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
+    <div class="footer-links">
+      <a href="/rules">Правила</a>
+      <a href="https://discord.gg/88e2Rsp8GT" target="_blank">Discord</a>
+      <a href="https://t.me/popkindomcraft" target="_blank">Telegram</a>
+    </div>
+    <div class="footer-small">Minecraft является товарным знаком Mojang Studios. PopkinDom не связан с Mojang Studios.</div>
+  </div>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>

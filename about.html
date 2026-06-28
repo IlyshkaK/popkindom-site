@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Подробней — PopkinDom</title>
-  <link rel="stylesheet" href="style.css?v=footer-final-fix" />
+  <title>Подробней - PopkinDom</title>
+  <link rel="stylesheet" href="style.css?v=nav-align-news" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
   <link rel="dns-prefetch" href="//unpkg.com" />
@@ -15,12 +15,37 @@
 <header class="header">
   <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
 
-  <nav class="nav">
-    <a href="/index">Главная</a>
-    <a href="/rules">Правила</a>
-    <a href="/top">Топ</a>
-    <a href="/server">Сервер</a>
-    <a href="/about" class="active">Подробней</a>
+  <nav class="nav main-nav" aria-label="Основная навигация">
+    <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
+    <a href="/news"><i data-lucide="newspaper"></i><span>Новости</span></a>
+    <a href="/faq"><i data-lucide="circle-help"></i><span>FAQ</span></a>
+    <div class="nav-more-wrap">
+      <button type="button" class="nav-more-btn active" aria-haspopup="true" aria-expanded="false">
+        <i data-lucide="grid-2x2"></i><span>Прочее</span>
+      </button>
+      <div class="mega-menu" aria-label="Прочее меню">
+        <div class="mega-col">
+          <span class="mega-title">Основное</span>
+          <a href="#" id="playNavBtn"><i data-lucide="gamepad-2"></i><b>Начать игру</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Активность</span>
+          <a href="/top"><i data-lucide="trophy"></i><b>Топы игроков</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Наши соцсети</span>
+          <a href="https://discord.gg/88e2Rsp8GT" target="_blank" rel="noopener"><i data-lucide="message-circle"></i><b>Discord</b></a>
+          <a href="https://t.me/popkindomcraft" target="_blank" rel="noopener"><i data-lucide="send"></i><b>Telegram</b></a>
+        </div>
+        <div class="mega-col">
+          <span class="mega-title">Прочее</span>
+          <a href="/rules"><i data-lucide="book-open"></i><b>Правила сообщества</b></a>
+          <a href="/server"><i data-lucide="server"></i><b>Сервер</b></a>
+          <a href="/about"><i data-lucide="info"></i><b>Подробней</b></a>
+          <a href="/team"><i data-lucide="users-round"></i><b>Команда проекта</b></a>
+        </div>
+      </div>
+    </div>
   </nav>
 
   <div class="auth-menu-wrap">
@@ -36,7 +61,7 @@
       <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
     </div>
   </div>
-
+  
   <button class="burger" id="burgerBtn" aria-label="Открыть меню">
     <span></span>
     <span></span>
@@ -45,18 +70,20 @@
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="/index">Главная</a>
-  <a href="/rules">Правила</a>
-  <a href="/top">Топ</a>
-  <a href="/server">Сервер</a>
-  <a href="/about">Подробней</a>
-  <a href="/login" class="mobile-register auth-action-mobile">Войти</a>
+  <a href="/index"><i data-lucide="home"></i> Главная</a>
+  <a href="/news"><i data-lucide="newspaper"></i> Новости</a>
+  <a href="/faq"><i data-lucide="circle-help"></i> FAQ</a>
+  <a href="/top"><i data-lucide="trophy"></i> Топы игроков</a>
+  <a href="/rules"><i data-lucide="book-open"></i> Правила</a>
+  <a href="/server"><i data-lucide="server"></i> Сервер</a>
+  <a href="/about"><i data-lucide="info"></i> Подробней</a>
+  <a href="/team"><i data-lucide="users-round"></i> Команда проекта</a>
+  <a href="/login" class="mobile-register auth-action-mobile"><i data-lucide="log-in"></i> Войти</a>
   <a href="/account" class="mobile-auth-link auth-only"><i data-lucide="user-round"></i> Кабинет</a>
   <a href="/security" class="mobile-auth-link auth-only"><i data-lucide="shield"></i> Безопасность</a>
   <a href="/admin" class="mobile-auth-link auth-only admin-only"><i data-lucide="shield-check"></i> Админ-панель</a>
   <button type="button" class="mobile-auth-link auth-only mobile-auth-logout" data-logout><i data-lucide="log-out"></i> Выйти из аккаунта</button>
 </div>
-
 <main class="about-page">
   <div class="rules-bg"></div>
   <div class="rules-dark"></div>
@@ -110,7 +137,7 @@
         <article class="about-feature glass-card">
           <i data-lucide="users-round"></i>
           <h3>Дружное сообщество</h3>
-          <p>Главная ценность сервера — игроки, общение и общий вайб сезона.</p>
+          <p>Главная ценность сервера - игроки, общение и общий вайб сезона.</p>
         </article>
         <article class="about-feature glass-card">
           <i data-lucide="chart-column"></i>
@@ -160,9 +187,9 @@
       <b>h4nty</b>
     </div>
     <div class="admin-bubble">
-      <p>Для меня ПопаКрафт — это про людей, вайб и воспоминания, место, куда всегда хотелось зайти после тяжёлого дня. Там было как-то по-домашнему тепло и уютно, настоящий отдых от всего.</p>
+      <p>Для меня ПопаКрафт - это про людей, вайб и воспоминания, место, куда всегда хотелось зайти после тяжёлого дня. Там было как-то по-домашнему тепло и уютно, настоящий отдых от всего.</p>
 
-      <p>Мне очень нравилось строить всякие проекты, в то время, когда Любаша гоняла где-то исследовала и добывала мне ресурсы, также ещё нравилась прокачка персонажа и миллиард достижений, но самое ценное было — это время, проведённое с ребятами.</p>
+      <p>Мне очень нравилось строить всякие проекты, в то время, когда Любаша гоняла где-то исследовала и добывала мне ресурсы, также ещё нравилась прокачка персонажа и миллиард достижений, но самое ценное было - это время, проведённое с ребятами.</p>
 
       <p>Помню Любашину дршку отмечали, такой вайб был, построили специальные арты в виде всяких украшений и надписей «С днём рождения», квест придумали мини.</p>
 

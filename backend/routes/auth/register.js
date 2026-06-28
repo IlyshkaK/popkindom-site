@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
   const ip = getClientIp(req);
 
   if (!isValidMinecraftNick(username)) {
-    return sendJson(res, 400, { message: 'Ник должен быть 3–16 символов: буквы, цифры и _.' });
+    return sendJson(res, 400, { message: 'Ник должен быть 3-16 символов: буквы, цифры и _.' });
   }
 
   if (!isPasswordStrong(username, password)) {
