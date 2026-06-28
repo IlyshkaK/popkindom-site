@@ -10078,3 +10078,52 @@ body.home-page .footer{margin-top:0!important;clear:both;position:relative;} .ho
     font-size: 15px !important;
   }
 }
+
+
+/* ===== SERVER PAGE: WORLDS VALUES ALIGNMENT + PLUGIN GRID FIX ===== */
+.world-card-v2 {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.world-card-v2 div {
+  display: grid !important;
+  grid-template-columns: minmax(120px, 1fr) minmax(96px, max-content) !important;
+  align-items: center !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+}
+
+.world-card-v2 div span,
+.world-card-v2 div b {
+  min-width: 0 !important;
+  line-height: 1.25 !important;
+}
+
+.world-card-v2 div span {
+  text-align: left !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.world-card-v2 div b {
+  justify-self: end !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+
+@media (max-width: 520px) {
+  .world-card-v2 div {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+  }
+
+  .world-card-v2 div b {
+    justify-self: start !important;
+    text-align: left !important;
+    white-space: normal !important;
+  }
+}
