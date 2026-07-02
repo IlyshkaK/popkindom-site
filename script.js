@@ -1422,83 +1422,122 @@ function renderAdminPlayerPanel(player) {
   ].filter((item) => adminActionAllowedForCurrentUser(item.action, player));
   const canActOnSelected = canAdminActOnPlayer(player);
   const restrictionText = canActOnSelected ? "" : adminRestrictionMessage(player);
+  const isOnline = player.online === true || player.isOnline === true;
+  const hasBan = player.banned === true || player.active_ban === true;
+  const hasMute = player.muted === true || player.active_mute === true;
+  const hasPunishment = hasBan || hasMute || player.hasPunishment || player.hasActivePunishments;
+  const lastSeen = player.last_server_login || player.last_web_login || player.player_updated_at || player.updated_at;
+  const blocksTotal = player.blocks_total ?? player.blocks_mined ?? player.mined_blocks ?? 0;
+  const playTicks = player.play_time_ticks ?? player.play_time ?? 0;
 
   panel.innerHTML = `
-    <div class="admin-player-profile admin-player-profile-wide">
-      <div class="admin-info-col">
-        <span class="admin-info-label">Ник</span>
-        <div class="admin-player-main">
-          <img src="${minecraftHeadUrl(player.username, 64)}" alt="">
-          <h2>${player.username}</h2>
-        </div>
-      </div>
-
-      <div class="admin-info-col">
-        <span class="admin-info-label">Роль</span>
-        <div class="admin-selected-role">${adminRoleBadge(player.role)}</div>
-      </div>
-
-      <div class="admin-info-col">
-        <span class="admin-info-label">Статус</span>
-        <span class="admin-status ${(player.online||player.isOnline)? "online":"offline"}">${(player.online||player.isOnline)? "Онлайн":"Офлайн"}</span>
-      </div>
-
-      <div class="admin-info-col">
-        <span class="admin-info-label">White-List</span>
-        ${adminWhitelistBadge(player)}
-      </div>
-
-      <div class="admin-info-col">
-        <span class="admin-info-label">Наказания</span>
-        <span class="admin-status ${(player.hasPunishment||player.hasActivePunishments)? "offline":"online"}">${(player.hasPunishment||player.hasActivePunishments)? "Есть":"Нет"}</span>
-      </div>
-    </div>
-
-    <div class="admin-selected-grid">
-      <form class="admin-action-form ${canActOnSelected ? "" : "admin-action-disabled"}" id="adminActionForm">
-        <label>Действие</label>
-        ${!canActOnSelected ? `<div class="admin-restriction-notice"><i data-lucide="shield-alert"></i><span>${restrictionText}</span></div>` : ""}
-        <input id="adminActionType" type="hidden" value="${defaultAction}" />
-        <div class="admin-action-picker" role="radiogroup" aria-label="Выбор действия">
-          ${canActOnSelected && actionButtons.length ? actionButtons.map((item) => `
-            <button type="button" class="${item.action === defaultAction ? "active " : ""}${item.cls}" data-admin-action="${item.action}">
-              <i data-lucide="${item.icon}"></i><span>${item.label}</span>
-            </button>
-          `).join("") : (canActOnSelected ? `<div class="admin-no-actions">Нет доступных действий для выбранного игрока.</div>` : "")}
-        </div>
-
-        <label id="adminRoleLabel" hidden>Новая роль</label>
-        <div id="adminRoleSelectWrap" class="admin-role-select-wrap" hidden>
-          <select id="adminNewRole" class="admin-role-select">
-          <option value="PLAYER">Игрок</option>
-          <option value="MODERATOR">Модератор</option>
-          <option value="ADMIN">Администратор</option>
-          <option value="OWNER">Владелец</option>
-          </select>
-        </div>
-
-        <label id="adminDurationLabel" hidden>Срок</label>
-        <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
-
-        <label id="adminMessageLabel" hidden>Сообщение игроку</label>
-        <textarea id="adminPrivateMessage" rows="3" placeholder="Текст личного сообщения игроку" hidden></textarea>
-
-        <label id="adminReasonLabel">Причина</label>
-        <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
-
-        <button type="submit" class="primary-btn" ${canActOnSelected ? "" : "disabled"}><i data-lucide="gavel"></i> Выполнить действие</button>
-        <p class="auth-message" id="adminActionMessage"></p>
-      </form>
-
-      <div class="admin-history-box">
-        <div class="admin-section-head compact">
-          <div>
-            <p class="eyebrow"><i data-lucide="history"></i> История</p>
-            <h3>Наказания игрока</h3>
+    <div class="admin-player-v2-shell">
+      <header class="admin-player-v2-header">
+        <div>
+          <p class="eyebrow"><i data-lucide="shield-check"></i> Управление игроком</p>
+          <h2 id="adminPlayerModalTitle">${escapeHtml(player.username || "Игрок")}</h2>
+          <div class="admin-player-v2-header-tags">
+            <span class="admin-status ${isOnline ? "online" : "offline"}">${isOnline ? "Онлайн" : "Офлайн"}</span>
+            ${adminRoleBadge(player.role)}
+            ${adminWhitelistBadge(player)}
           </div>
-          <button type="button" class="admin-mini-btn" id="adminHistoryRefresh"><i data-lucide="refresh-cw"></i></button>
         </div>
-        <div id="adminPlayerHistory" class="admin-history-list">Загрузка…</div>
+        <button type="button" class="admin-mini-btn" id="adminPlayerRefresh"><i data-lucide="refresh-cw"></i> Обновить данные</button>
+      </header>
+
+      ${!canActOnSelected ? `<div class="admin-restriction-notice admin-restriction-notice-wide"><i data-lucide="shield-alert"></i><span>${restrictionText}</span></div>` : ""}
+
+      <div class="admin-player-v2-grid">
+        <aside class="admin-player-info-card admin-v2-card">
+          <div class="admin-player-render-wrap">
+            <img class="admin-player-render" src="${minecraftBustUrl(player.username, 420)}" alt="${escapeHtml(player.username || "Игрок")}" onerror="this.onerror=null;this.src='${minecraftBustFallbackUrl("Steve", 420)}'">
+          </div>
+          <div class="admin-player-info-main">
+            <h3>${escapeHtml(player.username || "-")}</h3>
+            <div class="admin-player-info-tags">
+              ${adminRoleBadge(player.role)}
+              <span class="admin-status ${isOnline ? "online" : "offline"}">${isOnline ? "Онлайн" : "Офлайн"}</span>
+            </div>
+          </div>
+          <div class="admin-player-info-list">
+            <p><span>White-List</span><b>${player.whitelisted ? "Добавлен" : "Нет"}</b></p>
+            <p><span>Наказания</span><b class="${hasPunishment ? "admin-text-danger" : "admin-text-ok"}">${hasPunishment ? "Имеются" : "Нет"}</b></p>
+            <p><span>На сервере с</span><b>${formatServerSince(player.registered_at)}</b></p>
+            <p><span>Последний вход</span><b>${formatLastLogin(lastSeen)}</b></p>
+          </div>
+        </aside>
+
+        <section class="admin-action-form admin-v2-card ${canActOnSelected ? "" : "admin-action-disabled"}" id="adminActionFormWrap">
+          <form id="adminActionForm">
+            <label>Действие</label>
+            <input id="adminActionType" type="hidden" value="${defaultAction}" />
+            <div class="admin-action-picker" role="radiogroup" aria-label="Выбор действия">
+              ${canActOnSelected && actionButtons.length ? actionButtons.map((item) => `
+                <button type="button" class="${item.action === defaultAction ? "active " : ""}${item.cls}" data-admin-action="${item.action}">
+                  <i data-lucide="${item.icon}"></i><span>${item.label}</span>
+                </button>
+              `).join("") : (canActOnSelected ? `<div class="admin-no-actions">Нет доступных действий для выбранного игрока.</div>` : "")}
+            </div>
+
+            <label id="adminRoleLabel" hidden>Новая роль</label>
+            <div id="adminRoleSelectWrap" class="admin-role-select-wrap" hidden>
+              <select id="adminNewRole" class="admin-role-select">
+                <option value="PLAYER">Игрок</option>
+                <option value="MODERATOR">Модератор</option>
+                <option value="ADMIN">Администратор</option>
+                <option value="OWNER">Владелец</option>
+              </select>
+            </div>
+
+            <label id="adminDurationLabel" hidden>Срок</label>
+            <input id="adminActionDuration" type="text" placeholder="Например: 10m, 2h, 7d" hidden />
+
+            <label id="adminMessageLabel" hidden>Сообщение игроку</label>
+            <textarea id="adminPrivateMessage" rows="3" placeholder="Текст личного сообщения игроку" hidden></textarea>
+
+            <label id="adminReasonLabel">Причина</label>
+            <textarea id="adminActionReason" rows="3" placeholder="Например: нарушение правил сервера"></textarea>
+
+            <button type="submit" class="primary-btn" ${canActOnSelected ? "" : "disabled"}><i data-lucide="gavel"></i> Выполнить действие</button>
+            <p class="auth-message" id="adminActionMessage"></p>
+          </form>
+        </section>
+
+        <section class="admin-active-punishments admin-v2-card">
+          <div class="admin-v2-card-head">
+            <p class="eyebrow"><i data-lucide="shield-alert"></i> Активные наказания</p>
+            <h3>${hasPunishment ? "Есть ограничения" : "Наказаний нет"}</h3>
+          </div>
+          <div class="admin-active-punishments-list">
+            ${hasBan ? `<article class="admin-active-punishment danger"><b>BAN</b><span>${player.ban_expires_at ? `до ${formatDate(player.ban_expires_at)}` : "активен"}</span></article>` : ""}
+            ${hasMute ? `<article class="admin-active-punishment warn"><b>MUTE</b><span>${player.mute_expires_at ? `до ${formatDate(player.mute_expires_at)}` : "активен"}</span></article>` : ""}
+            ${!hasPunishment ? `<div class="admin-empty-mini"><i data-lucide="circle-check"></i><p>У игрока нет активных наказаний.</p></div>` : ""}
+          </div>
+        </section>
+
+        <section class="admin-player-stats admin-v2-card">
+          <div class="admin-v2-card-head">
+            <p class="eyebrow"><i data-lucide="bar-chart-3"></i> Статистика</p>
+            <h3>Кратко</h3>
+          </div>
+          <div class="admin-player-stats-grid">
+            <p><span>Время</span><b>${formatTicks(playTicks)}</b></p>
+            <p><span>Блоки</span><b>${formatNumber(blocksTotal)}</b></p>
+            <p><span>Мобы</span><b>${formatNumber(player.mob_kills)}</b></p>
+            <p><span>Смерти</span><b>${formatNumber(player.deaths)}</b></p>
+          </div>
+        </section>
+
+        <section class="admin-history-box admin-v2-card">
+          <div class="admin-section-head compact">
+            <div>
+              <p class="eyebrow"><i data-lucide="history"></i> История</p>
+              <h3>Наказания игрока</h3>
+            </div>
+            <button type="button" class="admin-mini-btn" id="adminHistoryRefresh"><i data-lucide="refresh-cw"></i></button>
+          </div>
+          <div id="adminPlayerHistory" class="admin-history-list">Загрузка…</div>
+        </section>
       </div>
     </div>
   `;
@@ -1567,6 +1606,12 @@ function renderAdminPlayerPanel(player) {
   });
 
   document.getElementById("adminHistoryRefresh")?.addEventListener("click", () => loadAdminPlayerHistory(player.username));
+  document.getElementById("adminPlayerRefresh")?.addEventListener("click", async () => {
+    openAdminPlayerModalLoading();
+    await loadAdminPlayers();
+    const fresh = adminPlayersCache.find((item) => String(item.username || "").toLowerCase() === String(player.username || "").toLowerCase()) || player;
+    renderAdminPlayerPanel(fresh);
+  });
 
   loadAdminPlayerHistory(player.username);
   loadAdminPlayers();

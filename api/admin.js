@@ -283,11 +283,29 @@ async function handlePlayers(req, res) {
        u.last_server_login,
        p.online,
        p.updated_at AS player_updated_at,
+       COALESCE(ps.play_time_ticks, 0) AS play_time_ticks,
+       COALESCE(ps.mob_kills, 0) AS mob_kills,
+       COALESCE(ps.deaths, 0) AS deaths,
+       COALESCE(pb.blocks_total, 0) AS blocks_total,
        EXISTS (SELECT 1 FROM moderation_whitelist wl WHERE wl.player_name_lower = u.username_lower AND wl.active = TRUE) AS whitelisted,
        EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS banned,
-       EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS muted
+       EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS muted,
+       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS ban_expires_at,
+       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS mute_expires_at
      FROM pd_users u
      LEFT JOIN players p ON p.auth_user_id = u.id
+     LEFT JOIN LATERAL (
+       SELECT play_time_ticks, mob_kills, deaths
+       FROM player_stats
+       WHERE auth_user_id = u.id
+       ORDER BY updated_at DESC
+       LIMIT 1
+     ) ps ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT SUM(amount)::BIGINT AS blocks_total
+       FROM player_blocks
+       WHERE auth_user_id = u.id
+     ) pb ON TRUE
      ${where}
      ORDER BY COALESCE(p.updated_at, u.last_web_login, u.registered_at) DESC
      LIMIT 80;`,
