@@ -335,10 +335,10 @@ async function handlePlayerDetails(req, res) {
     [usernameLower]
   );
 
-  const user = userResult.rows[0];
+  const user = userResult.rows[0] || null;
   if (!user) return sendJson(res, 404, { message: 'Игрок не найден на сайте.' });
 
-  const authUserId = user.id;
+  const authUserId = Number(user.id);
   let player = null;
   let stats = null;
   let blocksTotal = 0;
@@ -353,24 +353,28 @@ async function handlePlayerDetails(req, res) {
     const result = await query(
       `SELECT *
        FROM players
-       WHERE auth_user_id = $1
-       ORDER BY online DESC, updated_at DESC
+       WHERE auth_user_id = $1 OR LOWER(nickname) = $2 OR username_lower = $2
+       ORDER BY online DESC, updated_at DESC NULLS LAST
        LIMIT 1;`,
-      [authUserId]
+      [authUserId, usernameLower]
     );
     player = result.rows[0] || null;
   } catch (error) {
     console.warn('admin player-details players query failed:', error.message);
   }
 
+  const playerUuid = player?.uuid || null;
+  const serverId = player?.server_id || 'summer-4';
+
   try {
     const result = await query(
       `SELECT *
        FROM player_stats
        WHERE auth_user_id = $1
-       ORDER BY updated_at DESC
+          OR ($2::text IS NOT NULL AND uuid = $2::text)
+       ORDER BY updated_at DESC NULLS LAST
        LIMIT 1;`,
-      [authUserId]
+      [authUserId, playerUuid]
     );
     stats = result.rows[0] || null;
   } catch (error) {
@@ -381,8 +385,9 @@ async function handlePlayerDetails(req, res) {
     const result = await query(
       `SELECT COALESCE(SUM(amount), 0)::BIGINT AS total
        FROM player_blocks
-       WHERE auth_user_id = $1;`,
-      [authUserId]
+       WHERE auth_user_id = $1
+          OR ($2::text IS NOT NULL AND uuid = $2::text);`,
+      [authUserId, playerUuid]
     );
     blocksTotal = Number(result.rows[0]?.total || 0);
   } catch (error) {
@@ -391,12 +396,14 @@ async function handlePlayerDetails(req, res) {
 
   try {
     const result = await query(
-      `SELECT death_reason, world_name, x, y, z, created_at
+      `SELECT id, uuid, server_id, auth_user_id, nickname, death_reason, world_name, x, y, z, created_at
        FROM player_death_history
        WHERE auth_user_id = $1
-       ORDER BY created_at DESC
+          OR LOWER(nickname) = $2
+          OR ($3::text IS NOT NULL AND uuid = $3::text)
+       ORDER BY created_at DESC NULLS LAST
        LIMIT 3;`,
-      [authUserId]
+      [authUserId, usernameLower, playerUuid]
     );
     recentDeaths = result.rows || [];
   } catch (error) {
@@ -423,20 +430,32 @@ async function handlePlayerDetails(req, res) {
     console.warn('admin player-details moderation query failed:', error.message);
   }
 
+  const finalStats = {
+    ...(stats || {}),
+    play_time_ticks: Number(stats?.play_time_ticks ?? player?.play_time_ticks ?? 0),
+    deaths: Number(stats?.deaths ?? player?.deaths ?? 0),
+    mob_kills: Number(stats?.mob_kills ?? player?.mob_kills ?? 0),
+    blocks_total: blocksTotal,
+  };
+
   const mergedPlayer = {
     ...(player || {}),
-    ...(stats || {}),
+    ...finalStats,
     id: user.id,
     auth_user_id: authUserId,
+    uuid: playerUuid || stats?.uuid || null,
+    server_id: serverId,
     username: user.username,
     username_lower: user.username_lower,
     nickname: player?.nickname || user.username,
     role: user.role,
-    registered_at: user.registered_at,
+    registered_at: user.registered_at || player?.first_join || null,
+    first_join: player?.first_join || user.registered_at || null,
     last_web_login: user.last_web_login,
-    last_server_login: user.last_server_login,
+    last_server_login: user.last_server_login || player?.last_join || null,
+    last_join: player?.last_join || user.last_server_login || user.last_web_login || null,
     online: player?.online === true,
-    player_updated_at: player?.updated_at || null,
+    player_updated_at: player?.updated_at || stats?.updated_at || null,
     blocks_total: blocksTotal,
     whitelisted,
     banned,
@@ -447,12 +466,12 @@ async function handlePlayerDetails(req, res) {
     mute_expires_at: muteExpiresAt,
     recent_deaths: recentDeaths,
     recentDeaths,
-    stats: stats || {},
+    stats: finalStats,
   };
 
   return sendJson(res, 200, {
     player: mergedPlayer,
-    stats: stats || {},
+    stats: finalStats,
     blocksTotal,
     recentDeaths,
     deathsHistory: recentDeaths,
