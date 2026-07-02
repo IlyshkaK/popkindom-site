@@ -1429,6 +1429,9 @@ function renderAdminPlayerPanel(player) {
   const lastSeen = player.last_server_login || player.last_web_login || player.player_updated_at || player.updated_at;
   const blocksTotal = player.blocks_total ?? player.blocks_mined ?? player.mined_blocks ?? 0;
   const playTicks = player.play_time_ticks ?? player.play_time ?? 0;
+  const roleInfo = resolveAdminRole(player.role);
+  const playerUuid = player.uuid || player.minecraft_uuid || player.player_uuid || player.id || "-";
+  const accountSource = player.auth_source || player.source || (player.site_registered ? "Сайт" : "Сервер");
 
   panel.innerHTML = `
     <div class="admin-player-v2-shell">
@@ -1459,11 +1462,16 @@ function renderAdminPlayerPanel(player) {
               <span class="admin-status ${isOnline ? "online" : "offline"}">${isOnline ? "Онлайн" : "Офлайн"}</span>
             </div>
           </div>
-          <div class="admin-player-info-list">
+          <div class="admin-player-info-list admin-player-info-list-extended">
+            <p><span>Никнейм</span><b>${escapeHtml(player.username || "-")}</b></p>
+            <p><span>Роль</span><b>${roleInfo.label}</b></p>
+            <p><span>Статус</span><b class="${isOnline ? "admin-text-ok" : ""}">${isOnline ? "Онлайн" : "Офлайн"}</b></p>
             <p><span>White-List</span><b>${player.whitelisted ? "Добавлен" : "Нет"}</b></p>
             <p><span>Наказания</span><b class="${hasPunishment ? "admin-text-danger" : "admin-text-ok"}">${hasPunishment ? "Имеются" : "Нет"}</b></p>
             <p><span>На сервере с</span><b>${formatServerSince(player.registered_at)}</b></p>
             <p><span>Последний вход</span><b>${formatLastLogin(lastSeen)}</b></p>
+            <p><span>Источник</span><b>${escapeHtml(accountSource || "-")}</b></p>
+            <p class="admin-player-info-full"><span>ID / UUID</span><b title="${escapeHtml(playerUuid)}">${escapeHtml(playerUuid)}</b></p>
           </div>
         </aside>
 

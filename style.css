@@ -10703,3 +10703,170 @@ body.admin-modal-open {
     min-height: 240px;
   }
 }
+
+/* ===== ADMIN PANEL V2: Etap 1.2.3 viewport + player info + mobile fix ===== */
+.admin-player-modal {
+  z-index: 20000;
+  align-items: flex-start;
+  padding: 92px 22px 22px;
+}
+
+.admin-player-modal-card {
+  max-height: calc(100vh - 114px);
+}
+
+.admin-player-modal-content {
+  max-height: calc(100vh - 158px);
+}
+
+.admin-player-v2-grid {
+  grid-template-columns: minmax(245px, 0.72fr) minmax(520px, 1.55fr) minmax(340px, 0.92fr);
+}
+
+.admin-player-info-card {
+  grid-template-columns: minmax(180px, .72fr) minmax(330px, 1.28fr);
+  align-items: stretch;
+}
+
+.admin-player-info-main {
+  display: grid;
+  align-content: start;
+}
+
+.admin-player-info-list-extended {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-player-info-list-extended p {
+  min-height: 54px;
+}
+
+.admin-player-info-list-extended .admin-player-info-full {
+  grid-column: 1 / -1;
+}
+
+.admin-player-info-list-extended .admin-player-info-full b {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-player-render-wrap {
+  min-height: 320px;
+}
+
+.admin-player-render {
+  max-height: 315px;
+}
+
+@media (max-width: 1280px) {
+  .admin-player-v2-grid {
+    grid-template-columns: minmax(250px, .75fr) minmax(460px, 1.25fr);
+  }
+
+  .admin-player-info-card {
+    grid-template-columns: minmax(170px, .75fr) minmax(280px, 1.25fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-player-modal {
+    padding: 86px 12px 12px;
+  }
+
+  .admin-player-modal-card {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 98px);
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .admin-player-modal-content {
+    max-height: calc(100vh - 132px);
+  }
+
+  .admin-player-v2-header {
+    padding-right: 40px;
+    gap: 12px;
+  }
+
+  .admin-player-v2-header h2 {
+    font-size: clamp(28px, 9vw, 40px);
+  }
+
+  .admin-player-v2-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "info"
+      "active"
+      "stats"
+      "actions"
+      "history";
+  }
+
+  .admin-player-info-card {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-player-info-list-extended {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-player-render-wrap {
+    min-height: 240px;
+  }
+
+  .admin-player-render {
+    max-height: 250px;
+  }
+
+  .admin-player-v2-grid #adminActionFormWrap .admin-action-picker {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-player-modal {
+    padding: 76px 8px 8px;
+  }
+
+  .admin-player-modal-card {
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 84px);
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .admin-player-modal-content {
+    max-height: calc(100vh - 110px);
+  }
+
+  .admin-player-v2-header {
+    align-items: stretch;
+  }
+
+  .admin-player-v2-header .admin-mini-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-v2-card {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .admin-player-v2-grid #adminActionFormWrap .admin-action-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-player-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-player-info-list p,
+  .admin-player-stats-grid p {
+    padding: 10px;
+  }
+}
