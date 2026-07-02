@@ -1319,12 +1319,13 @@ async function loadAdminPlayers() {
     }).join("") : `<tr><td colspan="6">Игроки не найдены.</td></tr>`;
 
     table.querySelectorAll("[data-admin-select]").forEach((button) => {
-      button.addEventListener("click", () => {
+      button.addEventListener("click", async () => {
         const username = button.dataset.adminSelect;
         const player = adminPlayersCache.find((item) => item.username === username);
         if (player) {
           openAdminPlayerModalLoading();
-          window.setTimeout(() => renderAdminPlayerPanel(player), 140);
+          const detailedPlayer = await loadAdminPlayerDetails(username, player);
+          window.setTimeout(() => renderAdminPlayerPanel(detailedPlayer || player), 120);
         }
       });
     });
@@ -1398,6 +1399,22 @@ function sortAdminPlayers(players) {
       numeric: true
     });
   });
+}
+
+function mergeAdminPlayerData(basePlayer, freshPlayer) {
+  return { ...(basePlayer || {}), ...(freshPlayer || {}) };
+}
+
+async function loadAdminPlayerDetails(username, fallbackPlayer = null) {
+  const safeName = String(username || "").trim();
+  if (!safeName) return fallbackPlayer;
+  try {
+    const data = await apiRequest(`/api/admin?section=player-details&username=${encodeURIComponent(safeName)}`);
+    return mergeAdminPlayerData(fallbackPlayer, data.player || data);
+  } catch (error) {
+    console.warn("Не удалось загрузить подробную статистику игрока:", error);
+    return fallbackPlayer;
+  }
 }
 
 
@@ -1498,7 +1515,7 @@ function renderAdminPlayerPanel(player) {
   ]);
   const roleInfo = resolveAdminRole(player.role);
   const playerUuid = player.uuid || player.minecraft_uuid || player.player_uuid || player.id || "-";
-  const recentDeaths = pickAdminArray(player, ["recent_deaths", "recentDeaths", "death_history", "deathHistory", "latest_deaths", "latestDeaths", "stats.recent_deaths", "player_stats.recent_deaths"]).slice(0, 3);
+  const recentDeaths = pickAdminArray(player, ["recent_deaths", "recentDeaths", "deaths_history", "deathsHistory", "death_history", "deathHistory", "latest_deaths", "latestDeaths", "stats.recent_deaths", "stats.deathsHistory", "player_stats.recent_deaths"]).slice(0, 3);
   const formattedUuid = String(playerUuid || "-");
   const shortUuid = formattedUuid.length > 18 ? `${formattedUuid.slice(0, 8)}…${formattedUuid.slice(-6)}` : formattedUuid;
 
@@ -1688,8 +1705,9 @@ function renderAdminPlayerPanel(player) {
   document.getElementById("adminPlayerRefresh")?.addEventListener("click", async () => {
     openAdminPlayerModalLoading();
     await loadAdminPlayers();
-    const fresh = adminPlayersCache.find((item) => String(item.username || "").toLowerCase() === String(player.username || "").toLowerCase()) || player;
-    renderAdminPlayerPanel(fresh);
+    const listFresh = adminPlayersCache.find((item) => String(item.username || "").toLowerCase() === String(player.username || "").toLowerCase()) || player;
+    const detailedPlayer = await loadAdminPlayerDetails(player.username, listFresh);
+    renderAdminPlayerPanel(detailedPlayer || listFresh);
   });
 
   loadAdminPlayerHistory(player.username);

@@ -291,7 +291,17 @@ async function handlePlayers(req, res) {
        EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS banned,
        EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS muted,
        (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS ban_expires_at,
-       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS mute_expires_at
+       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS mute_expires_at,
+       COALESCE((
+         SELECT json_agg(death_row ORDER BY death_row.created_at DESC)
+         FROM (
+           SELECT death_reason, world_name, x, y, z, created_at
+           FROM player_death_history
+           WHERE auth_user_id = u.id
+           ORDER BY created_at DESC
+           LIMIT 3
+         ) death_row
+       ), '[]'::json) AS recent_deaths
      FROM pd_users u
      LEFT JOIN players p ON p.auth_user_id = u.id
      LEFT JOIN LATERAL (
@@ -313,6 +323,72 @@ async function handlePlayers(req, res) {
   );
 
   return sendJson(res, 200, { players: result.rows });
+}
+
+
+async function handlePlayerDetails(req, res) {
+  if (req.method !== 'GET') return methodNotAllowed(res);
+  const admin = await requireAdmin(req, res);
+  if (!admin) return;
+
+  const username = String(req.query?.username || '').trim();
+  const usernameLower = username.toLowerCase();
+  if (!/^[a-zA-Z0-9_]{3,16}$/.test(username)) {
+    return sendJson(res, 400, { message: 'Некорректный ник игрока.' });
+  }
+
+  const result = await query(
+    `SELECT
+       u.id,
+       u.username,
+       u.username_lower,
+       u.role,
+       u.registered_at,
+       u.last_web_login,
+       u.last_server_login,
+       p.online,
+       p.updated_at AS player_updated_at,
+       COALESCE(ps.play_time_ticks, 0) AS play_time_ticks,
+       COALESCE(ps.mob_kills, 0) AS mob_kills,
+       COALESCE(ps.deaths, 0) AS deaths,
+       COALESCE(pb.blocks_total, 0) AS blocks_total,
+       EXISTS (SELECT 1 FROM moderation_whitelist wl WHERE wl.player_name_lower = u.username_lower AND wl.active = TRUE) AS whitelisted,
+       EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS banned,
+       EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS muted,
+       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS ban_expires_at,
+       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS mute_expires_at,
+       COALESCE((
+         SELECT json_agg(death_row ORDER BY death_row.created_at DESC)
+         FROM (
+           SELECT death_reason, world_name, x, y, z, created_at
+           FROM player_death_history
+           WHERE auth_user_id = u.id
+           ORDER BY created_at DESC
+           LIMIT 3
+         ) death_row
+       ), '[]'::json) AS recent_deaths
+     FROM pd_users u
+     LEFT JOIN players p ON p.auth_user_id = u.id
+     LEFT JOIN LATERAL (
+       SELECT play_time_ticks, mob_kills, deaths
+       FROM player_stats
+       WHERE auth_user_id = u.id
+       ORDER BY updated_at DESC
+       LIMIT 1
+     ) ps ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT SUM(amount)::BIGINT AS blocks_total
+       FROM player_blocks
+       WHERE auth_user_id = u.id
+     ) pb ON TRUE
+     WHERE u.username_lower = $1
+     LIMIT 1;`,
+    [usernameLower]
+  );
+
+  const player = result.rows[0] || null;
+  if (!player) return sendJson(res, 404, { message: 'Игрок не найден.' });
+  return sendJson(res, 200, { player });
 }
 
 async function handlePlayerHistory(req, res) {
@@ -620,6 +696,7 @@ module.exports = async function handler(req, res) {
     if (section === 'verify-pin') return handleVerifyPin(req, res);
     if (section === 'overview') return handleOverview(req, res);
     if (section === 'players') return handlePlayers(req, res);
+    if (section === 'player-details') return handlePlayerDetails(req, res);
     if (section === 'player-history') return handlePlayerHistory(req, res);
     if (section === 'player-action') return handlePlayerAction(req, res);
     if (section === 'whitelist-requests') return handleWhitelistRequests(req, res);
