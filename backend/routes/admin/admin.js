@@ -291,17 +291,7 @@ async function handlePlayers(req, res) {
        EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS banned,
        EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS muted,
        (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS ban_expires_at,
-       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS mute_expires_at,
-       COALESCE((
-         SELECT json_agg(row_to_json(dh))
-         FROM (
-           SELECT death_reason, world_name, x, y, z, created_at
-           FROM player_death_history
-           WHERE auth_user_id = u.id
-           ORDER BY created_at DESC
-           LIMIT 3
-         ) dh
-       ), '[]'::json) AS recent_deaths
+       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS mute_expires_at
      FROM pd_users u
      LEFT JOIN players p ON p.auth_user_id = u.id
      LEFT JOIN LATERAL (
