@@ -95,8 +95,9 @@
     <div class="admin-pin-overlay" id="adminPinOverlay" hidden>
       <section class="admin-pin-card glass-card" id="adminPinGate">
         <div class="admin-pin-icon"><i data-lucide="lock-keyhole"></i></div>
+        <button type="button" class="admin-modal-close admin-pin-cancel" id="adminPinCancel" aria-label="Отказаться от проверки PIN"><i data-lucide="x"></i></button>
         <h2 id="adminPinTitle">Введите PIN-код</h2>
-        <p id="adminPinText">Для входа в админ-панель подтвердите 4-значный PIN-код.</p>
+        <p id="adminPinText">Для доступа к административной панели необходимо подтвердить личность с помощью PIN-кода.</p>
 
         <form id="adminPinForm" class="admin-pin-form">
           <input id="adminPinInput" class="admin-pin-input" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="PIN-код" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" required />
@@ -162,7 +163,7 @@
           </div>
         </section>
 
-        <aside class="admin-action-card glass-card" id="adminPlayerPanel">
+        <aside class="admin-action-card glass-card" id="adminPlayerPanel" hidden aria-hidden="true">
           <div class="admin-empty-state">
             <i data-lucide="mouse-pointer-click"></i>
             <h2>Выбери игрока</h2>
@@ -170,6 +171,23 @@
           </div>
         </aside>
       </div>
+
+
+    <div class="admin-player-modal" id="adminPlayerModal" hidden aria-hidden="true">
+      <div class="admin-player-modal-backdrop" data-admin-player-modal-close></div>
+      <section class="admin-player-modal-card glass-card" role="dialog" aria-modal="true" aria-labelledby="adminPlayerModalTitle">
+        <button type="button" class="admin-modal-close" id="adminPlayerModalClose" aria-label="Закрыть окно">
+          <i data-lucide="x"></i>
+        </button>
+        <div id="adminPlayerModalContent" class="admin-player-modal-content">
+          <div class="admin-modal-loading">
+            <span class="admin-modal-spinner" aria-hidden="true"></span>
+            <h2 id="adminPlayerModalTitle">Загрузка игрока…</h2>
+            <p>Подготавливаем меню взаимодействия.</p>
+          </div>
+        </div>
+      </section>
+    </div>
 
       <section class="admin-table-card glass-card admin-full-only">
         <div class="admin-section-head">

@@ -1276,6 +1276,7 @@ async function loadAdminOverview() {
   dashboard.hidden = false;
 
   const badge = document.getElementById("adminBadge");
+  bindAdminPlayerModal();
   if (badge) badge.innerHTML = adminUserBadge(data.admin.username, data.admin.role);
 
   const usersCount = document.getElementById("adminUsersCount");
@@ -1301,7 +1302,7 @@ async function loadAdminPlayers() {
 
   try {
     const data = await apiRequest(`/api/admin?section=players&search=${encodeURIComponent(search)}`);
-    adminPlayersCache = data.players || [];
+    adminPlayersCache = sortAdminPlayers(data.players || []);
 
     table.innerHTML = adminPlayersCache.length ? adminPlayersCache.map((player) => {
       const online = player.online === true;
@@ -1321,7 +1322,10 @@ async function loadAdminPlayers() {
       button.addEventListener("click", () => {
         const username = button.dataset.adminSelect;
         const player = adminPlayersCache.find((item) => item.username === username);
-        if (player) renderAdminPlayerPanel(player);
+        if (player) {
+          openAdminPlayerModalLoading();
+          window.setTimeout(() => renderAdminPlayerPanel(player), 140);
+        }
       });
     });
 
@@ -1331,9 +1335,74 @@ async function loadAdminPlayers() {
   }
 }
 
+
+function openAdminPlayerModalLoading() {
+  const modal = document.getElementById("adminPlayerModal");
+  const content = document.getElementById("adminPlayerModalContent");
+  if (!modal || !content) return;
+  content.innerHTML = `
+    <div class="admin-modal-loading">
+      <span class="admin-modal-spinner" aria-hidden="true"></span>
+      <h2 id="adminPlayerModalTitle">Загрузка игрока…</h2>
+      <p>Подготавливаем меню взаимодействия.</p>
+    </div>
+  `;
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("admin-modal-open");
+  requestAnimationFrame(() => modal.classList.add("open"));
+  refreshLucideIcons();
+}
+
+function closeAdminPlayerModal() {
+  const modal = document.getElementById("adminPlayerModal");
+  if (!modal || modal.hidden) return;
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("admin-modal-open");
+  window.setTimeout(() => {
+    if (!modal.classList.contains("open")) modal.hidden = true;
+  }, 220);
+}
+
+function bindAdminPlayerModal() {
+  const modal = document.getElementById("adminPlayerModal");
+  if (!modal || modal.dataset.bound) return;
+  modal.dataset.bound = "true";
+  modal.querySelectorAll("[data-admin-player-modal-close]").forEach((node) => {
+    node.addEventListener("click", closeAdminPlayerModal);
+  });
+  document.getElementById("adminPlayerModalClose")?.addEventListener("click", closeAdminPlayerModal);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) closeAdminPlayerModal();
+  });
+}
+
+function adminNameSortRank(username) {
+  const first = String(username || "").trim().charAt(0);
+  return /^[A-Za-zА-Яа-яЁё]$/.test(first) ? 0 : 1;
+}
+
+function sortAdminPlayers(players) {
+  return [...(players || [])].sort((a, b) => {
+    const onlineA = (a.online === true || a.isOnline === true) ? 0 : 1;
+    const onlineB = (b.online === true || b.isOnline === true) ? 0 : 1;
+    if (onlineA !== onlineB) return onlineA - onlineB;
+
+    const rankA = adminNameSortRank(a.username);
+    const rankB = adminNameSortRank(b.username);
+    if (rankA !== rankB) return rankA - rankB;
+
+    return String(a.username || "").localeCompare(String(b.username || ""), ["ru", "en"], {
+      sensitivity: "base",
+      numeric: true
+    });
+  });
+}
+
 function renderAdminPlayerPanel(player) {
   adminSelectedPlayer = player;
-  const panel = document.getElementById("adminPlayerPanel");
+  const panel = document.getElementById("adminPlayerModalContent") || document.getElementById("adminPlayerPanel");
   if (!panel) return;
 
   const defaultAction = adminDefaultActionForCurrentUser(player);
@@ -1391,11 +1460,11 @@ function renderAdminPlayerPanel(player) {
         ${!canActOnSelected ? `<div class="admin-restriction-notice"><i data-lucide="shield-alert"></i><span>${restrictionText}</span></div>` : ""}
         <input id="adminActionType" type="hidden" value="${defaultAction}" />
         <div class="admin-action-picker" role="radiogroup" aria-label="Выбор действия">
-          ${actionButtons.length ? actionButtons.map((item) => `
+          ${canActOnSelected && actionButtons.length ? actionButtons.map((item) => `
             <button type="button" class="${item.action === defaultAction ? "active " : ""}${item.cls}" data-admin-action="${item.action}">
               <i data-lucide="${item.icon}"></i><span>${item.label}</span>
             </button>
-          `).join("") : `<div class="admin-no-actions">Нет доступных действий для выбранного игрока.</div>`}
+          `).join("") : (canActOnSelected ? `<div class="admin-no-actions">Нет доступных действий для выбранного игрока.</div>` : "")}
         </div>
 
         <label id="adminRoleLabel" hidden>Новая роль</label>
@@ -1433,6 +1502,8 @@ function renderAdminPlayerPanel(player) {
       </div>
     </div>
   `;
+
+  panel.classList.add("admin-modal-content-ready");
 
   const actionType = document.getElementById("adminActionType");
   const duration = document.getElementById("adminActionDuration");
@@ -1709,6 +1780,18 @@ async function initAdminPanel() {
   const pinRepeat = document.getElementById("adminPinRepeat");
   const pinSubmit = document.getElementById("adminPinSubmit");
   const badge = document.getElementById("adminBadge");
+  bindAdminPlayerModal();
+
+  function cancelAdminPinCheck() {
+    if (pinOverlay) pinOverlay.classList.remove("open");
+    document.body.classList.remove("admin-pin-locked");
+    window.setTimeout(() => { window.location.href = "index.html"; }, 180);
+  }
+
+  document.getElementById("adminPinCancel")?.addEventListener("click", cancelAdminPinCheck);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && pinOverlay && !pinOverlay.hidden && pinForm?.dataset.mode === "verify") cancelAdminPinCheck();
+  });
 
   if (!currentUser) {
     window.location.href = "login.html";
@@ -1719,7 +1802,7 @@ async function initAdminPanel() {
     if (badge) badge.textContent = "Доступ закрыт";
     if (dashboard) dashboard.hidden = true;
     document.body.classList.add("admin-pin-locked");
-    if (pinOverlay) pinOverlay.hidden = false;
+    if (pinOverlay) { pinOverlay.hidden = false; requestAnimationFrame(() => pinOverlay.classList.add("open")); }
     if (pinGate) {
       pinGate.innerHTML = `
         <div class="admin-pin-icon"><i data-lucide="ban"></i></div>
@@ -1740,7 +1823,7 @@ async function initAdminPanel() {
 
     if (status.verified) {
       document.body.classList.remove("admin-pin-locked");
-      if (pinOverlay) pinOverlay.hidden = true;
+      if (pinOverlay) { pinOverlay.classList.remove("open"); pinOverlay.hidden = true; }
       if (dashboard) dashboard.hidden = false;
       await loadAdminOverview();
       bindAdminControls();
@@ -1749,7 +1832,7 @@ async function initAdminPanel() {
 
     document.body.classList.add("admin-pin-locked");
     if (dashboard) dashboard.hidden = false;
-    if (pinOverlay) pinOverlay.hidden = false;
+    if (pinOverlay) { pinOverlay.hidden = false; requestAnimationFrame(() => pinOverlay.classList.add("open")); }
 
     if (!status.hasPin) {
       pinTitle.textContent = "Создайте PIN-код";
@@ -1769,7 +1852,7 @@ async function initAdminPanel() {
   } catch (error) {
     setAdminMessage(error.message || "Ошибка проверки доступа.", "error");
     document.body.classList.add("admin-pin-locked");
-    if (pinOverlay) pinOverlay.hidden = false;
+    if (pinOverlay) { pinOverlay.hidden = false; requestAnimationFrame(() => pinOverlay.classList.add("open")); }
   }
 
   if (pinForm) {
@@ -1800,7 +1883,7 @@ async function initAdminPanel() {
         pinInput.value = "";
         pinRepeat.value = "";
         document.body.classList.remove("admin-pin-locked");
-        if (pinOverlay) pinOverlay.hidden = true;
+        if (pinOverlay) { pinOverlay.classList.remove("open"); pinOverlay.hidden = true; }
         if (dashboard) dashboard.hidden = false;
         await loadAdminOverview();
         bindAdminControls();
