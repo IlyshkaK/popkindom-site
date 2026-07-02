@@ -11251,3 +11251,73 @@ body.admin-modal-open {
     max-height: 245px;
   }
 }
+
+/* ===== ADMIN PANEL V2: Etap 1.2.7 scroll inside frame fix ===== */
+.admin-player-modal {
+  padding: 96px 22px 22px !important;
+}
+
+.admin-player-modal-card {
+  width: min(1560px, calc(100vw - 44px)) !important;
+  max-height: calc(100vh - 118px) !important;
+  overflow: hidden !important;
+  padding: 0 58px 0 0 !important;
+  border-radius: 28px !important;
+  box-sizing: border-box !important;
+}
+
+.admin-player-modal-content {
+  width: 100% !important;
+  max-height: calc(100vh - 118px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 22px !important;
+  border-radius: 28px 0 0 28px !important;
+  box-sizing: border-box !important;
+  scrollbar-gutter: stable both-edges;
+}
+
+.admin-player-modal-card > .admin-modal-close {
+  top: 14px !important;
+  right: 8px !important;
+  z-index: 80 !important;
+}
+
+@media (max-width: 900px) {
+  .admin-player-modal {
+    padding: 84px 10px 10px !important;
+  }
+  .admin-player-modal-card {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 94px) !important;
+    padding: 0 !important;
+    border-radius: 22px !important;
+  }
+  .admin-player-modal-content {
+    max-height: calc(100vh - 94px) !important;
+    padding: 62px 12px 12px !important;
+    border-radius: 22px !important;
+    scrollbar-gutter: stable;
+  }
+  .admin-player-modal-card > .admin-modal-close {
+    top: 12px !important;
+    right: 12px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-player-modal {
+    padding: 76px 8px 8px !important;
+  }
+  .admin-player-modal-card {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100vh - 84px) !important;
+    border-radius: 18px !important;
+  }
+  .admin-player-modal-content {
+    max-height: calc(100vh - 84px) !important;
+    padding: 58px 10px 10px !important;
+    border-radius: 18px !important;
+  }
+}
