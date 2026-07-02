@@ -1400,6 +1400,23 @@ function sortAdminPlayers(players) {
   });
 }
 
+
+function renderAdminRecentDeathsMini(items = []) {
+  const preparedItems = Array.isArray(items) ? sortByDateDesc(items).slice(0, 3) : [];
+  if (!preparedItems.length) {
+    return `<article class="admin-death-mini-empty"><b>Нет данных</b><span>Последние смерти появятся после синхронизации статистики.</span></article>`;
+  }
+  return preparedItems.map((item) => {
+    const reason = item.death_reason || item.reason || "Игрок погиб";
+    const date = formatLastLogin(item.created_at || item.createdAt);
+    const world = item.world_name || item.worldName || "";
+    const coords = [item.x, item.y, item.z].every((value) => value !== undefined && value !== null)
+      ? ` · ${Math.round(Number(item.x))}, ${Math.round(Number(item.y))}, ${Math.round(Number(item.z))}`
+      : "";
+    return `<article><b>☠ ${escapeHtml(reason)}</b><span>${escapeHtml(date)}${world ? ` · ${escapeHtml(world)}` : ""}${escapeHtml(coords)}</span></article>`;
+  }).join("");
+}
+
 function renderAdminPlayerPanel(player) {
   adminSelectedPlayer = player;
   const panel = document.getElementById("adminPlayerModalContent") || document.getElementById("adminPlayerPanel");
@@ -1427,11 +1444,15 @@ function renderAdminPlayerPanel(player) {
   const hasMute = player.muted === true || player.active_mute === true;
   const hasPunishment = hasBan || hasMute || player.hasPunishment || player.hasActivePunishments;
   const lastSeen = player.last_server_login || player.last_web_login || player.player_updated_at || player.updated_at;
-  const blocksTotal = player.blocks_total ?? player.blocks_mined ?? player.mined_blocks ?? 0;
-  const playTicks = player.play_time_ticks ?? player.play_time ?? 0;
+  const blocksTotal = player.blocks_total ?? player.blocks_mined ?? player.mined_blocks ?? player.blocks ?? 0;
+  const playTicks = player.play_time_ticks ?? player.playtime_ticks ?? player.play_time ?? player.playTime ?? 0;
+  const mobsTotal = player.mob_kills ?? player.mobs_killed ?? player.killed_mobs ?? player.mobKills ?? 0;
+  const deathsTotal = player.deaths ?? player.death_count ?? player.deaths_count ?? 0;
   const roleInfo = resolveAdminRole(player.role);
   const playerUuid = player.uuid || player.minecraft_uuid || player.player_uuid || player.id || "-";
-  const accountSource = player.auth_source || player.source || (player.site_registered ? "Сайт" : "Сервер");
+  const recentDeaths = Array.isArray(player.recent_deaths) ? player.recent_deaths : (Array.isArray(player.recentDeaths) ? player.recentDeaths : []);
+  const formattedUuid = String(playerUuid || "-");
+  const shortUuid = formattedUuid.length > 18 ? `${formattedUuid.slice(0, 8)}…${formattedUuid.slice(-6)}` : formattedUuid;
 
   panel.innerHTML = `
     <div class="admin-player-v2-shell">
@@ -1456,22 +1477,28 @@ function renderAdminPlayerPanel(player) {
             <img class="admin-player-render" src="${minecraftBustUrl(player.username, 420)}" alt="${escapeHtml(player.username || "Игрок")}" onerror="this.onerror=null;this.src='${minecraftBustFallbackUrl("Steve", 420)}'">
           </div>
           <div class="admin-player-info-main">
-            <h3>${escapeHtml(player.username || "-")}</h3>
-            <div class="admin-player-info-tags">
-              ${adminRoleBadge(player.role)}
-              <span class="admin-status ${isOnline ? "online" : "offline"}">${isOnline ? "Онлайн" : "Офлайн"}</span>
+            <div class="admin-player-info-title">
+              <h3>${escapeHtml(player.username || "-")}</h3>
+              <div class="admin-player-info-tags">
+                ${adminRoleBadge(player.role)}
+                <span class="admin-status ${isOnline ? "online" : "offline"}">${isOnline ? "Онлайн" : "Офлайн"}</span>
+              </div>
             </div>
-          </div>
-          <div class="admin-player-info-list admin-player-info-list-extended">
-            <p><span>Никнейм</span><b>${escapeHtml(player.username || "-")}</b></p>
-            <p><span>Роль</span><b>${roleInfo.label}</b></p>
-            <p><span>Статус</span><b class="${isOnline ? "admin-text-ok" : ""}">${isOnline ? "Онлайн" : "Офлайн"}</b></p>
-            <p><span>White-List</span><b>${player.whitelisted ? "Добавлен" : "Нет"}</b></p>
-            <p><span>Наказания</span><b class="${hasPunishment ? "admin-text-danger" : "admin-text-ok"}">${hasPunishment ? "Имеются" : "Нет"}</b></p>
-            <p><span>На сервере с</span><b>${formatServerSince(player.registered_at)}</b></p>
-            <p><span>Последний вход</span><b>${formatLastLogin(lastSeen)}</b></p>
-            <p><span>Источник</span><b>${escapeHtml(accountSource || "-")}</b></p>
-            <p class="admin-player-info-full"><span>ID / UUID</span><b title="${escapeHtml(playerUuid)}">${escapeHtml(playerUuid)}</b></p>
+            <div class="admin-player-info-list admin-player-info-list-clean">
+              <p><span>White-List</span><b>${player.whitelisted ? "Добавлен" : "Нет"}</b></p>
+              <p><span>Наказания</span><b class="${hasPunishment ? "admin-text-danger" : "admin-text-ok"}">${hasPunishment ? "Имеются" : "Нет"}</b></p>
+              <p><span>На сервере с</span><b>${formatServerSince(player.registered_at)}</b></p>
+              <p><span>Последний вход</span><b>${formatLastLogin(lastSeen)}</b></p>
+              <p class="admin-player-info-full"><span>ID / UUID</span><b title="${escapeHtml(formattedUuid)}">${escapeHtml(shortUuid)}</b></p>
+            </div>
+            <div class="admin-death-mini">
+              <div class="admin-v2-card-head compact-mini">
+                <p class="eyebrow"><i data-lucide="skull"></i> Последние смерти</p>
+              </div>
+              <div class="admin-death-mini-list">
+                ${renderAdminRecentDeathsMini(recentDeaths)}
+              </div>
+            </div>
           </div>
         </aside>
 
@@ -1531,8 +1558,8 @@ function renderAdminPlayerPanel(player) {
           <div class="admin-player-stats-grid">
             <p><span>Время</span><b>${formatTicks(playTicks)}</b></p>
             <p><span>Блоки</span><b>${formatNumber(blocksTotal)}</b></p>
-            <p><span>Мобы</span><b>${formatNumber(player.mob_kills)}</b></p>
-            <p><span>Смерти</span><b>${formatNumber(player.deaths)}</b></p>
+            <p><span>Мобы</span><b>${formatNumber(mobsTotal)}</b></p>
+            <p><span>Смерти</span><b>${formatNumber(deathsTotal)}</b></p>
           </div>
         </section>
 
