@@ -327,83 +327,135 @@ async function handlePlayerDetails(req, res) {
     return sendJson(res, 400, { message: 'Некорректный ник игрока.' });
   }
 
-  const baseResult = await query(
-    `SELECT
-       u.id,
-       u.username,
-       u.username_lower,
-       u.role,
-       u.registered_at,
-       u.last_web_login,
-       u.last_server_login,
-       p.online,
-       p.updated_at AS player_updated_at,
-       EXISTS (SELECT 1 FROM moderation_whitelist wl WHERE wl.player_name_lower = u.username_lower AND wl.active = TRUE) AS whitelisted,
-       EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS banned,
-       EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS muted,
-       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS ban_expires_at,
-       (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = u.username_lower AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS mute_expires_at
-     FROM pd_users u
-     LEFT JOIN players p ON p.auth_user_id = u.id
-     WHERE u.username_lower = $1
+  const userResult = await query(
+    `SELECT id, username, username_lower, role, registered_at, last_web_login, last_server_login
+     FROM pd_users
+     WHERE username_lower = $1
      LIMIT 1;`,
     [usernameLower]
   );
 
-  const basePlayer = baseResult.rows[0] || null;
-  if (!basePlayer) return sendJson(res, 404, { message: 'Игрок не найден.' });
+  const user = userResult.rows[0];
+  if (!user) return sendJson(res, 404, { message: 'Игрок не найден на сайте.' });
 
-  const [statsResult, blocksResult, deathsResult] = await Promise.all([
-    query(
+  const authUserId = user.id;
+  let player = null;
+  let stats = null;
+  let blocksTotal = 0;
+  let recentDeaths = [];
+  let whitelisted = false;
+  let banned = false;
+  let muted = false;
+  let banExpiresAt = null;
+  let muteExpiresAt = null;
+
+  try {
+    const result = await query(
+      `SELECT *
+       FROM players
+       WHERE auth_user_id = $1
+       ORDER BY online DESC, updated_at DESC
+       LIMIT 1;`,
+      [authUserId]
+    );
+    player = result.rows[0] || null;
+  } catch (error) {
+    console.warn('admin player-details players query failed:', error.message);
+  }
+
+  try {
+    const result = await query(
       `SELECT *
        FROM player_stats
        WHERE auth_user_id = $1
        ORDER BY updated_at DESC
        LIMIT 1;`,
-      [basePlayer.id]
-    ).catch((error) => {
-      console.warn('admin player-details stats query failed:', error.message || error);
-      return { rows: [] };
-    }),
-    query(
-      `SELECT COALESCE(SUM(amount), 0)::BIGINT AS blocks_total
+      [authUserId]
+    );
+    stats = result.rows[0] || null;
+  } catch (error) {
+    console.warn('admin player-details stats query failed:', error.message);
+  }
+
+  try {
+    const result = await query(
+      `SELECT COALESCE(SUM(amount), 0)::BIGINT AS total
        FROM player_blocks
        WHERE auth_user_id = $1;`,
-      [basePlayer.id]
-    ).catch((error) => {
-      console.warn('admin player-details blocks query failed:', error.message || error);
-      return { rows: [{ blocks_total: 0 }] };
-    }),
-    query(
+      [authUserId]
+    );
+    blocksTotal = Number(result.rows[0]?.total || 0);
+  } catch (error) {
+    console.warn('admin player-details blocks query failed:', error.message);
+  }
+
+  try {
+    const result = await query(
       `SELECT death_reason, world_name, x, y, z, created_at
        FROM player_death_history
        WHERE auth_user_id = $1
        ORDER BY created_at DESC
        LIMIT 3;`,
-      [basePlayer.id]
-    ).catch((error) => {
-      console.warn('admin player-details deaths query failed:', error.message || error);
-      return { rows: [] };
-    }),
-  ]);
+      [authUserId]
+    );
+    recentDeaths = result.rows || [];
+  } catch (error) {
+    console.warn('admin player-details deaths query failed:', error.message);
+  }
 
-  const stats = statsResult.rows[0] || {};
-  const blocksTotal = blocksResult.rows[0]?.blocks_total || stats.blocks_total || stats.blocks_mined || stats.mined_blocks || 0;
-  const recentDeaths = deathsResult.rows || [];
+  try {
+    const result = await query(
+      `SELECT
+         EXISTS (SELECT 1 FROM moderation_whitelist wl WHERE wl.player_name_lower = $1 AND wl.active = TRUE) AS whitelisted,
+         EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = $1 AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS banned,
+         EXISTS (SELECT 1 FROM moderation_punishments mp WHERE mp.player_name_lower = $1 AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW())) AS muted,
+         (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = $1 AND mp.active = TRUE AND mp.type IN ('BAN', 'TEMP_BAN') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS ban_expires_at,
+         (SELECT mp.expires_at FROM moderation_punishments mp WHERE mp.player_name_lower = $1 AND mp.active = TRUE AND mp.type IN ('MUTE', 'TEMP_MUTE') AND (mp.expires_at IS NULL OR mp.expires_at > NOW()) ORDER BY mp.created_at DESC LIMIT 1) AS mute_expires_at;`,
+      [usernameLower]
+    );
+    const row = result.rows[0] || {};
+    whitelisted = row.whitelisted === true;
+    banned = row.banned === true;
+    muted = row.muted === true;
+    banExpiresAt = row.ban_expires_at || null;
+    muteExpiresAt = row.mute_expires_at || null;
+  } catch (error) {
+    console.warn('admin player-details moderation query failed:', error.message);
+  }
+
+  const mergedPlayer = {
+    ...(player || {}),
+    ...(stats || {}),
+    id: user.id,
+    auth_user_id: authUserId,
+    username: user.username,
+    username_lower: user.username_lower,
+    nickname: player?.nickname || user.username,
+    role: user.role,
+    registered_at: user.registered_at,
+    last_web_login: user.last_web_login,
+    last_server_login: user.last_server_login,
+    online: player?.online === true,
+    player_updated_at: player?.updated_at || null,
+    blocks_total: blocksTotal,
+    whitelisted,
+    banned,
+    muted,
+    active_ban: banned,
+    active_mute: muted,
+    ban_expires_at: banExpiresAt,
+    mute_expires_at: muteExpiresAt,
+    recent_deaths: recentDeaths,
+    recentDeaths,
+    stats: stats || {},
+  };
 
   return sendJson(res, 200, {
-    player: {
-      ...basePlayer,
-      ...stats,
-      blocks_total: blocksTotal,
-      stats,
-      player_stats: stats,
-      recent_deaths: recentDeaths,
-      recentDeaths,
-      death_history: recentDeaths,
-      deaths_history: recentDeaths,
-      deathsHistory: recentDeaths,
-    },
+    player: mergedPlayer,
+    stats: stats || {},
+    blocksTotal,
+    recentDeaths,
+    deathsHistory: recentDeaths,
   });
 }
 

@@ -1319,13 +1319,19 @@ async function loadAdminPlayers() {
     }).join("") : `<tr><td colspan="6">Игроки не найдены.</td></tr>`;
 
     table.querySelectorAll("[data-admin-select]").forEach((button) => {
-      button.addEventListener("click", async () => {
+      button.addEventListener("click", () => {
         const username = button.dataset.adminSelect;
         const player = adminPlayersCache.find((item) => item.username === username);
         if (player) {
           openAdminPlayerModalLoading();
-          const detailedPlayer = await loadAdminPlayerDetails(username, player);
-          window.setTimeout(() => renderAdminPlayerPanel(detailedPlayer || player), 120);
+          loadAdminPlayerDetails(player.username, player)
+            .then((detailedPlayer) => renderAdminPlayerPanel(detailedPlayer))
+            .catch((error) => {
+              const content = document.getElementById("adminPlayerModalContent");
+              if (content) {
+                content.innerHTML = `<div class="admin-modal-loading admin-modal-error"><h2>Не удалось загрузить статистику</h2><p>${escapeHtml(error.message || "Ошибка загрузки данных игрока.")}</p></div>`;
+              }
+            });
         }
       });
     });
@@ -1366,6 +1372,22 @@ function closeAdminPlayerModal() {
   }, 220);
 }
 
+async function loadAdminPlayerDetails(username, fallbackPlayer = null) {
+  const safeUsername = String(username || fallbackPlayer?.username || "").trim();
+  if (!safeUsername) throw new Error("Не выбран игрок.");
+
+  const data = await apiRequest(`/api/admin?section=player-details&username=${encodeURIComponent(safeUsername)}`);
+  const details = data.player || {};
+  return {
+    ...(fallbackPlayer || {}),
+    ...details,
+    stats: data.stats || details.stats || fallbackPlayer?.stats || {},
+    blocks_total: Number(data.blocksTotal ?? details.blocks_total ?? fallbackPlayer?.blocks_total ?? 0),
+    recent_deaths: data.recentDeaths || data.deathsHistory || details.recent_deaths || details.recentDeaths || [],
+    recentDeaths: data.recentDeaths || data.deathsHistory || details.recentDeaths || details.recent_deaths || []
+  };
+}
+
 function bindAdminPlayerModal() {
   const modal = document.getElementById("adminPlayerModal");
   if (!modal || modal.dataset.bound) return;
@@ -1401,23 +1423,6 @@ function sortAdminPlayers(players) {
   });
 }
 
-
-
-function mergeAdminPlayerData(basePlayer, freshPlayer) {
-  return { ...(basePlayer || {}), ...(freshPlayer || {}) };
-}
-
-async function loadAdminPlayerDetails(username, fallbackPlayer = null) {
-  const safeName = String(username || "").trim();
-  if (!safeName) return fallbackPlayer;
-  try {
-    const data = await apiRequest(`/api/admin?section=player-details&username=${encodeURIComponent(safeName)}`);
-    return mergeAdminPlayerData(fallbackPlayer, data.player || data);
-  } catch (error) {
-    console.warn("Не удалось загрузить подробную статистику игрока:", error);
-    return fallbackPlayer;
-  }
-}
 
 function renderAdminRecentDeathsMini(items = []) {
   const preparedItems = Array.isArray(items) ? sortByDateDesc(items).slice(0, 3) : [];
@@ -1516,7 +1521,7 @@ function renderAdminPlayerPanel(player) {
   ]);
   const roleInfo = resolveAdminRole(player.role);
   const playerUuid = player.uuid || player.minecraft_uuid || player.player_uuid || player.id || "-";
-  const recentDeaths = pickAdminArray(player, ["recent_deaths", "recentDeaths", "death_history", "deathHistory", "deaths_history", "deathsHistory", "latest_deaths", "latestDeaths", "stats.recent_deaths", "stats.deaths_history", "player_stats.recent_deaths"]).slice(0, 3);
+  const recentDeaths = pickAdminArray(player, ["recent_deaths", "recentDeaths", "death_history", "deathHistory", "latest_deaths", "latestDeaths", "stats.recent_deaths", "player_stats.recent_deaths"]).slice(0, 3);
   const formattedUuid = String(playerUuid || "-");
   const shortUuid = formattedUuid.length > 18 ? `${formattedUuid.slice(0, 8)}…${formattedUuid.slice(-6)}` : formattedUuid;
 
@@ -1705,10 +1710,16 @@ function renderAdminPlayerPanel(player) {
   document.getElementById("adminHistoryRefresh")?.addEventListener("click", () => loadAdminPlayerHistory(player.username));
   document.getElementById("adminPlayerRefresh")?.addEventListener("click", async () => {
     openAdminPlayerModalLoading();
-    await loadAdminPlayers();
-    const fresh = adminPlayersCache.find((item) => String(item.username || "").toLowerCase() === String(player.username || "").toLowerCase()) || player;
-    const detailedPlayer = await loadAdminPlayerDetails(player.username, fresh);
-    renderAdminPlayerPanel(detailedPlayer || fresh);
+    try {
+      const fresh = await loadAdminPlayerDetails(player.username, player);
+      renderAdminPlayerPanel(fresh);
+      loadAdminPlayers();
+    } catch (error) {
+      const content = document.getElementById("adminPlayerModalContent");
+      if (content) {
+        content.innerHTML = `<div class="admin-modal-loading admin-modal-error"><h2>Не удалось обновить данные</h2><p>${escapeHtml(error.message || "Ошибка загрузки данных игрока.")}</p></div>`;
+      }
+    }
   });
 
   loadAdminPlayerHistory(player.username);
