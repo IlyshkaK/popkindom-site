@@ -11321,3 +11321,122 @@ body.admin-modal-open {
     border-radius: 18px !important;
   }
 }
+
+/* ===== ADMIN PANEL V2: Etap 1.2.8 stable modal frame ===== */
+.admin-player-modal {
+  z-index: 30000 !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: 96px 22px 22px !important;
+  box-sizing: border-box !important;
+}
+
+.admin-player-modal-card {
+  position: relative !important;
+  width: min(1560px, calc(100vw - 44px)) !important;
+  height: auto !important;
+  max-height: calc(100vh - 118px) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 28px !important;
+  box-sizing: border-box !important;
+}
+
+.admin-player-modal-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: calc(100vh - 118px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 22px 76px 22px 22px !important;
+  border-radius: 28px !important;
+  box-sizing: border-box !important;
+  scrollbar-gutter: stable !important;
+}
+
+.admin-player-modal-card > .admin-modal-close {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  z-index: 100 !important;
+  flex: 0 0 auto !important;
+}
+
+.admin-player-modal-content::-webkit-scrollbar { width: 9px !important; }
+.admin-player-modal-content::-webkit-scrollbar-track {
+  margin: 16px 0 !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.07) !important;
+}
+.admin-player-modal-content::-webkit-scrollbar-thumb {
+  border-radius: 999px !important;
+  background: rgba(126,226,60,.72) !important;
+}
+
+.admin-player-v2-header {
+  padding-right: 0 !important;
+}
+
+.admin-player-info-card {
+  align-items: center !important;
+}
+
+.admin-player-render-wrap {
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.admin-player-render {
+  display: block !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+}
+
+@media (max-width: 900px) {
+  .admin-player-modal {
+    padding: 84px 10px 10px !important;
+  }
+
+  .admin-player-modal-card {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 94px) !important;
+    border-radius: 22px !important;
+  }
+
+  .admin-player-modal-content {
+    max-height: calc(100vh - 94px) !important;
+    padding: 62px 12px 12px !important;
+    border-radius: 22px !important;
+  }
+
+  .admin-player-modal-card > .admin-modal-close {
+    top: 12px !important;
+    right: 12px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-player-modal {
+    padding: 76px 8px 8px !important;
+  }
+
+  .admin-player-modal-card {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100vh - 84px) !important;
+    border-radius: 18px !important;
+  }
+
+  .admin-player-modal-content {
+    max-height: calc(100vh - 84px) !important;
+    padding: 58px 10px 10px !important;
+    border-radius: 18px !important;
+  }
+
+  .admin-player-modal-card > .admin-modal-close {
+    top: 10px !important;
+    right: 10px !important;
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
