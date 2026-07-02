@@ -11037,3 +11037,73 @@ body.admin-modal-open {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== ADMIN PANEL V2: Etap 1.2.5 modal fix ===== */
+.admin-player-modal-card {
+  position: relative;
+  padding-right: 76px;
+}
+
+.admin-player-modal-content {
+  margin-right: -52px;
+  padding-right: 52px;
+}
+
+.admin-modal-close {
+  right: 20px;
+  top: 20px;
+  z-index: 20;
+}
+
+.admin-player-v2-header-tags {
+  display: none;
+}
+
+.admin-player-render-wrap {
+  align-items: center;
+  justify-content: center;
+  padding: 18px 10px;
+}
+
+.admin-player-render {
+  max-height: min(330px, 58vh);
+  max-width: 86%;
+  object-position: center center;
+}
+
+.admin-player-info-card {
+  align-items: center;
+}
+
+.admin-player-info-main {
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .admin-player-modal-card {
+    padding-right: 58px;
+  }
+  .admin-player-modal-content {
+    margin-right: -42px;
+    padding-right: 42px;
+  }
+  .admin-modal-close {
+    right: 14px;
+    top: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-player-modal-card {
+    padding-right: 14px;
+    padding-top: 58px;
+  }
+  .admin-player-modal-content {
+    margin-right: 0;
+    padding-right: 6px;
+  }
+  .admin-modal-close {
+    right: 14px;
+    top: 12px;
+  }
+}

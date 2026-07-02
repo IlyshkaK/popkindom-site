@@ -1417,6 +1417,38 @@ function renderAdminRecentDeathsMini(items = []) {
   }).join("");
 }
 
+
+function getDeepValue(source, path) {
+  if (!source || !path) return undefined;
+  return String(path).split('.').reduce((obj, key) => (obj && obj[key] !== undefined ? obj[key] : undefined), source);
+}
+
+function pickAdminNumber(player, paths, fallback = 0) {
+  for (const path of paths) {
+    const value = path.includes('.') ? getDeepValue(player, path) : player?.[path];
+    if (value === null || value === undefined || value === '') continue;
+    const numeric = Number(value);
+    if (Number.isFinite(numeric)) return numeric;
+  }
+  return fallback;
+}
+
+function pickAdminArray(player, paths) {
+  for (const path of paths) {
+    const value = path.includes('.') ? getDeepValue(player, path) : player?.[path];
+    if (Array.isArray(value)) return value;
+  }
+  return [];
+}
+
+function normalizeAdminPlayTicks(raw) {
+  const value = Number(raw || 0);
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  // VPS API может отдавать время как ticks, seconds или minutes.
+  // Большие значения считаем тиками Minecraft, маленькие — минутами/секундами.
+  return value;
+}
+
 function renderAdminPlayerPanel(player) {
   adminSelectedPlayer = player;
   const panel = document.getElementById("adminPlayerModalContent") || document.getElementById("adminPlayerPanel");
@@ -1443,14 +1475,30 @@ function renderAdminPlayerPanel(player) {
   const hasBan = player.banned === true || player.active_ban === true;
   const hasMute = player.muted === true || player.active_mute === true;
   const hasPunishment = hasBan || hasMute || player.hasPunishment || player.hasActivePunishments;
-  const lastSeen = player.last_server_login || player.last_web_login || player.player_updated_at || player.updated_at;
-  const blocksTotal = player.blocks_total ?? player.blocks_mined ?? player.mined_blocks ?? player.blocks ?? 0;
-  const playTicks = player.play_time_ticks ?? player.playtime_ticks ?? player.play_time ?? player.playTime ?? 0;
-  const mobsTotal = player.mob_kills ?? player.mobs_killed ?? player.killed_mobs ?? player.mobKills ?? 0;
-  const deathsTotal = player.deaths ?? player.death_count ?? player.deaths_count ?? 0;
+  const lastSeen = player.last_server_login || player.last_web_login || player.last_seen || player.lastSeen || player.player_updated_at || player.updated_at;
+  const blocksTotal = pickAdminNumber(player, [
+    "blocks_total", "blocks_mined", "mined_blocks", "broken_blocks", "blocks",
+    "stats.blocks_total", "stats.blocks_mined", "stats.mined_blocks", "stats.broken_blocks",
+    "player_stats.blocks_total", "player_stats.blocks_mined", "detailed_stats.blocks_mined"
+  ]);
+  const playTicks = normalizeAdminPlayTicks(pickAdminNumber(player, [
+    "play_time_ticks", "playtime_ticks", "playTimeTicks", "time_played_ticks", "stat_play_one_minute",
+    "play_time", "playtime", "playTime", "online_time", "onlineTime", "time_played",
+    "stats.play_time_ticks", "stats.playtime_ticks", "stats.online_time", "stats.play_time",
+    "player_stats.play_time_ticks", "detailed_stats.play_time_ticks"
+  ]));
+  const mobsTotal = pickAdminNumber(player, [
+    "mob_kills", "mobs_killed", "killed_mobs", "mobKills", "mob_kills_total",
+    "stats.mob_kills", "stats.mobs_killed", "stats.killed_mobs",
+    "player_stats.mob_kills", "detailed_stats.mob_kills"
+  ]);
+  const deathsTotal = pickAdminNumber(player, [
+    "deaths", "death_count", "deaths_count", "total_deaths",
+    "stats.deaths", "stats.death_count", "player_stats.deaths", "detailed_stats.deaths"
+  ]);
   const roleInfo = resolveAdminRole(player.role);
   const playerUuid = player.uuid || player.minecraft_uuid || player.player_uuid || player.id || "-";
-  const recentDeaths = Array.isArray(player.recent_deaths) ? player.recent_deaths : (Array.isArray(player.recentDeaths) ? player.recentDeaths : []);
+  const recentDeaths = pickAdminArray(player, ["recent_deaths", "recentDeaths", "death_history", "deathHistory", "latest_deaths", "latestDeaths", "stats.recent_deaths", "player_stats.recent_deaths"]).slice(0, 3);
   const formattedUuid = String(playerUuid || "-");
   const shortUuid = formattedUuid.length > 18 ? `${formattedUuid.slice(0, 8)}…${formattedUuid.slice(-6)}` : formattedUuid;
 
@@ -1460,11 +1508,7 @@ function renderAdminPlayerPanel(player) {
         <div>
           <p class="eyebrow"><i data-lucide="shield-check"></i> Управление игроком</p>
           <h2 id="adminPlayerModalTitle">${escapeHtml(player.username || "Игрок")}</h2>
-          <div class="admin-player-v2-header-tags">
-            <span class="admin-status ${isOnline ? "online" : "offline"}">${isOnline ? "Онлайн" : "Офлайн"}</span>
-            ${adminRoleBadge(player.role)}
-            ${adminWhitelistBadge(player)}
-          </div>
+
         </div>
         <button type="button" class="admin-mini-btn" id="adminPlayerRefresh"><i data-lucide="refresh-cw"></i> Обновить данные</button>
       </header>
