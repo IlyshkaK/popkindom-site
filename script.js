@@ -1401,6 +1401,8 @@ function sortAdminPlayers(players) {
   });
 }
 
+
+
 function mergeAdminPlayerData(basePlayer, freshPlayer) {
   return { ...(basePlayer || {}), ...(freshPlayer || {}) };
 }
@@ -1416,7 +1418,6 @@ async function loadAdminPlayerDetails(username, fallbackPlayer = null) {
     return fallbackPlayer;
   }
 }
-
 
 function renderAdminRecentDeathsMini(items = []) {
   const preparedItems = Array.isArray(items) ? sortByDateDesc(items).slice(0, 3) : [];
@@ -1515,7 +1516,7 @@ function renderAdminPlayerPanel(player) {
   ]);
   const roleInfo = resolveAdminRole(player.role);
   const playerUuid = player.uuid || player.minecraft_uuid || player.player_uuid || player.id || "-";
-  const recentDeaths = pickAdminArray(player, ["recent_deaths", "recentDeaths", "deaths_history", "deathsHistory", "death_history", "deathHistory", "latest_deaths", "latestDeaths", "stats.recent_deaths", "stats.deathsHistory", "player_stats.recent_deaths"]).slice(0, 3);
+  const recentDeaths = pickAdminArray(player, ["recent_deaths", "recentDeaths", "death_history", "deathHistory", "deaths_history", "deathsHistory", "latest_deaths", "latestDeaths", "stats.recent_deaths", "stats.deaths_history", "player_stats.recent_deaths"]).slice(0, 3);
   const formattedUuid = String(playerUuid || "-");
   const shortUuid = formattedUuid.length > 18 ? `${formattedUuid.slice(0, 8)}…${formattedUuid.slice(-6)}` : formattedUuid;
 
@@ -1705,9 +1706,9 @@ function renderAdminPlayerPanel(player) {
   document.getElementById("adminPlayerRefresh")?.addEventListener("click", async () => {
     openAdminPlayerModalLoading();
     await loadAdminPlayers();
-    const listFresh = adminPlayersCache.find((item) => String(item.username || "").toLowerCase() === String(player.username || "").toLowerCase()) || player;
-    const detailedPlayer = await loadAdminPlayerDetails(player.username, listFresh);
-    renderAdminPlayerPanel(detailedPlayer || listFresh);
+    const fresh = adminPlayersCache.find((item) => String(item.username || "").toLowerCase() === String(player.username || "").toLowerCase()) || player;
+    const detailedPlayer = await loadAdminPlayerDetails(player.username, fresh);
+    renderAdminPlayerPanel(detailedPlayer || fresh);
   });
 
   loadAdminPlayerHistory(player.username);
