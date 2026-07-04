@@ -2443,32 +2443,93 @@ document.querySelectorAll("[data-copy]").forEach((button) => {
 });
 
 
-async function loadNews() {
-  const res = await fetch('/api/news');
-  const data = await res.json();
+document.querySelectorAll("a[href='#']").forEach((link) => {
+  link.addEventListener("click", (event) => event.preventDefault());
+});
 
-  const container = document.querySelector('.news-list-v2');
-  if (!container) return;
+/* ===== Burger ===== */
+const burgerBtn = document.getElementById("burgerBtn");
+const mobileMenu = document.getElementById("mobileMenu");
 
-  container.innerHTML = '';
-
-  data.forEach(n => {
-    const el = document.createElement('article');
-
-    el.className = 'rule-panel-v2 news-panel';
-
-    el.innerHTML = `
-      <img src="${n.image}" style="width:100%;border-radius:12px;margin-bottom:12px;">
-      <div class="news-panel-meta">
-        <span>Обновление</span>
-        <time>${n.date}</time>
-      </div>
-      <h2>${n.title}</h2>
-      <p>${n.short}</p>
-    `;
-
-    container.appendChild(el);
+if (burgerBtn && mobileMenu) {
+  burgerBtn.addEventListener("click", () => {
+    burgerBtn.classList.toggle("open");
+    mobileMenu.classList.toggle("open");
   });
 }
 
-document.addEventListener('DOMContentLoaded', loadNews);
+/* ===== VIEW MODE ===== */
+const SITE_VIEW_KEY = "popkindom_site_view_mode";
+const viewportMeta = document.querySelector('meta[name="viewport"]');
+
+function getPreferredViewMode() {
+  try {
+    return localStorage.getItem(SITE_VIEW_KEY) || "auto";
+  } catch {
+    return "auto";
+  }
+}
+
+function setPreferredViewMode(mode) {
+  try {
+    localStorage.setItem(SITE_VIEW_KEY, mode);
+  } catch {}
+  applyViewMode(mode);
+}
+
+function applyViewMode(mode = getPreferredViewMode()) {
+  const body = document.body;
+  if (!body) return;
+
+  body.classList.remove("force-desktop", "force-mobile");
+
+  if (mode === "desktop") {
+    body.classList.add("force-desktop");
+    if (viewportMeta) viewportMeta.setAttribute("content", "width=1280");
+  } else if (mode === "mobile") {
+    body.classList.add("force-mobile");
+    viewportMeta?.setAttribute("content", "width=device-width, initial-scale=1.0");
+  }
+
+  updateViewToggleLabels(mode);
+}
+
+/* ===== NEWS SYSTEM FIX ===== */
+async function loadNews() {
+  try {
+    const res = await fetch("/api/news");
+    const data = await res.json();
+
+    const container = document.querySelector(".news-list-v2");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    data.forEach((n) => {
+      const el = document.createElement("article");
+      el.className = "rule-panel-v2 news-panel";
+
+      el.innerHTML = `
+        <img src="${n.image}" style="width:100%;border-radius:12px;margin-bottom:12px;" />
+        <div class="news-panel-meta">
+          <span>Обновление</span>
+          <time>${n.date}</time>
+        </div>
+        <div class="rule-panel-head">
+          <h2>${n.title}</h2>
+        </div>
+        <p>${n.short}</p>
+      `;
+
+      container.appendChild(el);
+    });
+
+  } catch (e) {
+    console.error("News load error:", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyViewMode();
+  loadNews();
+});
