@@ -2444,31 +2444,31 @@ document.querySelectorAll("[data-copy]").forEach((button) => {
 
 
 async function loadNews() {
-  try {
-    const res = await fetch('/api/news');
-    const data = await res.json();
+  const res = await fetch('/api/news');
+  const data = await res.json();
 
-    const container = document.querySelector('.news-list-v2');
-    if (!container) return;
+  const container = document.querySelector('.news-list-v2');
+  if (!container) return;
 
-    container.innerHTML = '';
+  container.innerHTML = '';
 
-    data.forEach(n => {
-      const el = document.createElement('article');
-      el.className = 'rule-panel-v2 news-panel';
+  data.forEach(n => {
+    const el = document.createElement('article');
 
-      el.innerHTML = `
-        <div class="news-panel-meta"><span>Обновление</span><time>${n.date}</time></div>
-        <div class="rule-panel-head"><h2>${n.title}</h2></div>
-        <p>${n.short}</p>
-      `;
+    el.className = 'rule-panel-v2 news-panel';
 
-      container.appendChild(el);
-    });
+    el.innerHTML = `
+      <img src="${n.image}" style="width:100%;border-radius:12px;margin-bottom:12px;">
+      <div class="news-panel-meta">
+        <span>Обновление</span>
+        <time>${n.date}</time>
+      </div>
+      <h2>${n.title}</h2>
+      <p>${n.short}</p>
+    `;
 
-  } catch (e) {
-    console.error('News load error', e);
-  }
+    container.appendChild(el);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', loadNews);

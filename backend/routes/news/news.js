@@ -1,19 +1,32 @@
-
 const news = [
   {
     id: "nether-update-04072026",
     title: "Открытие Ада + обновление GMusic",
     date: "04.07.2026",
-    image: "/background.png",
-    short: "Открытие Ада и новая система GMusic",
-    content: "Ад переработан: дебаффы каждые 10 минут, ActionBar уведомления, запрет кроватей и TNT + обновление GMusic с новыми треками."
+    image: "/background-nether-update.png",
+    short: "Ад стал прогрессирующей зоной выживания",
+    content: `
+🔥 ОТКРЫТИЕ АДА
+
+Ад теперь прогрессирующая зона:
+
+⏱ каждые 10 минут — дебафф
+
+☠ эффекты:
+• замедление
+• слабость
+• голод
+• слепота
+• тошнота
+
+🛏 запрещены кровати
+💥 TNT заблокирован
+
+🎵 GMusic обновлён
+`
   }
 ];
 
 module.exports = async (req, res) => {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
-  return res.json(news);
+  res.json(news);
 };
