@@ -23,8 +23,6 @@ function registerBackendRoutes(app) {
   app.post('/api/security', asyncRoute(require('./routes/account/security')));
 
   app.get('/api/top', asyncRoute(require('./routes/top/top')));
-  app.get('/api/news', asyncRoute(require('./routes/news/news')));
-
   app.all('/api/admin', asyncRoute(require('./routes/admin/admin')));
 
   app.use('/api', (req, res) => {
