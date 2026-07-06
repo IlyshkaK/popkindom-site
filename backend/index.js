@@ -23,7 +23,12 @@ function registerBackendRoutes(app) {
   app.post('/api/security', asyncRoute(require('./routes/account/security')));
 
   app.get('/api/top', asyncRoute(require('./routes/top/top')));
+  app.get('/api/news', asyncRoute(require('./routes/news/news')));
+  app.post('/api/support', asyncRoute(require('./routes/support/support')));
+
   app.all('/api/admin', asyncRoute(require('./routes/admin/admin')));
+  app.all('/api/admin/news', asyncRoute(require('./routes/admin/news-cms')));
+  app.all('/api/admin/support', asyncRoute(require('./routes/admin/support-admin')));
 
   app.use('/api', (req, res) => {
     res.status(404).json({ message: 'API route not found.' });
