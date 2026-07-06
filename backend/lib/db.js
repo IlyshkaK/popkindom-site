@@ -90,6 +90,48 @@ async function ensureAuthTables() {
     await query(`CREATE INDEX IF NOT EXISTS idx_pd_auth_sessions_token ON pd_auth_sessions(token_hash);`);
 
     await query(`
+      CREATE TABLE IF NOT EXISTS pd_news (
+        id BIGSERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        summary TEXT NOT NULL,
+        content TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'Объявление',
+        cover_url TEXT,
+        is_published BOOLEAN NOT NULL DEFAULT FALSE,
+        created_by TEXT,
+        updated_by TEXT,
+        published_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await query(`CREATE INDEX IF NOT EXISTS idx_pd_news_published ON pd_news (is_published, published_at DESC, created_at DESC);`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_pd_news_slug ON pd_news (slug);`);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS pd_support_tickets (
+        id BIGSERIAL PRIMARY KEY,
+        user_id INT NULL REFERENCES pd_users(id) ON DELETE SET NULL,
+        username TEXT,
+        contact TEXT,
+        telegram_username TEXT,
+        subject TEXT NOT NULL,
+        message TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        admin_reply TEXT,
+        answered_by TEXT,
+        answered_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await query(`CREATE INDEX IF NOT EXISTS idx_pd_support_status_created ON pd_support_tickets (status, created_at DESC);`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_pd_support_user ON pd_support_tickets (user_id, created_at DESC);`);
+
+    await query(`
       CREATE TABLE IF NOT EXISTS moderation_punishments (
         id BIGSERIAL PRIMARY KEY,
         player_name TEXT NOT NULL,
