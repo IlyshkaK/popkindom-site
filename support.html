@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тех. поддержка - PopkinDom</title>
+  <link rel="stylesheet" href="style.css?v=nav-align-news" />
+  <link rel="stylesheet" href="cms-support.css?v=1" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="dns-prefetch" href="//unpkg.com" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="inner-page">
+<header class="header">
+  <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
+  <nav class="nav main-nav" aria-label="Основная навигация">
+    <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
+    <a href="/news"><i data-lucide="newspaper"></i><span>Новости</span></a>
+    <a href="/support" class="active"><i data-lucide="life-buoy"></i><span>Поддержка</span></a>
+    <a href="/faq"><i data-lucide="circle-help"></i><span>FAQ</span></a>
+    <div class="nav-more-wrap">
+      <button type="button" class="nav-more-btn" aria-haspopup="true" aria-expanded="false"><i data-lucide="grid-2x2"></i><span>Прочее</span></button>
+      <div class="mega-menu" aria-label="Прочее меню">
+        <div class="mega-col"><span class="mega-title">Основное</span><a href="#" id="playNavBtn"><i data-lucide="gamepad-2"></i><b>Начать игру</b></a></div>
+        <div class="mega-col"><span class="mega-title">Активность</span><a href="/top"><i data-lucide="trophy"></i><b>Топы игроков</b></a></div>
+        <div class="mega-col"><span class="mega-title">Наши соцсети</span><a href="https://discord.gg/88e2Rsp8GT" target="_blank" rel="noopener"><i data-lucide="message-circle"></i><b>Discord</b></a><a href="https://t.me/popkindomcraft" target="_blank" rel="noopener"><i data-lucide="send"></i><b>Telegram</b></a></div>
+        <div class="mega-col"><span class="mega-title">Прочее</span><a href="/rules"><i data-lucide="book-open"></i><b>Правила сообщества</b></a><a href="/server"><i data-lucide="server"></i><b>Сервер</b></a><a href="/about"><i data-lucide="info"></i><b>Подробнее</b></a><a href="/team"><i data-lucide="users-round"></i><b>Команда проекта</b></a></div>
+      </div>
+    </div>
+  </nav>
+  <div class="auth-menu-wrap">
+    <a href="/login" class="register-btn auth-action-btn" id="authMenuBtn"><span class="auth-action-icon"><i data-lucide="log-in"></i></span><b class="auth-action-text">Войти</b></a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="/account"><i data-lucide="user-round"></i><b>Кабинет</b></a>
+      <a href="/security"><i data-lucide="shield"></i><b>Безопасность</b></a>
+      <a href="/admin" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
+    </div>
+  </div>
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/index"><i data-lucide="home"></i>Главная</a>
+  <a href="/news"><i data-lucide="newspaper"></i>Новости</a>
+  <a href="/support" class="active"><i data-lucide="life-buoy"></i>Поддержка</a>
+  <a href="/faq"><i data-lucide="circle-help"></i>FAQ</a>
+  <a href="/top"><i data-lucide="trophy"></i>Топы игроков</a>
+  <a href="/rules"><i data-lucide="book-open"></i>Правила</a>
+  <a href="/server"><i data-lucide="server"></i>Сервер</a>
+  <a href="/about"><i data-lucide="info"></i>Подробнее</a>
+  <a href="/team"><i data-lucide="users-round"></i>Команда проекта</a>
+</div>
+
+<main class="rules-page rules-page-v2">
+  <div class="rules-bg"></div>
+  <div class="rules-dark"></div>
+  <section class="rules-content rules-content-v2">
+    <section class="rules-hero-v2 glass-card page-hero-unified">
+      <div>
+        <span class="about-kicker"><i data-lucide="life-buoy"></i> Связь с администрацией</span>
+        <h1>Тех. поддержка</h1>
+        <p>Опиши проблему, оставь Telegram или другой контакт — обращение сохранится на сайте и уйдёт администрации в Telegram-бота.</p>
+      </div>
+      <div class="rules-hero-note page-hero-note-unified">
+        <i data-lucide="send"></i>
+        <b>Telegram-уведомления</b>
+        <span>Новые обращения автоматически отправляются в чат администрации.</span>
+      </div>
+    </section>
+
+    <section class="support-grid">
+      <article class="glass-card support-card">
+        <div class="support-section-head">
+          <div><p class="eyebrow"><i data-lucide="message-square-plus"></i> Новое обращение</p><h2>Написать в поддержку</h2></div>
+        </div>
+        <form id="supportForm" class="support-form">
+          <label for="supportUsername">Ник</label>
+          <input id="supportUsername" type="text" maxlength="16" placeholder="Твой ник в Minecraft" autocomplete="username" />
+          <label for="supportTelegram">Telegram</label>
+          <input id="supportTelegram" type="text" maxlength="64" placeholder="@username" autocomplete="off" />
+          <label for="supportContact">Доп. контакт</label>
+          <input id="supportContact" type="text" maxlength="120" placeholder="Discord, почта или другой способ связи" autocomplete="off" />
+          <label for="supportSubject">Тема</label>
+          <input id="supportSubject" type="text" maxlength="120" placeholder="Например: проблема со входом" required />
+          <label for="supportText">Описание</label>
+          <textarea id="supportText" rows="7" maxlength="2000" placeholder="Расскажи подробнее, что случилось" required></textarea>
+          <div class="support-actions"><button type="submit" class="primary-btn"><i data-lucide="send"></i> Отправить обращение</button></div>
+          <p class="auth-message" id="supportMessage"></p>
+        </form>
+      </article>
+
+      <aside class="glass-card support-card">
+        <div class="support-section-head"><div><p class="eyebrow"><i data-lucide="info"></i> Как это работает</p><h2>Что дальше?</h2></div></div>
+        <div class="support-info-list">
+          <article><b>1. Обращение сохраняется</b><span>Мы не теряем заявки даже если Telegram временно недоступен.</span></article>
+          <article><b>2. Бот пишет администрации</b><span>В чат приходит тема, ник, Telegram и текст проблемы.</span></article>
+          <article><b>3. Ответ придёт вручную</b><span>Администрация свяжется по указанному Telegram или контакту.</span></article>
+        </div>
+      </aside>
+    </section>
+  </section>
+</main>
+
+<footer class="footer footer-solid" style="background:#020605!important;background-image:linear-gradient(180deg,#07100b 0%,#020605 100%)!important;background-color:#020605!important;opacity:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;">
+  <div class="footer-content">
+    <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
+    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
+  </div>
+</footer>
+<script src="script.js?v=admin-v2-1-3-1"></script>
+<script src="cms-support.js?v=1"></script>
+</body>
+</html>
