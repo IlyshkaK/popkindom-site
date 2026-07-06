@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Новости - PopkinDom</title>
   <link rel="stylesheet" href="style.css?v=nav-align-news" />
+  <link rel="stylesheet" href="cms-support.css?v=1" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
   <link rel="dns-prefetch" href="//unpkg.com" />
@@ -18,6 +19,7 @@
   <nav class="nav main-nav" aria-label="Основная навигация">
     <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
     <a href="/news" class="active"><i data-lucide="newspaper"></i><span>Новости</span></a>
+    <a href="/support"><i data-lucide="life-buoy"></i><span>Поддержка</span></a>
     <a href="/faq"><i data-lucide="circle-help"></i><span>FAQ</span></a>
     <div class="nav-more-wrap">
       <button type="button" class="nav-more-btn" aria-haspopup="true" aria-expanded="false">
@@ -72,6 +74,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="/index"><i data-lucide="home"></i>Главная</a>
   <a href="/news" class="active"><i data-lucide="newspaper"></i>Новости</a>
+  <a href="/support"><i data-lucide="life-buoy"></i>Поддержка</a>
   <a href="/faq"><i data-lucide="circle-help"></i>FAQ</a>
   <a href="/top"><i data-lucide="trophy"></i>Топы игроков</a>
   <a href="/rules"><i data-lucide="book-open"></i>Правила</a>
@@ -88,38 +91,26 @@
       <div>
         <span class="about-kicker"><i data-lucide="newspaper"></i> Лента проекта</span>
         <h1>Новости</h1>
-        <p>Здесь будут появляться важные объявления, обновления сервера, события сезона и информация о технических работах.</p>
+        <p>Здесь появляются важные объявления, обновления сервера, события сезона и информация о технических работах.</p>
       </div>
       <div class="rules-hero-note page-hero-note-unified">
         <i data-lucide="radio"></i>
-        <b>Следи за обновлениями</b>
-        <span>Главные новости будут дублироваться на сайте, в Discord и Telegram проекта.</span>
+        <b>CMS-лента</b>
+        <span>Новости публикуются администрацией через закрытую CMS-панель.</span>
       </div>
     </section>
 
     <section class="rules-summary-grid page-summary-grid news-summary-grid">
-      <a href="#announcements" class="rules-summary-card"><i data-lucide="megaphone"></i><b>Объявления</b><span>важная информация</span></a>
-      <a href="#season" class="rules-summary-card"><i data-lucide="sun"></i><b>Сезон</b><span>Summer Season 4</span></a>
-      <a href="#server-news" class="rules-summary-card"><i data-lucide="server"></i><b>Сервер</b><span>статус и работы</span></a>
+      <a href="#publicNewsList" class="rules-summary-card"><i data-lucide="megaphone"></i><b>Объявления</b><span>важная информация</span></a>
+      <a href="#publicNewsList" class="rules-summary-card"><i data-lucide="sun"></i><b>Сезон</b><span>Summer Season 4</span></a>
+      <a href="#publicNewsList" class="rules-summary-card"><i data-lucide="server"></i><b>Сервер</b><span>статус и работы</span></a>
     </section>
 
-    <section class="rules-list-v2 news-list-v2">
-      <article class="rule-panel-v2 news-panel good" id="announcements">
-        <div class="news-panel-meta"><span>Объявление</span><time>Скоро</time></div>
-        <div class="rule-panel-head"><i data-lucide="sparkles"></i><h2>Новости скоро появятся</h2></div>
-        <p>Здесь будут публиковаться обновления сервера, технические работы, события сезона и важные изменения проекта.</p>
-      </article>
-
-      <article class="rule-panel-v2 news-panel" id="season">
-        <div class="news-panel-meta"><span>Сезон</span><time>Summer Season 4</time></div>
-        <div class="rule-panel-head"><i data-lucide="sun"></i><h2>Summer Season 4</h2></div>
-        <p>Все материалы по текущему сезону будут собраны на этой странице отдельными карточками.</p>
-      </article>
-
-      <article class="rule-panel-v2 news-panel" id="server-news">
-        <div class="news-panel-meta"><span>Сервер</span><time>Актуально</time></div>
-        <div class="rule-panel-head"><i data-lucide="server"></i><h2>Статус проекта</h2></div>
-        <p>Информация о работах, стабильности и изменениях на сайте будет появляться здесь.</p>
+    <section class="rules-list-v2 news-list-v2" id="publicNewsList">
+      <article class="rule-panel-v2 news-panel good">
+        <div class="news-panel-meta"><span>Загрузка</span><time>Сейчас</time></div>
+        <div class="rule-panel-head"><i data-lucide="loader-circle"></i><h2>Загружаем новости…</h2></div>
+        <p>Подключаемся к CMS-ленте сайта.</p>
       </article>
     </section>
   </section>
@@ -131,6 +122,7 @@
     <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
     <div class="footer-links">
       <a href="/rules">Правила</a>
+      <a href="/support">Поддержка</a>
       <a href="https://discord.gg/88e2Rsp8GT" target="_blank">Discord</a>
       <a href="https://t.me/popkindomcraft" target="_blank">Telegram</a>
     </div>
@@ -138,5 +130,6 @@
   </div>
 </footer>
 <script src="script.js"></script>
+<script src="cms-support.js?v=1"></script>
 </body>
 </html>
