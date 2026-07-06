@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS новости - PopkinDom</title>
+  <link rel="stylesheet" href="style.css?v=admin-v2-1-3-1" />
+  <link rel="stylesheet" href="cms-support.css?v=1" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="inner-page protected-page">
+<header class="header">
+  <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
+  <nav class="nav main-nav" aria-label="Основная навигация">
+    <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
+    <a href="/news"><i data-lucide="newspaper"></i><span>Новости</span></a>
+    <a href="/support"><i data-lucide="life-buoy"></i><span>Поддержка</span></a>
+    <a href="/admin" class="active"><i data-lucide="shield-check"></i><span>Админ</span></a>
+  </nav>
+  <div class="auth-menu-wrap">
+    <a href="/login" class="register-btn auth-action-btn" id="authMenuBtn"><span class="auth-action-icon"><i data-lucide="log-in"></i></span><b class="auth-action-text">Войти</b></a>
+    <div class="auth-dropdown" id="authDropdown">
+      <a href="/account"><i data-lucide="user-round"></i><b>Кабинет</b></a>
+      <a href="/security"><i data-lucide="shield"></i><b>Безопасность</b></a>
+      <a href="/admin" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a>
+      <span class="auth-dropdown-divider"></span>
+      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
+    </div>
+  </div>
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/index"><i data-lucide="home"></i>Главная</a>
+  <a href="/news"><i data-lucide="newspaper"></i>Новости</a>
+  <a href="/support"><i data-lucide="life-buoy"></i>Поддержка</a>
+  <a href="/admin" class="active"><i data-lucide="shield-check"></i>Админ</a>
+</div>
+
+<main class="admin-page protected-page">
+  <div class="account-bg"></div>
+  <div class="account-dark"></div>
+  <section class="admin-layout">
+    <div class="admin-hero glass-card">
+      <div>
+        <p class="eyebrow"><i data-lucide="newspaper"></i> CMS-новости</p>
+        <h1>Управление новостями</h1>
+        <p>Создание, редактирование, публикация и удаление новостей сайта. Доступ только для ADMIN и OWNER после подтверждения PIN в админ-панели.</p>
+      </div>
+      <div class="admin-badge">ADMIN / OWNER</div>
+    </div>
+
+    <section class="admin-dashboard">
+      <div class="admin-extra-grid">
+        <section class="admin-table-card glass-card">
+          <div class="admin-section-head">
+            <div><p class="eyebrow"><i data-lucide="pen-line"></i> Редактор</p><h2>Новость</h2></div>
+            <button type="button" class="admin-mini-btn" id="cmsNewBtn"><i data-lucide="plus"></i> Новая</button>
+          </div>
+          <form id="cmsNewsForm" class="admin-extra-form">
+            <label>Заголовок</label>
+            <input id="cmsTitle" type="text" maxlength="160" placeholder="Например: Открытие Ада" required />
+            <div class="admin-extra-form-row">
+              <div><label>Категория</label><input id="cmsCategory" type="text" maxlength="80" value="Объявление" /></div>
+              <div><label>Slug</label><input id="cmsSlug" type="text" maxlength="80" placeholder="mozhno-ostavit-pustym" /></div>
+            </div>
+            <label>Картинка</label>
+            <input id="cmsCoverUrl" type="url" maxlength="700" placeholder="https://..." />
+            <label>Краткое описание</label>
+            <textarea id="cmsSummary" rows="3" maxlength="500" placeholder="Короткий текст для карточки" required></textarea>
+            <label>Полный текст</label>
+            <textarea id="cmsContent" rows="9" maxlength="8000" placeholder="Основной текст новости" required></textarea>
+            <label class="cms-checkbox"><input id="cmsPublished" type="checkbox" /> Опубликовать на сайте</label>
+            <div class="admin-extra-actions">
+              <button type="submit" class="primary-btn"><i data-lucide="save"></i> <span id="cmsSubmitText">Создать новость</span></button>
+              <a class="admin-mini-btn" href="/news" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Открыть ленту</a>
+            </div>
+            <p class="auth-message" id="cmsNewsMessage"></p>
+          </form>
+        </section>
+
+        <section class="admin-table-card glass-card">
+          <div class="admin-section-head">
+            <div><p class="eyebrow"><i data-lucide="list"></i> Список</p><h2>Все новости</h2></div>
+            <button type="button" class="admin-mini-btn" id="cmsRefreshBtn"><i data-lucide="refresh-cw"></i> Обновить</button>
+          </div>
+          <div id="cmsNewsList" class="admin-extra-list"><div class="admin-extra-empty">Загрузка…</div></div>
+        </section>
+      </div>
+    </section>
+  </section>
+</main>
+<footer class="footer footer-solid" style="background:#020605!important;background-image:linear-gradient(180deg,#07100b 0%,#020605 100%)!important;background-color:#020605!important;opacity:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;"><div class="footer-content"><div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div><div class="footer-text">© 2026 PopkinDom. Все права защищены.</div></div></footer>
+<script src="script.js?v=admin-v2-1-3-1"></script>
+<script src="cms-support.js?v=1"></script>
+</body>
+</html>
