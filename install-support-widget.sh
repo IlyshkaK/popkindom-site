@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SITE_DIR="${1:-/opt/popkindom/site}"
-CSS_TAG='  <link rel="stylesheet" href="/support-widget.css?v=3" />'
-JS_TAG='  <script src="/support-widget.js?v=3"></script>'
+CSS_TAG='  <link rel="stylesheet" href="/support-widget.css?v=6" data-pd-support-widget="true" />'
+JS_TAG='  <script src="/support-widget.js?v=6"></script>'
 
 if [[ ! -d "$SITE_DIR" ]]; then
   echo "Site directory not found: $SITE_DIR" >&2
@@ -21,14 +21,10 @@ import re
 import sys
 
 site_dir = Path(sys.argv[1])
-css_tag = '  <link rel="stylesheet" href="/support-widget.css?v=3" />'
-js_tag = '  <script src="/support-widget.js?v=3"></script>'
+css_tag = '  <link rel="stylesheet" href="/support-widget.css?v=6" data-pd-support-widget="true" />'
+js_tag = '  <script src="/support-widget.js?v=6"></script>'
 
-admin_pages = {
-    'admin.html',
-    'admin-news.html',
-    'admin-support.html',
-}
+admin_pages = {'admin.html', 'admin-news.html', 'admin-support.html'}
 
 support_link_pattern = re.compile(
     r'\s*<a\b[^>]*href=["\'](?:/support(?:\.html)?(?:\?[^"\']*)?)["\'][^>]*>.*?</a>\s*',
@@ -41,14 +37,17 @@ for file in sorted(site_dir.glob('*.html')):
 
     text = file.read_text(encoding='utf-8')
 
-    # Удаляем пункт «Поддержка» из основной, мобильной и прочей навигации.
+    # Удаляем пункт «Поддержка» из любой навигации и футера.
     text = support_link_pattern.sub('\n', text)
 
-    # Удаляем старые подключения, чтобы не было дублей.
+    # Полностью убираем старую модальную систему поддержки.
+    text = re.sub(r'\s*<script[^>]+support-modal\.js[^>]*>\s*</script>\s*', '\n', text, flags=re.IGNORECASE)
+    text = re.sub(r'\s*<div\b[^>]*class=["\'][^"\']*support-modal[^"\']*["\'][\s\S]*?</div>\s*(?=<footer|</body>)', '\n', text, flags=re.IGNORECASE)
+
+    # Удаляем старые подключения виджета, чтобы не было дублей и кеша старой версии.
     text = re.sub(r'\s*<link[^>]+support-widget\.css[^>]*>\s*', '\n', text, flags=re.IGNORECASE)
     text = re.sub(r'\s*<script[^>]+support-widget\.js[^>]*>\s*</script>\s*', '\n', text, flags=re.IGNORECASE)
 
-    # В админских страницах чат не нужен.
     if file.name not in admin_pages:
         if '</head>' in text:
             text = text.replace('</head>', css_tag + '\n</head>', 1)
@@ -56,24 +55,24 @@ for file in sorted(site_dir.glob('*.html')):
             text = text.replace('</body>', js_tag + '\n</body>', 1)
 
     file.write_text(text, encoding='utf-8')
-    state = 'without chat' if file.name in admin_pages else 'with chat'
+    state = 'without chat' if file.name in admin_pages else 'floating chat'
     print(f'Updated: {file.name} ({state})')
 
-# Старый адрес поддержки только открывает чат на главной.
 (site_dir / 'support.html').write_text('''<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Поддержка — PopkinDom</title>
+  <meta http-equiv="refresh" content="0; url=/index?support=1" />
 </head>
 <body>
-  <script>
-    window.location.replace('/index?support=1');
-  </script>
+  <script>window.location.replace('/index?support=1');</script>
 </body>
 </html>
 ''', encoding='utf-8')
 PY
 
-echo "Support navigation removed. Chat kept on public pages and removed from admin pages."
+rm -f "$SITE_DIR/support-modal.js"
+
+echo "Legacy support modal removed. Floating support chat installed on public pages."
