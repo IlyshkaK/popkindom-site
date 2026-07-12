@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Тех. поддержка - PopkinDom</title>
   <link rel="stylesheet" href="style.css?v=nav-align-news" />
-  <link rel="stylesheet" href="cms-support.css?v=1" />
+  <link rel="stylesheet" href="cms-support.css?v=2" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
   <link rel="dns-prefetch" href="//unpkg.com" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body class="inner-page">
+<body class="inner-page support-page-coldclan">
 <header class="header">
   <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
   <nav class="nav main-nav" aria-label="Основная навигация">
@@ -54,55 +54,61 @@
   <a href="/team"><i data-lucide="users-round"></i>Команда проекта</a>
 </div>
 
-<main class="rules-page rules-page-v2">
+<main class="support-landing">
   <div class="rules-bg"></div>
   <div class="rules-dark"></div>
-  <section class="rules-content rules-content-v2">
-    <section class="rules-hero-v2 glass-card page-hero-unified">
-      <div>
-        <span class="about-kicker"><i data-lucide="life-buoy"></i> Связь с администрацией</span>
-        <h1>Тех. поддержка</h1>
-        <p>Опиши проблему, оставь Telegram или другой контакт — обращение сохранится на сайте и уйдёт администрации в Telegram-бота.</p>
-      </div>
-      <div class="rules-hero-note page-hero-note-unified">
-        <i data-lucide="send"></i>
-        <b>Telegram-уведомления</b>
-        <span>Новые обращения автоматически отправляются в чат администрации.</span>
-      </div>
-    </section>
-
-    <section class="support-grid">
-      <article class="glass-card support-card">
-        <div class="support-section-head">
-          <div><p class="eyebrow"><i data-lucide="message-square-plus"></i> Новое обращение</p><h2>Написать в поддержку</h2></div>
-        </div>
-        <form id="supportForm" class="support-form">
-          <label for="supportUsername">Ник</label>
-          <input id="supportUsername" type="text" maxlength="16" placeholder="Твой ник в Minecraft" autocomplete="username" />
-          <label for="supportTelegram">Telegram</label>
-          <input id="supportTelegram" type="text" maxlength="64" placeholder="@username" autocomplete="off" />
-          <label for="supportContact">Доп. контакт</label>
-          <input id="supportContact" type="text" maxlength="120" placeholder="Discord, почта или другой способ связи" autocomplete="off" />
-          <label for="supportSubject">Тема</label>
-          <input id="supportSubject" type="text" maxlength="120" placeholder="Например: проблема со входом" required />
-          <label for="supportText">Описание</label>
-          <textarea id="supportText" rows="7" maxlength="2000" placeholder="Расскажи подробнее, что случилось" required></textarea>
-          <div class="support-actions"><button type="submit" class="primary-btn"><i data-lucide="send"></i> Отправить обращение</button></div>
-          <p class="auth-message" id="supportMessage"></p>
-        </form>
-      </article>
-
-      <aside class="glass-card support-card">
-        <div class="support-section-head"><div><p class="eyebrow"><i data-lucide="info"></i> Как это работает</p><h2>Что дальше?</h2></div></div>
-        <div class="support-info-list">
-          <article><b>1. Обращение сохраняется</b><span>Мы не теряем заявки даже если Telegram временно недоступен.</span></article>
-          <article><b>2. Бот пишет администрации</b><span>В чат приходит тема, ник, Telegram и текст проблемы.</span></article>
-          <article><b>3. Ответ придёт вручную</b><span>Администрация свяжется по указанному Telegram или контакту.</span></article>
-        </div>
-      </aside>
-    </section>
+  <section class="support-landing-card glass-card">
+    <div class="support-landing-icon"><i data-lucide="headphones"></i></div>
+    <span class="about-kicker"><i data-lucide="life-buoy"></i> PopkinDom Support</span>
+    <h1>Нужна помощь?</h1>
+    <p>Расскажи, что случилось. Заявка попадёт администрации и продублируется в Telegram.</p>
+    <button type="button" class="primary-btn support-open-btn" id="supportOpenBtn"><i data-lucide="message-square-plus"></i> Создать обращение</button>
+    <small>Ответим по указанному Telegram или другому контакту.</small>
   </section>
 </main>
+
+<div class="support-modal" id="supportModal" hidden aria-hidden="true">
+  <div class="support-modal-backdrop" data-support-close></div>
+  <section class="support-modal-card" role="dialog" aria-modal="true" aria-labelledby="supportModalTitle">
+    <button type="button" class="support-modal-close" data-support-close aria-label="Закрыть"><i data-lucide="x"></i></button>
+    <div class="support-modal-head">
+      <div class="support-modal-icon"><i data-lucide="message-square-plus"></i></div>
+      <div>
+        <span class="about-kicker">Новое обращение</span>
+        <h2 id="supportModalTitle">Связаться с поддержкой</h2>
+        <p>Заполни форму — обращение сохранится и уйдёт администрации.</p>
+      </div>
+    </div>
+
+    <form id="supportForm" class="support-form support-modal-form">
+      <div class="support-form-row">
+        <div>
+          <label for="supportUsername">Ник</label>
+          <input id="supportUsername" type="text" maxlength="16" placeholder="Твой ник" autocomplete="username" />
+        </div>
+        <div>
+          <label for="supportTelegram">Telegram</label>
+          <input id="supportTelegram" type="text" maxlength="64" placeholder="@username" autocomplete="off" />
+        </div>
+      </div>
+
+      <label for="supportContact">Другой контакт</label>
+      <input id="supportContact" type="text" maxlength="120" placeholder="Discord, почта или другой способ связи" autocomplete="off" />
+
+      <label for="supportSubject">Тема обращения</label>
+      <input id="supportSubject" type="text" maxlength="120" placeholder="Например: проблема со входом" required />
+
+      <label for="supportText">Опиши проблему</label>
+      <textarea id="supportText" rows="6" maxlength="2000" placeholder="Что произошло и как это можно повторить?" required></textarea>
+
+      <div class="support-modal-actions">
+        <button type="button" class="support-cancel-btn" data-support-close>Отмена</button>
+        <button type="submit" class="primary-btn"><i data-lucide="send"></i> Отправить</button>
+      </div>
+      <p class="auth-message" id="supportMessage"></p>
+    </form>
+  </section>
+</div>
 
 <footer class="footer footer-solid" style="background:#020605!important;background-image:linear-gradient(180deg,#07100b 0%,#020605 100%)!important;background-color:#020605!important;opacity:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;">
   <div class="footer-content">
@@ -112,5 +118,6 @@
 </footer>
 <script src="script.js?v=admin-v2-1-3-1"></script>
 <script src="cms-support.js?v=1"></script>
+<script src="support-modal.js?v=1"></script>
 </body>
 </html>
