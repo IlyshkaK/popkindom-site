@@ -29,14 +29,9 @@ cat > "$SITE_DIR/support.html" <<'HTML'
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Поддержка — PopkinDom</title>
-  <link rel="stylesheet" href="/support-widget.css?v=2" />
 </head>
 <body>
-  <script>
-    sessionStorage.setItem('pd_support_widget_open', '1');
-    window.location.replace('/index');
-  </script>
-  <script src="/support-widget.js?v=2"></script>
+  <script>window.location.replace('/index?support=1');</script>
 </body>
 </html>
 HTML
