@@ -6,75 +6,38 @@
   <title>Новости - PopkinDom</title>
   <link rel="stylesheet" href="style.css?v=nav-align-news" />
   <link rel="stylesheet" href="cms-support.css?v=1" />
+  <link rel="stylesheet" href="/support-widget.css?v=4" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
   <link rel="dns-prefetch" href="//unpkg.com" />
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body class="inner-page news-page-body">
-
 <header class="header">
   <a href="/index" class="brand" aria-label="PopkinDom 4"><i data-lucide="crown"></i><span>POPKIN<span>DOM</span></span></a>
-
   <nav class="nav main-nav" aria-label="Основная навигация">
     <a href="/index"><i data-lucide="home"></i><span>Главная</span></a>
     <a href="/news" class="active"><i data-lucide="newspaper"></i><span>Новости</span></a>
-    <a href="/support"><i data-lucide="life-buoy"></i><span>Поддержка</span></a>
     <a href="/faq"><i data-lucide="circle-help"></i><span>FAQ</span></a>
     <div class="nav-more-wrap">
-      <button type="button" class="nav-more-btn" aria-haspopup="true" aria-expanded="false">
-        <i data-lucide="grid-2x2"></i><span>Прочее</span>
-      </button>
+      <button type="button" class="nav-more-btn" aria-haspopup="true" aria-expanded="false"><i data-lucide="grid-2x2"></i><span>Прочее</span></button>
       <div class="mega-menu" aria-label="Прочее меню">
-        <div class="mega-col">
-          <span class="mega-title">Основное</span>
-          <a href="#" id="playNavBtn"><i data-lucide="gamepad-2"></i><b>Начать игру</b></a>
-        </div>
-        <div class="mega-col">
-          <span class="mega-title">Активность</span>
-          <a href="/top"><i data-lucide="trophy"></i><b>Топы игроков</b></a>
-        </div>
-        <div class="mega-col">
-          <span class="mega-title">Наши соцсети</span>
-          <a href="https://discord.gg/88e2Rsp8GT" target="_blank" rel="noopener"><i data-lucide="message-circle"></i><b>Discord</b></a>
-          <a href="https://t.me/popkindomcraft" target="_blank" rel="noopener"><i data-lucide="send"></i><b>Telegram</b></a>
-        </div>
-        <div class="mega-col">
-          <span class="mega-title">Прочее</span>
-          <a href="/rules"><i data-lucide="book-open"></i><b>Правила сообщества</b></a>
-          <a href="/server"><i data-lucide="server"></i><b>Сервер</b></a>
-          <a href="/about"><i data-lucide="info"></i><b>Подробнее</b></a>
-          <a href="/team"><i data-lucide="users-round"></i><b>Команда проекта</b></a>
-        </div>
+        <div class="mega-col"><span class="mega-title">Основное</span><a href="#" id="playNavBtn"><i data-lucide="gamepad-2"></i><b>Начать игру</b></a></div>
+        <div class="mega-col"><span class="mega-title">Активность</span><a href="/top"><i data-lucide="trophy"></i><b>Топы игроков</b></a></div>
+        <div class="mega-col"><span class="mega-title">Наши соцсети</span><a href="https://discord.gg/88e2Rsp8GT" target="_blank" rel="noopener"><i data-lucide="message-circle"></i><b>Discord</b></a><a href="https://t.me/popkindomcraft" target="_blank" rel="noopener"><i data-lucide="send"></i><b>Telegram</b></a></div>
+        <div class="mega-col"><span class="mega-title">Прочее</span><a href="/rules"><i data-lucide="book-open"></i><b>Правила сообщества</b></a><a href="/server"><i data-lucide="server"></i><b>Сервер</b></a><a href="/about"><i data-lucide="info"></i><b>Подробнее</b></a><a href="/team"><i data-lucide="users-round"></i><b>Команда проекта</b></a></div>
       </div>
     </div>
   </nav>
-
   <div class="auth-menu-wrap">
-    <a href="/login" class="register-btn auth-action-btn" id="authMenuBtn">
-      <span class="auth-action-icon"><i data-lucide="log-in"></i></span>
-      <b class="auth-action-text">Войти</b>
-    </a>
-    <div class="auth-dropdown" id="authDropdown">
-      <a href="/account"><i data-lucide="user-round"></i><b>Кабинет</b></a>
-      <a href="/security"><i data-lucide="shield"></i><b>Безопасность</b></a>
-      <a href="/admin" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a>
-      <span class="auth-dropdown-divider"></span>
-      <button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button>
-    </div>
+    <a href="/login" class="register-btn auth-action-btn" id="authMenuBtn"><span class="auth-action-icon"><i data-lucide="log-in"></i></span><b class="auth-action-text">Войти</b></a>
+    <div class="auth-dropdown" id="authDropdown"><a href="/account"><i data-lucide="user-round"></i><b>Кабинет</b></a><a href="/security"><i data-lucide="shield"></i><b>Безопасность</b></a><a href="/admin" class="admin-only"><i data-lucide="shield-check"></i><b>Админ-панель</b></a><span class="auth-dropdown-divider"></span><button type="button" class="auth-dropdown-logout" data-logout><i data-lucide="log-out"></i><b>Выйти из аккаунта</b></button></div>
   </div>
-  
-  <button class="burger" id="burgerBtn" aria-label="Открыть меню">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
+  <button class="burger" id="burgerBtn" aria-label="Открыть меню"><span></span><span></span><span></span></button>
 </header>
-
 <div class="mobile-menu" id="mobileMenu">
   <a href="/index"><i data-lucide="home"></i>Главная</a>
   <a href="/news" class="active"><i data-lucide="newspaper"></i>Новости</a>
-  <a href="/support"><i data-lucide="life-buoy"></i>Поддержка</a>
   <a href="/faq"><i data-lucide="circle-help"></i>FAQ</a>
   <a href="/top"><i data-lucide="trophy"></i>Топы игроков</a>
   <a href="/rules"><i data-lucide="book-open"></i>Правила</a>
@@ -83,53 +46,23 @@
   <a href="/team"><i data-lucide="users-round"></i>Команда проекта</a>
 </div>
 <main class="rules-page rules-page-v2 news-page news-page-v2">
-  <div class="rules-bg"></div>
-  <div class="rules-dark"></div>
-
+  <div class="rules-bg"></div><div class="rules-dark"></div>
   <section class="rules-content rules-content-v2 news-content-v2">
     <section class="rules-hero-v2 glass-card page-hero-unified">
-      <div>
-        <span class="about-kicker"><i data-lucide="newspaper"></i> Лента проекта</span>
-        <h1>Новости</h1>
-        <p>Здесь появляются важные объявления, обновления сервера, события сезона и информация о технических работах.</p>
-      </div>
-      <div class="rules-hero-note page-hero-note-unified">
-        <i data-lucide="radio"></i>
-        <b>CMS-лента</b>
-        <span>Новости публикуются администрацией через закрытую CMS-панель.</span>
-      </div>
+      <div><span class="about-kicker"><i data-lucide="newspaper"></i> Лента проекта</span><h1>Новости</h1><p>Здесь появляются важные объявления, обновления сервера, события сезона и информация о технических работах.</p></div>
+      <div class="rules-hero-note page-hero-note-unified"><i data-lucide="radio"></i><b>CMS-лента</b><span>Новости публикуются администрацией через закрытую CMS-панель.</span></div>
     </section>
-
     <section class="rules-summary-grid page-summary-grid news-summary-grid">
       <a href="#publicNewsList" class="rules-summary-card"><i data-lucide="megaphone"></i><b>Объявления</b><span>важная информация</span></a>
       <a href="#publicNewsList" class="rules-summary-card"><i data-lucide="sun"></i><b>Сезон</b><span>Summer Season 4</span></a>
       <a href="#publicNewsList" class="rules-summary-card"><i data-lucide="server"></i><b>Сервер</b><span>статус и работы</span></a>
     </section>
-
-    <section class="rules-list-v2 news-list-v2" id="publicNewsList">
-      <article class="rule-panel-v2 news-panel good">
-        <div class="news-panel-meta"><span>Загрузка</span><time>Сейчас</time></div>
-        <div class="rule-panel-head"><i data-lucide="loader-circle"></i><h2>Загружаем новости…</h2></div>
-        <p>Подключаемся к CMS-ленте сайта.</p>
-      </article>
-    </section>
+    <section class="rules-list-v2 news-list-v2" id="publicNewsList"><article class="rule-panel-v2 news-panel good"><div class="news-panel-meta"><span>Загрузка</span><time>Сейчас</time></div><div class="rule-panel-head"><i data-lucide="loader-circle"></i><h2>Загружаем новости…</h2></div><p>Подключаемся к CMS-ленте сайта.</p></article></section>
   </section>
 </main>
-
-<footer class="footer">
-  <div class="footer-content">
-    <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
-    <div class="footer-text">© 2026 PopkinDom. Все права защищены.</div>
-    <div class="footer-links">
-      <a href="/rules">Правила</a>
-      <a href="/support">Поддержка</a>
-      <a href="https://discord.gg/88e2Rsp8GT" target="_blank">Discord</a>
-      <a href="https://t.me/popkindomcraft" target="_blank">Telegram</a>
-    </div>
-    <div class="footer-small">Minecraft является товарным знаком Mojang Studios. PopkinDom не связан с Mojang Studios.</div>
-  </div>
-</footer>
+<footer class="footer"><div class="footer-content"><div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div><div class="footer-text">© 2026 PopkinDom. Все права защищены.</div><div class="footer-links"><a href="/rules">Правила</a><a href="https://discord.gg/88e2Rsp8GT" target="_blank">Discord</a><a href="https://t.me/popkindomcraft" target="_blank">Telegram</a></div><div class="footer-small">Minecraft является товарным знаком Mojang Studios. PopkinDom не связан с Mojang Studios.</div></div></footer>
 <script src="script.js"></script>
 <script src="cms-support.js?v=1"></script>
+<script src="/support-widget.js?v=4"></script>
 </body>
 </html>
