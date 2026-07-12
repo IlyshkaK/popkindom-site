@@ -4,20 +4,29 @@
   if (adminPage || window.__pdSupportWidgetLoaded) return;
   window.__pdSupportWidgetLoaded = true;
 
-  // Полностью удаляем старую поддержку в виде отдельного блока/модального окна.
-  document.querySelectorAll(
-    '#supportModal, .support-modal, .support-landing, .support-page-coldclan, #supportOpenBtn'
-  ).forEach((element) => {
-    if (element === document.body) return;
-    element.remove();
-  });
-  document.body.classList.remove('support-page-coldclan', 'support-modal-open');
+  function removeLegacySupportUi() {
+    document.querySelectorAll(
+      '#supportModal, .support-modal, .support-landing, .support-page-coldclan, #supportOpenBtn'
+    ).forEach((element) => {
+      if (element !== document.body) element.remove();
+    });
 
-  // Виджет сам подключает стили. Отдельный <link> в HTML больше не обязателен.
+    document.querySelectorAll(
+      'a[href="/support"], a[href="/support.html"], a[href^="/support?"]'
+    ).forEach((link) => link.remove());
+
+    document.body.classList.remove('support-page-coldclan', 'support-modal-open');
+  }
+
+  removeLegacySupportUi();
+
+  const observer = new MutationObserver(removeLegacySupportUi);
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
   if (!document.querySelector('link[data-pd-support-widget]')) {
     const stylesheet = document.createElement('link');
     stylesheet.rel = 'stylesheet';
-    stylesheet.href = '/support-widget.css?v=6';
+    stylesheet.href = '/support-widget.css?v=7';
     stylesheet.dataset.pdSupportWidget = 'true';
     document.head.appendChild(stylesheet);
   }
@@ -144,14 +153,6 @@
   close.addEventListener('click', closeChat);
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeChat();
-  });
-
-  // Старые ссылки поддержки больше не ведут на отдельную страницу.
-  document.addEventListener('click', (event) => {
-    const link = event.target.closest('a[href="/support"], a[href="/support.html"], a[href^="/support?"]');
-    if (!link) return;
-    event.preventDefault();
-    openChat();
   });
 
   (async () => {
