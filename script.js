@@ -292,7 +292,7 @@ function refreshAuthUI() {
   const securityUsername = document.getElementById("securityUsername");
   if (securityUsername && isAuth) securityUsername.textContent = currentUser.username;
 
-  const isAdmin = isAuth && ["MODERATOR", "ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase());
+  const isAdmin = isAuth && ["MODERATOR", "ADMIN", "OWNER"].includes(normalizeAdminRole(currentUser.role));
   document.body.classList.toggle("is-admin", isAdmin);
 
   refreshLucideIcons();
@@ -928,25 +928,25 @@ function renderAccountData(data) {
 
   setText("profileUsername", username);
 
-  const roleRawOriginal = String(data.user?.role || player.role || "PLAYER").trim();
+  const roleRawOriginal = String(data.user?.role || player.role || "default").trim();
   const roleRaw = roleRawOriginal.toUpperCase();
 
   function resolveRole(raw) {
-    const value = String(raw || "PLAYER").trim().toUpperCase();
+    const value = String(raw || "default").trim().toUpperCase();
 
-    if (value.includes("OWNER") || value.includes("ВЛАДЕЛ")) {
-      return { label: "Владелец", className: "owner" };
+    if (value.includes("SPEC.ADMIN") || value.includes("OWNER") || value.includes("ВЛАДЕЛ")) {
+      return { label: "Спец.Админ", className: "owner" };
     }
 
     if (value.includes("ADMIN") || value.includes("АДМИН")) {
-      return { label: "Администратор", className: "admin" };
+      return { label: "Админ", className: "admin" };
     }
 
     if (value.includes("MODER") || value.includes("МОДЕР")) {
-      return { label: "Модератор", className: "moderator" };
+      return { label: "Модер", className: "moderator" };
     }
 
-    return { label: "Игрок", className: "player" };
+    return { label: "Участник", className: "player" };
   }
 
   const resolvedRole = resolveRole(roleRaw);
@@ -1008,7 +1008,48 @@ function renderAccountData(data) {
   renderEnchantments(data.enchantments);
   renderDeathHistory((data.recentDeaths || data.deathsHistory || []).slice(0, 3));
   renderRecentAchievements((data.recentAchievements || data.achievements || []).slice(0, 5));
+  loadTitles();
   refreshLucideIcons();
+}
+
+const titleRarityLabels = { COMMON: 'Обычный', UNCOMMON: 'Необычный', RARE: 'Редкий', EPIC: 'Эпический', LEGENDARY: 'Легендарный', MYTHIC: 'Мифический' };
+let titlesLoading = false;
+
+async function loadTitles() {
+  const grid = document.getElementById('titlesGrid');
+  if (!grid || titlesLoading) return;
+  titlesLoading = true;
+  try {
+    const data = await apiRequest('/api/account/titles');
+    const roleClass = String(data.role || 'default').replace('.', '-');
+    document.getElementById('titlesCounter').textContent = `${data.unlockedCount || 0} получено`;
+    grid.innerHTML = data.titles.map((title) => {
+      const selected = data.activeTitleId === title.id;
+      return `<article class="title-card title-role-${roleClass} ${title.unlocked ? 'unlocked' : 'locked'} ${selected ? 'selected' : ''}">
+        <div class="title-card-top"><b>[${escapeHtml(title.name)}]</b><span>${titleRarityLabels[title.rarity] || title.rarity}</span></div>
+        <p>${escapeHtml(title.description)}</p>
+        ${title.unlocked ? `<button type="button" data-select-title="${title.id}" ${selected ? 'disabled' : ''}>${selected ? 'Выбран' : 'Выбрать'}</button>` : '<small><i data-lucide="lock"></i> Ещё не получен</small>'}
+      </article>`;
+    }).join('');
+    grid.querySelectorAll('[data-select-title]').forEach((button) => button.addEventListener('click', async () => {
+      const message = document.getElementById('titlesMessage');
+      button.disabled = true;
+      try {
+        const result = await apiRequest('/api/account/titles', { method: 'POST', body: JSON.stringify({ titleId: button.dataset.selectTitle }) });
+        message.textContent = `${result.message} На сервере обновится в течение 5 секунд.`;
+        message.className = 'titles-message success';
+        titlesLoading = false;
+        await loadTitles();
+      } catch (error) {
+        message.textContent = error.message;
+        message.className = 'titles-message error';
+        button.disabled = false;
+      }
+    }));
+    refreshLucideIcons();
+  } catch (error) {
+    grid.innerHTML = `<p class="titles-error">${escapeHtml(error.message)}</p>`;
+  } finally { titlesLoading = false; }
 }
 
 /* ===== SECURITY PAGE ACTIONS ===== */
@@ -1137,25 +1178,25 @@ let adminSelectedPlayer = null;
 let adminPlayersCache = [];
 
 function isCurrentUserAdmin() {
-  return Boolean(currentUser && ["MODERATOR", "ADMIN", "OWNER"].includes(String(currentUser.role || "").toUpperCase()));
+  return Boolean(currentUser && ["MODERATOR", "ADMIN", "OWNER"].includes(normalizeAdminRole(currentUser.role)));
 }
 
 function resolveAdminRole(raw) {
-  const value = String(raw || "PLAYER").trim().toUpperCase();
+  const value = String(raw || "default").trim().toUpperCase();
 
-  if (value.includes("OWNER") || value.includes("ВЛАДЕЛ")) {
-    return { label: "Владелец", className: "owner" };
+  if (value.includes("SPEC.ADMIN") || value.includes("OWNER") || value.includes("ВЛАДЕЛ")) {
+    return { label: "Спец.Админ", className: "owner" };
   }
 
   if (value.includes("ADMIN") || value.includes("АДМИН")) {
-    return { label: "Администратор", className: "admin" };
+    return { label: "Админ", className: "admin" };
   }
 
   if (value.includes("MODER") || value.includes("МОДЕР")) {
-    return { label: "Модератор", className: "moderator" };
+    return { label: "Модер", className: "moderator" };
   }
 
-  return { label: "Игрок", className: "player" };
+  return { label: "Участник", className: "player" };
 }
 
 function adminRoleBadge(raw) {
@@ -1169,12 +1210,12 @@ function adminUserBadge(username, roleRaw) {
 
 
 function currentAdminRole() {
-  return String(currentUser?.role || "").toUpperCase();
+  return normalizeAdminRole(currentUser?.role);
 }
 
 function normalizeAdminRole(raw) {
   const value = String(raw || "PLAYER").trim().toUpperCase();
-  if (value.includes("OWNER") || value.includes("ВЛАДЕЛ")) return "OWNER";
+  if (value.includes("SPEC.ADMIN") || value.includes("OWNER") || value.includes("ВЛАДЕЛ")) return "OWNER";
   if (value.includes("ADMIN") || value.includes("АДМИН")) return "ADMIN";
   if (value.includes("MODER") || value.includes("МОДЕР")) return "MODERATOR";
   return "PLAYER";
@@ -1584,10 +1625,10 @@ function renderAdminPlayerPanel(player) {
             <label id="adminRoleLabel" hidden>Новая роль</label>
             <div id="adminRoleSelectWrap" class="admin-role-select-wrap" hidden>
               <select id="adminNewRole" class="admin-role-select">
-                <option value="PLAYER">Игрок</option>
-                <option value="MODERATOR">Модератор</option>
-                <option value="ADMIN">Администратор</option>
-                <option value="OWNER">Владелец</option>
+                <option value="default">Участник</option>
+                <option value="moderator">Модер</option>
+                <option value="admin">Админ</option>
+                <option value="spec.admin">Спец.Админ</option>
               </select>
             </div>
 
@@ -1961,7 +2002,7 @@ async function initAdminPanel() {
       pinGate.innerHTML = `
         <div class="admin-pin-icon"><i data-lucide="ban"></i></div>
         <h2>Недостаточно прав</h2>
-        <p>Админ-панель доступна ролям MODERATOR, ADMIN и OWNER.</p>
+        <p>Админ-панель доступна группам moderator, admin и spec.admin.</p>
         <a class="primary-btn" href="account.html"><i data-lucide="user-round"></i> Вернуться в кабинет</a>
       `;
     }
@@ -1972,8 +2013,8 @@ async function initAdminPanel() {
   try {
     const status = await apiRequest("/api/admin?section=status");
     if (badge) badge.innerHTML = adminUserBadge(status.user.username, status.user.role);
-    document.body.classList.toggle("admin-limited", String(status.user.role || "").toUpperCase() === "MODERATOR");
-    document.body.classList.toggle("admin-full", ["ADMIN", "OWNER"].includes(String(status.user.role || "").toUpperCase()));
+    document.body.classList.toggle("admin-limited", normalizeAdminRole(status.user.role) === "MODERATOR");
+    document.body.classList.toggle("admin-full", ["ADMIN", "OWNER"].includes(normalizeAdminRole(status.user.role)));
 
     if (status.verified) {
       document.body.classList.remove("admin-pin-locked");

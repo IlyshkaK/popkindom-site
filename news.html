@@ -76,8 +76,8 @@
       const response = await fetch('/api/me?summary=1', { credentials: 'include' });
       if (!response.ok) return;
       const data = await response.json();
-      const role = String(data?.user?.role || '').toUpperCase();
-      if (!['ADMIN', 'OWNER'].includes(role)) return;
+      const role = String(data?.user?.role || '').toLowerCase();
+	  if (!['admin', 'spec.admin'].includes(role)) return;
       const controls = document.getElementById('newsAdminControls');
       if (controls) controls.hidden = false;
       if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 2.4 } });

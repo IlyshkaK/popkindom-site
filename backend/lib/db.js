@@ -44,7 +44,7 @@ async function ensureAuthTables() {
         username_lower VARCHAR(16) NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
         pin_hash TEXT NULL,
-        role VARCHAR(32) NOT NULL DEFAULT 'PLAYER',
+        role VARCHAR(32) NOT NULL DEFAULT 'default',
         admin_panel_enabled BOOLEAN NOT NULL DEFAULT FALSE,
         registered_from VARCHAR(16) NOT NULL DEFAULT 'WEB',
         registered_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -88,6 +88,54 @@ async function ensureAuthTables() {
     await query(`CREATE INDEX IF NOT EXISTS idx_pd_users_username_lower ON pd_users(username_lower);`);
     await query(`CREATE INDEX IF NOT EXISTS idx_pd_auth_sessions_lookup ON pd_auth_sessions(user_id, session_type, ip_address, revoked, expires_at);`);
     await query(`CREATE INDEX IF NOT EXISTS idx_pd_auth_sessions_token ON pd_auth_sessions(token_hash);`);
+    await query(`ALTER TABLE pd_users ALTER COLUMN role SET DEFAULT 'default';`);
+    await query(`UPDATE pd_users SET role = CASE UPPER(role)
+      WHEN 'PLAYER' THEN 'default' WHEN 'PARTICIPANT' THEN 'default'
+      WHEN 'MODERATOR' THEN 'moderator' WHEN 'ADMIN' THEN 'admin'
+      WHEN 'OWNER' THEN 'spec.admin' WHEN 'SPEC_ADMIN' THEN 'spec.admin'
+      ELSE LOWER(role) END;`);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS pd_news (
+        id BIGSERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        summary TEXT NOT NULL,
+        content TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'Объявление',
+        cover_url TEXT,
+        is_published BOOLEAN NOT NULL DEFAULT FALSE,
+        created_by TEXT,
+        updated_by TEXT,
+        published_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await query(`CREATE INDEX IF NOT EXISTS idx_pd_news_published ON pd_news (is_published, published_at DESC, created_at DESC);`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_pd_news_slug ON pd_news (slug);`);
+
+    await query(`
+      CREATE TABLE IF NOT EXISTS pd_support_tickets (
+        id BIGSERIAL PRIMARY KEY,
+        user_id INT NULL REFERENCES pd_users(id) ON DELETE SET NULL,
+        username TEXT,
+        contact TEXT,
+        telegram_username TEXT,
+        subject TEXT NOT NULL,
+        message TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'OPEN',
+        admin_reply TEXT,
+        answered_by TEXT,
+        answered_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await query(`CREATE INDEX IF NOT EXISTS idx_pd_support_status_created ON pd_support_tickets (status, created_at DESC);`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_pd_support_user ON pd_support_tickets (user_id, created_at DESC);`);
 
     await query(`
       CREATE TABLE IF NOT EXISTS pd_news (

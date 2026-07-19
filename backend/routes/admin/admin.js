@@ -3,13 +3,14 @@ const { query, ensureAuthTables } = require('../../lib/db');
 const { sendJson, methodNotAllowed, readJson } = require('../../lib/http');
 const { getClientIp, getUserBySession, publicUser, logSecurity } = require('../../lib/security');
 const { isAdminRole, isFullAdminRole, isOwnerRole, isValidPin, createAdminSession, getAdminUser } = require('../../lib/admin');
+const { normalizeRole: canonicalRole, roleRank } = require('../../lib/roles');
 
 const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS || 12);
 const PLAYER_ACTIONS = new Set(['BAN', 'TEMP_BAN', 'MUTE', 'TEMP_MUTE', 'UNBAN', 'UNMUTE', 'KICK', 'WHITELIST_REMOVE', 'RESET_PASSWORD', 'RESET_PIN', 'PRIVATE_MESSAGE', 'SET_ROLE']);
 const MODERATOR_ACTIONS = new Set(['MUTE', 'TEMP_MUTE', 'UNMUTE', 'KICK', 'PRIVATE_MESSAGE']);
 const FULL_ADMIN_ACTIONS = new Set(['BAN', 'TEMP_BAN', 'MUTE', 'TEMP_MUTE', 'UNBAN', 'UNMUTE', 'KICK', 'WHITELIST_REMOVE', 'RESET_PASSWORD', 'RESET_PIN', 'PRIVATE_MESSAGE']);
 const OWNER_ACTIONS = new Set(['SET_ROLE']);
-const ALLOWED_ROLES = new Set(['PLAYER', 'MODERATOR', 'ADMIN', 'OWNER']);
+const ALLOWED_ROLES = new Set(['default', 'moderator', 'admin', 'spec.admin']);
 
 async function safeCount(sql) {
   try {
@@ -39,27 +40,22 @@ function generateTempPassword() {
 }
 
 function normalizeRole(raw) {
-  const value = String(raw || '').trim().toUpperCase();
-  if (['PLAYER', 'MODERATOR', 'ADMIN', 'OWNER'].includes(value)) return value;
-  if (value === 'ИГРОК') return 'PLAYER';
-  if (value === 'МОДЕРАТОР') return 'MODERATOR';
-  if (value === 'АДМИНИСТРАТОР') return 'ADMIN';
-  if (value === 'ВЛАДЕЛЕЦ') return 'OWNER';
-  return null;
-}
-
-function roleRank(raw) {
-  const role = normalizeRole(raw) || String(raw || 'PLAYER').trim().toUpperCase();
-  return { PLAYER: 1, MODERATOR: 2, ADMIN: 3, OWNER: 4 }[role] || 1;
+  const value = String(raw || '').trim();
+  if (!value) return null;
+  if (value.toUpperCase() === 'ИГРОК' || value.toUpperCase() === 'УЧАСТНИК') return 'default';
+  if (value.toUpperCase() === 'МОДЕРАТОР' || value.toUpperCase() === 'МОДЕР') return 'moderator';
+  if (value.toUpperCase() === 'АДМИНИСТРАТОР' || value.toUpperCase() === 'АДМИН') return 'admin';
+  if (value.toUpperCase() === 'ВЛАДЕЛЕЦ' || value.toUpperCase() === 'СПЕЦ.АДМИН') return 'spec.admin';
+  return canonicalRole(value);
 }
 
 function canActOnTargetRole(executorRoleRaw, targetRoleRaw) {
-  const executorRole = normalizeRole(executorRoleRaw) || String(executorRoleRaw || '').trim().toUpperCase();
-  const targetRole = normalizeRole(targetRoleRaw) || String(targetRoleRaw || 'PLAYER').trim().toUpperCase();
+  const executorRole = normalizeRole(executorRoleRaw);
+  const targetRole = normalizeRole(targetRoleRaw);
 
-  if (executorRole === 'OWNER') return true;
-  if (executorRole === 'ADMIN') return ['PLAYER', 'MODERATOR'].includes(targetRole);
-  if (executorRole === 'MODERATOR') return targetRole === 'PLAYER';
+  if (executorRole === 'spec.admin') return true;
+  if (executorRole === 'admin') return ['default', 'moderator'].includes(targetRole);
+  if (executorRole === 'moderator') return targetRole === 'default';
   return false;
 }
 
@@ -228,7 +224,7 @@ async function handleOverview(req, res) {
   const [usersCount, onlineCount, adminCount, whitelistRequestsCount] = await Promise.all([
     safeCount(`SELECT COUNT(*) FROM pd_users;`),
     safeCount(`SELECT COUNT(*) FROM players WHERE online = TRUE;`),
-    safeCount(`SELECT COUNT(*) FROM pd_users WHERE role IN ('ADMIN', 'OWNER');`),
+    safeCount(`SELECT COUNT(*) FROM pd_users WHERE role IN ('admin', 'spec.admin');`),
     safeCount(`SELECT COUNT(*) FROM moderation_whitelist_requests WHERE status = 'PENDING';`),
   ]);
 
@@ -522,13 +518,13 @@ async function handlePlayerAction(req, res) {
     return sendJson(res, 400, { message: 'Неизвестное действие.' });
   }
 
-  const adminRole = String(admin.role || '').toUpperCase();
+  const adminRole = normalizeRole(admin.role);
 
-  if (adminRole === 'MODERATOR' && !MODERATOR_ACTIONS.has(action)) {
+  if (adminRole === 'moderator' && !MODERATOR_ACTIONS.has(action)) {
     return sendJson(res, 403, { message: 'Модератор может выдавать мут, временный мут, снимать мут, кикать и писать игрокам.' });
   }
 
-  if (['ADMIN', 'OWNER'].includes(adminRole) && !FULL_ADMIN_ACTIONS.has(action) && !OWNER_ACTIONS.has(action)) {
+  if (['admin', 'spec.admin'].includes(adminRole) && !FULL_ADMIN_ACTIONS.has(action) && !OWNER_ACTIONS.has(action)) {
     return sendJson(res, 403, { message: 'Недостаточно прав для этого действия.' });
   }
 
@@ -547,10 +543,10 @@ async function handlePlayerAction(req, res) {
   }
 
   if (!canActOnTargetRole(adminRole, targetUser.role)) {
-    if (adminRole === 'ADMIN') {
+    if (adminRole === 'admin') {
       return sendJson(res, 403, { message: 'ADMIN может работать только с MODERATOR и PLAYER.' });
     }
-    if (adminRole === 'MODERATOR') {
+    if (adminRole === 'moderator') {
       return sendJson(res, 403, { message: 'MODERATOR может работать только с PLAYER.' });
     }
     return sendJson(res, 403, { message: 'Недостаточно прав для выбранного игрока.' });
@@ -558,7 +554,7 @@ async function handlePlayerAction(req, res) {
 
   if (action === 'SET_ROLE') {
     if (!newRole || !ALLOWED_ROLES.has(newRole)) {
-      return sendJson(res, 400, { message: 'Выберите корректную роль: PLAYER, MODERATOR, ADMIN или OWNER.' });
+      return sendJson(res, 400, { message: 'Выберите корректную роль: default, moderator, admin или spec.admin.' });
     }
 
     const result = await query(

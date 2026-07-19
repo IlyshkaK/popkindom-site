@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { query } = require('./db');
 const { parseCookies, serializeCookie } = require('./http');
+const { normalizeRole } = require('./roles');
 
 const COOKIE_NAME = process.env.COOKIE_NAME || 'pd_session';
 const SESSION_HOURS = Number(process.env.SESSION_HOURS || 48);
@@ -53,7 +54,7 @@ function publicUser(row) {
   return {
     id: row.id,
     username: row.username,
-    role: row.role,
+    role: normalizeRole(row.role),
     adminPanelEnabled: row.admin_panel_enabled,
     registeredAt: row.registered_at,
     lastServerLogin: row.last_server_login,

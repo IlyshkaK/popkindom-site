@@ -46,7 +46,7 @@
   }
 
   function isFullAdmin(user) {
-    return ['ADMIN', 'OWNER'].includes(String(user?.role || '').toUpperCase());
+    return ['admin', 'spec.admin'].includes(String(user?.role || '').toLowerCase());
   }
 
   async function requireFullAdmin() {

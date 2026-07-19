@@ -2,21 +2,22 @@ const crypto = require('crypto');
 const { query } = require('./db');
 const { parseCookies, serializeCookie } = require('./http');
 const { hashToken, getUserBySession } = require('./security');
+const { normalizeRole } = require('./roles');
 
 const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || 'pd_admin_session';
 const ADMIN_SESSION_MINUTES = Number(process.env.ADMIN_SESSION_MINUTES || 30);
 const COOKIE_SECURE = String(process.env.COOKIE_SECURE || 'true').toLowerCase() === 'true';
 
 function isAdminRole(user) {
-  return ['MODERATOR', 'ADMIN', 'OWNER'].includes(String(user?.role || '').toUpperCase());
+  return ['moderator', 'admin', 'spec.admin'].includes(normalizeRole(user?.role));
 }
 
 function isFullAdminRole(user) {
-  return ['ADMIN', 'OWNER'].includes(String(user?.role || '').toUpperCase());
+  return ['admin', 'spec.admin'].includes(normalizeRole(user?.role));
 }
 
 function isOwnerRole(user) {
-  return String(user?.role || '').toUpperCase() === 'OWNER';
+  return normalizeRole(user?.role) === 'spec.admin';
 }
 
 function createToken() {

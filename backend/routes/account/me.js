@@ -1,6 +1,7 @@
 const { query } = require('../../lib/db');
 const { sendJson, methodNotAllowed } = require('../../lib/http');
 const { getUserBySession, publicUser } = require('../../lib/security');
+const { normalizeRole } = require('../../lib/roles');
 
 function getQueryParam(req, name) {
   if (req.query && Object.prototype.hasOwnProperty.call(req.query, name)) return req.query[name];
@@ -145,10 +146,22 @@ module.exports = async function handler(req, res) {
     ]);
 
     const player = playerResult.rows[0] || null;
+    let effectiveRole = normalizeRole(user.role);
+    if (player?.uuid) {
+      try {
+        const titleRole = await query(`SELECT standard_title FROM pd_player_titles WHERE player_uuid=$1::uuid LIMIT 1`, [player.uuid]);
+        if (titleRole.rows[0]?.standard_title) {
+          effectiveRole = normalizeRole(titleRole.rows[0].standard_title);
+          if (effectiveRole !== normalizeRole(user.role)) await query(`UPDATE pd_users SET role=$1 WHERE id=$2`, [effectiveRole, user.id]);
+        }
+      } catch (roleError) {
+        console.warn('title role sync skipped:', roleError.message);
+      }
+    }
 
     const payload = {
       user: {
-        ...publicUser(user),
+        ...publicUser({ ...user, role: effectiveRole }),
         autoLoginEnabled: user.auto_login_enabled !== false,
         hasPin: Boolean(user.pin_hash),
       },

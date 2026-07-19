@@ -19,6 +19,7 @@ function registerBackendRoutes(app) {
   app.post('/api/logout-all', asyncRoute(require('./routes/auth/logout-all')));
 
   app.get('/api/me', asyncRoute(require('./routes/account/me')));
+  app.all('/api/account/titles', asyncRoute(require('./routes/account/titles')));
   app.post('/api/disable-autologin', asyncRoute(require('./routes/account/disable-autologin')));
   app.post('/api/security', asyncRoute(require('./routes/account/security')));
 

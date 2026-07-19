@@ -132,6 +132,23 @@ const CATEGORIES = {
       LIMIT 50;
     `,
   },
+  titles: {
+    label: 'Получено титулов',
+    description: 'Топ игроков по количеству полученных титулов.',
+    format: 'number',
+    sql: `
+      SELECT COALESCE(t.player_name, p.nickname, u.username, 'Игрок') AS username,
+             COUNT(ut.title_id)::BIGINT AS value,
+             t.active_title_id AS active_title_id,
+             t.standard_title AS role
+      FROM pd_player_titles t
+      LEFT JOIN pd_unlocked_titles ut ON ut.player_uuid=t.player_uuid
+      LEFT JOIN players p ON p.uuid::uuid=t.player_uuid
+      LEFT JOIN pd_users u ON u.id=p.auth_user_id
+      GROUP BY COALESCE(t.player_name, p.nickname, u.username, 'Игрок'), t.active_title_id, t.standard_title
+      ORDER BY value DESC LIMIT 50;
+    `,
+  },
   enchants: {
     label: 'Потрачено уровней',
     description: 'Топ игроков по уровням, потраченным на зачарования.',
@@ -151,7 +168,7 @@ const CATEGORIES = {
 function sanitizeRows(rows) {
   const used = new Set();
   return rows
-    .map((row) => ({ username: String(row.username || 'Игрок'), value: Number(row.value || 0) }))
+    .map((row) => ({ username: String(row.username || 'Игрок'), value: Number(row.value || 0), activeTitleId: row.active_title_id || null, role: row.role || null }))
     .filter((row) => row.value > 0)
     .filter((row) => {
       const key = row.username.toLowerCase();
