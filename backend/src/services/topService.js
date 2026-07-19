@@ -1,4 +1,5 @@
 const topRepository = require("../repositories/topRepository");
+const { normalizeRole } = require("../utils/roles");
 
 const META = {
   playtime: ["Время в игре", "Топ игроков по общему времени в игре.", "ticks"],
@@ -25,7 +26,7 @@ function sanitizeRows(rows) {
       username: String(row.username || "Игрок"),
       value: Number(row.value || 0),
       activeTitleId: row.active_title_id || null,
-      role: row.role || null,
+      role: normalizeRole(row.role),
     }))
     .filter((row) => row.value > 0)
     .filter((row) => {

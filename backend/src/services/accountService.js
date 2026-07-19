@@ -1,4 +1,5 @@
 const accountRepository = require("../repositories/accountRepository");
+const { normalizeRole } = require("../utils/roles");
 
 function ticksToHours(ticks) {
   return Math.floor(Number(ticks || 0) / 20 / 60 / 60);
@@ -54,7 +55,7 @@ const [
     total_experience: safePlayer.total_experience || 0,
     exp_progress: safePlayer.exp_progress || 0,
 
-    role: account.role,
+    role: normalizeRole(account.role),
   };
 
   const statsData = {
@@ -96,7 +97,7 @@ const [
     id: account.id,
     username: account.nickname,
     nickname: account.nickname,
-    role: account.role,
+    role: normalizeRole(account.role),
 
     registered_at: account.registered_at,
     registeredAt: account.registered_at,
@@ -127,7 +128,7 @@ const [
       id: account.id,
       nickname: account.nickname,
       username: account.nickname,
-      role: account.role,
+      role: normalizeRole(account.role),
       registered_at: account.registered_at,
       registeredAt: account.registered_at,
       last_server_login: account.last_server_login,

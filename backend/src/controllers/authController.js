@@ -5,6 +5,7 @@ const accountService = require("../services/accountService");
 const userRepository = require("../repositories/userRepository");
 const { success, fail } = require("../utils/apiResponse");
 const asyncHandler = require("../utils/asyncHandler");
+const { normalizeRole } = require("../utils/roles");
 
 function isValidMinecraftNick(username) {
   return /^[a-zA-Z0-9_]{3,16}$/.test(String(username || ""));
@@ -28,7 +29,7 @@ function createToken(user) {
     {
       id: user.id,
       nickname: user.nickname,
-      role: user.role,
+      role: normalizeRole(user.role),
     },
     process.env.JWT_SECRET,
     {
@@ -84,7 +85,7 @@ const register = asyncHandler(async (req, res) => {
       id: user.id,
       username: user.nickname,
       nickname: user.nickname,
-      role: user.role,
+      role: normalizeRole(user.role),
       autoLoginEnabled: user.auto_login_enabled,
       adminPanelEnabled: user.admin_panel_enabled,
       hasPin: Boolean(user.pin_hash),
@@ -128,7 +129,7 @@ const login = asyncHandler(async (req, res) => {
       id: user.id,
       username: user.nickname,
       nickname: user.nickname,
-      role: user.role,
+      role: normalizeRole(user.role),
       autoLoginEnabled: user.auto_login_enabled,
       adminPanelEnabled: user.admin_panel_enabled,
       hasPin: Boolean(user.pin_hash),

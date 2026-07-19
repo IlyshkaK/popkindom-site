@@ -47,7 +47,7 @@ async function createUser({ username, passwordHash, ipAddress }) {
       $1,
       LOWER($1),
       $2,
-      'PLAYER',
+      'default',
       'site',
       NOW(),
       $3,
