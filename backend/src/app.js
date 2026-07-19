@@ -11,7 +11,8 @@ const titlesRoutes = require("./routes/titlesRoutes");
 const pinRoutes = require("./routes/pinRoutes");
 const securityRoutes = require("./routes/securityRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-const { hasRoleAtLeast } = require("./utils/roles");
+const pool = require("./database/pool");
+const { normalizeRole, hasRoleAtLeast } = require("./utils/roles");
 
 const publicNewsHandler = require("../routes/news/news");
 const adminNewsHandler = require("../routes/admin/news-cms");
@@ -80,13 +81,35 @@ app.all("/api/admin/news", authRequired, asyncRoute(adminNewsHandler));
 app.use("/api/admin", adminRoutes);
 app.use("/api/top", topRoutes);
 
-app.get("/api/admin-status", authRequired, (req, res) => {
+app.get("/api/admin-status", authRequired, asyncRoute(async (req, res) => {
+  const result = await pool.query(
+    `
+    SELECT u.role,
+      (
+        SELECT t.standard_title
+        FROM pd_player_titles t
+        WHERE LOWER(t.player_name) = LOWER(u.username)
+        LIMIT 1
+      ) AS standard_title
+    FROM pd_users u
+    WHERE u.id = $1
+    LIMIT 1
+    `,
+    [req.user.id]
+  );
+  const account = result.rows[0];
+  const role = normalizeRole(account?.standard_title || account?.role || req.user?.role);
+
+  if (account && role !== normalizeRole(account.role)) {
+    await pool.query(`UPDATE pd_users SET role = $1 WHERE id = $2`, [role, req.user.id]);
+  }
+
   res.json({
     ok: true,
-    user: req.user,
-    hasAccess: hasRoleAtLeast(req.user?.role, "moderator"),
+    user: { ...req.user, role },
+    hasAccess: hasRoleAtLeast(role, "moderator"),
   });
-});
+}));
 
 app.use(notFoundHandler);
 app.use(errorHandler);
