@@ -317,6 +317,24 @@ function refreshAuthUI() {
   }
 }
 
+async function refreshAdminVisibility() {
+  if (!currentUser) {
+    document.body.classList.remove("is-admin");
+    return false;
+  }
+
+  try {
+    const status = await apiRequest("/api/admin-status");
+    if (status.user?.role) currentUser.role = status.user.role;
+    const hasAccess = status.hasAccess === true;
+    document.body.classList.toggle("is-admin", hasAccess);
+    return hasAccess;
+  } catch {
+    document.body.classList.remove("is-admin");
+    return false;
+  }
+}
+
 const authMenuBtn = document.getElementById("authMenuBtn");
 const authDropdown = document.getElementById("authDropdown");
 
@@ -1138,6 +1156,7 @@ async function refreshAccountRealtime() {
   const needsAuthNow = Boolean(document.querySelector(".protected-page"));
   const data = await loadMe({ full: needsFullAccount });
   refreshAuthUI();
+  await refreshAdminVisibility();
   refreshLucideIcons();
 
   if (needsAuthNow && !currentUser) {
