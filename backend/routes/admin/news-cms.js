@@ -1,6 +1,6 @@
 const { query, ensureAuthTables } = require('../../lib/db');
 const { sendJson, methodNotAllowed, readJson } = require('../../lib/http');
-const { getAdminUser, isFullAdminRole } = require('../../lib/admin');
+const { normalizeRole } = require('../../src/utils/roles');
 
 function slugify(value) {
   const base = String(value || '')
@@ -36,15 +36,35 @@ function normalize(row) {
 }
 
 async function requireCmsAdmin(req, res) {
-  const admin = await getAdminUser(req);
-  if (!admin) {
-    sendJson(res, 403, { message: 'Нужно подтвердить вход PIN-кодом.' });
+  const userId = Number(req.user?.id);
+  if (!Number.isInteger(userId) || userId <= 0) {
+    sendJson(res, 401, { code: 'AUTH_REQUIRED', message: 'Не авторизован.' });
     return null;
   }
-  if (!isFullAdminRole(admin)) {
-    sendJson(res, 403, { message: 'CMS-новости доступны только ADMIN и OWNER.' });
+
+  const result = await query(
+    `SELECT id, username, role
+     FROM pd_users
+     WHERE id = $1
+     LIMIT 1;`,
+    [userId]
+  );
+  const admin = result.rows[0] || null;
+
+  if (!admin || !['admin', 'spec.admin'].includes(normalizeRole(admin.role))) {
+    sendJson(res, 403, { code: 'ACCESS_DENIED', message: 'CMS-новости доступны только Админу и Спец.Админу.' });
     return null;
   }
+
+  const pinVerified =
+    req.session?.adminPinPassed === true &&
+    Number(req.session?.adminPinUserId) === Number(admin.id);
+
+  if (!pinVerified) {
+    sendJson(res, 403, { code: 'PIN_REQUIRED', message: 'Нужно подтвердить вход PIN-кодом.' });
+    return null;
+  }
+
   return admin;
 }
 
