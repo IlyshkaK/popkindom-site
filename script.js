@@ -1008,48 +1008,30 @@ function renderAccountData(data) {
   renderEnchantments(data.enchantments);
   renderDeathHistory((data.recentDeaths || data.deathsHistory || []).slice(0, 3));
   renderRecentAchievements((data.recentAchievements || data.achievements || []).slice(0, 5));
-  loadTitles();
+  loadProfileTitle();
   refreshLucideIcons();
 }
 
-const titleRarityLabels = { COMMON: 'Обычный', UNCOMMON: 'Необычный', RARE: 'Редкий', EPIC: 'Эпический', LEGENDARY: 'Легендарный', MYTHIC: 'Мифический' };
-let titlesLoading = false;
-
-async function loadTitles() {
-  const grid = document.getElementById('titlesGrid');
-  if (!grid || titlesLoading) return;
-  titlesLoading = true;
+async function loadProfileTitle() {
+  const badge = document.getElementById('profileRole');
+  if (!badge) return;
   try {
     const data = await apiRequest('/api/account/titles');
-    const roleClass = String(data.role || 'default').replace('.', '-');
-    document.getElementById('titlesCounter').textContent = `${data.unlockedCount || 0} получено`;
-    grid.innerHTML = data.titles.map((title) => {
-      const selected = data.activeTitleId === title.id;
-      return `<article class="title-card title-role-${roleClass} ${title.unlocked ? 'unlocked' : 'locked'} ${selected ? 'selected' : ''}">
-        <div class="title-card-top"><b>[${escapeHtml(title.name)}]</b><span>${titleRarityLabels[title.rarity] || title.rarity}</span></div>
-        <p>${escapeHtml(title.description)}</p>
-        ${title.unlocked ? `<button type="button" data-select-title="${title.id}" ${selected ? 'disabled' : ''}>${selected ? 'Выбран' : 'Выбрать'}</button>` : '<small><i data-lucide="lock"></i> Ещё не получен</small>'}
-      </article>`;
-    }).join('');
-    grid.querySelectorAll('[data-select-title]').forEach((button) => button.addEventListener('click', async () => {
-      const message = document.getElementById('titlesMessage');
-      button.disabled = true;
-      try {
-        const result = await apiRequest('/api/account/titles', { method: 'POST', body: JSON.stringify({ titleId: button.dataset.selectTitle }) });
-        message.textContent = `${result.message} На сервере обновится в течение 5 секунд.`;
-        message.className = 'titles-message success';
-        titlesLoading = false;
-        await loadTitles();
-      } catch (error) {
-        message.textContent = error.message;
-        message.className = 'titles-message error';
-        button.disabled = false;
-      }
-    }));
-    refreshLucideIcons();
+    const role = String(data.role || 'default').toLowerCase();
+    const roleView = {
+      default: { label: 'Участник', className: 'player' },
+      moderator: { label: 'Модер', className: 'moderator' },
+      admin: { label: 'Админ', className: 'admin' },
+      'spec.admin': { label: 'Спец.Админ', className: 'owner' },
+    }[role] || { label: 'Участник', className: 'player' };
+    const activeTitle = (data.titles || []).find(title => title.id === data.activeTitleId);
+    badge.textContent = activeTitle?.name || roleView.label;
+    badge.className = `role-badge role-${roleView.className}`;
+    badge.dataset.role = roleView.className;
+    badge.dataset.titleId = activeTitle?.id || '';
   } catch (error) {
-    grid.innerHTML = `<p class="titles-error">${escapeHtml(error.message)}</p>`;
-  } finally { titlesLoading = false; }
+    console.warn('Не удалось загрузить выбранный титул:', error.message);
+  }
 }
 
 /* ===== SECURITY PAGE ACTIONS ===== */
