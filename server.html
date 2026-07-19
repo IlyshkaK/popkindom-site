@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Сервер - PopkinDom</title>
-  <link rel="stylesheet" href="style.css?v=server-worlds-plugins-fix" />
+  <link rel="stylesheet" href="style.css?v=plugin-command-modal-1" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
   <link rel="dns-prefetch" href="//unpkg.com" />
@@ -106,13 +106,13 @@
       <div class="server-plugin-grid">
         <article><i data-lucide="beer"></i><h3>BreweryX</h3><p>Система варки напитков и рецептов для атмосферного выживания.</p></article>
         <article><i data-lucide="map"></i><h3>Chunky</h3><p>Предварительная генерация чанков, чтобы мир грузился стабильнее и без лишних лагов.</p></article>
-        <article><i data-lucide="shield-check"></i><h3>CoreProtect</h3><p>Логи действий игроков: блоки, сундуки и откаты при гриферстве или ошибках.</p></article>
-        <article><i data-lucide="music"></i><h3>GMusic</h3><p>Музыкальная атмосфера и звуковое оформление событий на сервере.</p></article>
-        <article><i data-lucide="armchair"></i><h3>GSit</h3><p>Сидение, лежание и дополнительные позы для лампового общения.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="coreprotect" tabindex="0"><i data-lucide="shield-check"></i><h3>CoreProtect</h3><p>Логи действий игроков: блоки, сундуки и откаты при гриферстве или ошибках.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="gmusic" tabindex="0"><i data-lucide="music"></i><h3>GMusic</h3><p>Музыкальная атмосфера и звуковое оформление событий на сервере.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="gsit" tabindex="0"><i data-lucide="armchair"></i><h3>GSit</h3><p>Сидение, лежание и дополнительные позы для лампового общения.</p></article>
         <article><i data-lucide="key-round"></i><h3>LuckPerms</h3><p>Права, группы, роли и доступы игроков и администрации.</p></article>
         <article><i data-lucide="braces"></i><h3>PlaceholderAPI</h3><p>Подстановка данных игрока для меню, сообщений, таба и других систем.</p></article>
-        <article><i data-lucide="radio-tower"></i><h3>ProtocolLib</h3><p>Техническая библиотека для расширенной работы плагинов с пакетами Minecraft.</p></article>
-        <article><i data-lucide="user-round"></i><h3>SkinsRestorer</h3><p>Отображение скинов игроков на сервере без обязательной лицензии Minecraft.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="protocollib" tabindex="0"><i data-lucide="radio-tower"></i><h3>ProtocolLib</h3><p>Техническая библиотека для расширенной работы плагинов с пакетами Minecraft.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="skinsrestorer" tabindex="0"><i data-lucide="user-round"></i><h3>SkinsRestorer</h3><p>Отображение скинов игроков на сервере без обязательной лицензии Minecraft.</p></article>
         <article><i data-lucide="activity"></i><h3>Spark</h3><p>Профилирование производительности и поиск причин лагов на сервере.</p></article>
         <article><i data-lucide="bed"></i><h3>Sleeper</h3><p>Удобная система сна, которая помогает пропускать ночь без ожидания всех игроков.</p></article>
       </div>
@@ -126,12 +126,16 @@
       </div>
 
       <div class="server-plugin-grid server-plugin-grid-featured">
-        <article><i data-lucide="log-in"></i><h3>PopkinDom Auth</h3><p>Авторизация игроков, регистрация, сессии, PIN-код и связь аккаунта игры с сайтом.</p></article>
-        <article><i data-lucide="repeat-2"></i><h3>PopkinDom Trades</h3><p>Безопасные обмены между игроками с подтверждением сделки и оплатой опытом.</p></article>
-        <article><i data-lucide="waypoints"></i><h3>PopkinDom Teleport</h3><p>Телепортация к игрокам и домой через заявки, подтверждения и честную оплату опытом.</p></article>
-        <article><i data-lucide="heart-crack"></i><h3>PopkinDom Insurance</h3><p>Уникальная переработка смерти, возврат предметов.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="popkindom-auth" tabindex="0"><i data-lucide="log-in"></i><h3>PopkinDom Auth</h3><p>Авторизация игроков, регистрация, сессии, PIN-код и связь аккаунта игры с сайтом.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="popkindom-trades" tabindex="0"><i data-lucide="repeat-2"></i><h3>PopkinDom Trades</h3><p>Безопасные обмены между игроками с подтверждением сделки и оплатой опытом.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="popkindom-teleport" tabindex="0"><i data-lucide="waypoints"></i><h3>PopkinDom Teleport</h3><p>Телепортация к игрокам и домой через заявки, подтверждения и честную оплату опытом.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="popkindom-insurance" tabindex="0"><i data-lucide="heart-crack"></i><h3>PopkinDom Insurance</h3><p>Уникальная переработка смерти, возврат предметов.</p></article>
         <article><i data-lucide="database-zap"></i><h3>PopkinDom WebBridge</h3><p>Мост между сервером и сайтом: статистика, онлайн, роли, профиль и данные игрока.</p></article>
         <article><i data-lucide="gavel"></i><h3>PopkinDom Moderation</h3><p>Баны, муты, кики, история наказаний, whitelist и инструменты администрации.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="popkindom-nether" tabindex="0"><i data-lucide="flame"></i><h3>PopkinDom Nether</h3><p>Уникальные механики Незера, переходы между мирами и сезонные возможности измерения.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="popkindom-tab" tabindex="0"><i data-lucide="list"></i><h3>PopkinDom TAB</h3><p>Фирменное оформление списка игроков, ролей, титулов и серверной информации.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="popkindom-titles" tabindex="0"><i data-lucide="badge"></i><h3>PopkinDom Titles</h3><p>Коллекция полученных титулов, прогресс открытия и выбор активного титула.</p></article>
+        <article class="plugin-command-card" data-plugin-commands="popkindom-promo" tabindex="0"><i data-lucide="ticket-percent"></i><h3>PopkinDom Promo</h3><p>Активация промокодов и получение сезонных наград на сервере.</p></article>
       </div>
     </section>
 
@@ -203,6 +207,16 @@
     </section>
   </section>
 </main>
+<div class="plugin-command-modal" id="pluginCommandModal" hidden aria-hidden="true">
+  <div class="plugin-command-backdrop" data-plugin-modal-close></div>
+  <section class="plugin-command-dialog" role="dialog" aria-modal="true" aria-labelledby="pluginCommandTitle">
+    <button class="plugin-command-close" type="button" data-plugin-modal-close aria-label="Закрыть"><i data-lucide="x"></i></button>
+    <span class="about-kicker"><i data-lucide="terminal"></i> Команды игрока</span>
+    <h2 id="pluginCommandTitle"></h2>
+    <p id="pluginCommandDescription"></p>
+    <div class="plugin-command-list" id="pluginCommandList"></div>
+  </section>
+</div>
 <footer class="footer footer-solid" style="background:#020605!important;background-image:linear-gradient(180deg,#07100b 0%,#020605 100%)!important;background-color:#020605!important;opacity:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;">
   <div class="footer-content">
     <div class="footer-logo"><i data-lucide="shield"></i><span>POPKIN<span>DOM</span></span></div>
@@ -216,6 +230,6 @@
     <div class="footer-small">Minecraft является товарным знаком Mojang Studios. PopkinDom не связан с Mojang Studios.</div>
   </div>
 </footer>
-<script src="script.js?v=admin-menu-restore-1"></script>
+<script src="script.js?v=plugin-command-modal-1"></script>
 </body>
 </html>

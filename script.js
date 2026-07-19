@@ -2463,6 +2463,157 @@ setInterval(updateServerAddressCountdown, 1000);
   });
 })();
 
+/* ===== Команды плагинов на странице сервера ===== */
+(function initPluginCommandModal() {
+  const modal = document.getElementById('pluginCommandModal');
+  if (!modal) return;
+
+  const title = document.getElementById('pluginCommandTitle');
+  const description = document.getElementById('pluginCommandDescription');
+  const list = document.getElementById('pluginCommandList');
+  const plugins = {
+    coreprotect: {
+      name: 'CoreProtect',
+      description: 'Команды просмотра истории доступны игроку только при наличии соответствующего права.',
+      commands: [
+        ['/co inspect', 'Включить или выключить режим проверки блоков.'],
+        ['/co lookup', 'Посмотреть доступную историю действий.'],
+        ['/co near', 'Показать недавние действия рядом с игроком.'],
+      ],
+    },
+    gmusic: {
+      name: 'GMusic',
+      description: 'Управление личным воспроизведением серверной музыки.',
+      commands: [
+        ['/music', 'Открыть меню музыки.'],
+        ['/music play', 'Запустить выбранную композицию.'],
+        ['/music stop', 'Остановить воспроизведение.'],
+        ['/music volume <0–100>', 'Изменить громкость музыки.'],
+        ['/music toggle', 'Включить или отключить серверную музыку.'],
+      ],
+    },
+    gsit: {
+      name: 'GSit',
+      description: 'Позы и действия для общения и красивых скриншотов.',
+      commands: [
+        ['/sit', 'Сесть на месте.'], ['/lay', 'Лечь.'], ['/crawl', 'Начать или закончить ползти.'],
+        ['/bellyflop', 'Лечь на живот.'], ['/spin', 'Включить вращение.'], ['/gsit toggle', 'Переключить взаимодействия GSit.'],
+      ],
+    },
+    protocollib: {
+      name: 'ProtocolLib',
+      description: 'Это техническая библиотека для других плагинов.',
+      commands: [],
+    },
+    skinsrestorer: {
+      name: 'SkinsRestorer',
+      description: 'Управление отображаемым скином игрока.',
+      commands: [
+        ['/skin', 'Открыть меню скинов.'], ['/skin set <ник>', 'Установить скин указанного игрока.'],
+        ['/skin clear', 'Сбросить установленный скин.'], ['/skin update', 'Обновить текущий скин.'], ['/skins', 'Открыть доступный список скинов.'],
+      ],
+    },
+    'popkindom-auth': {
+      name: 'PopkinDom Auth',
+      description: 'Регистрация, вход и защита игрового аккаунта.',
+      commands: [
+        ['/register <пароль> <повтор>', 'Зарегистрировать аккаунт.'], ['/login <пароль>', 'Войти в аккаунт.'],
+        ['/logout', 'Завершить игровую сессию.'], ['/changepassword <старый> <новый>', 'Сменить пароль.'],
+      ],
+    },
+    'popkindom-trades': {
+      name: 'PopkinDom Trades',
+      description: 'Безопасный обмен предметами и опытом между игроками.',
+      commands: [
+        ['/trade <игрок>', 'Отправить предложение обмена.'], ['/trade accept', 'Принять предложение.'],
+        ['/trade deny', 'Отклонить предложение.'], ['/trade cancel', 'Отменить текущий обмен.'],
+      ],
+    },
+    'popkindom-teleport': {
+      name: 'PopkinDom Teleport',
+      description: 'Заявки на телепортацию и управление личной точкой дома.',
+      commands: [
+        ['/tpa <игрок>', 'Запросить телепортацию к игроку.'], ['/tpahere <игрок>', 'Позвать игрока к себе.'],
+        ['/tpaccept', 'Принять заявку.'], ['/tpdeny', 'Отклонить заявку.'], ['/tpcancel', 'Отменить свою заявку.'],
+        ['/sethome', 'Установить точку дома.'], ['/home', 'Телепортироваться домой.'], ['/delhome', 'Удалить точку дома.'],
+      ],
+    },
+    'popkindom-insurance': {
+      name: 'PopkinDom Insurance',
+      description: 'Страхование и возврат предметов после смерти.',
+      commands: [
+        ['/insurance', 'Открыть меню страховки.'], ['/insurance status', 'Посмотреть состояние страховки.'],
+        ['/insurance claim', 'Забрать доступные застрахованные предметы.'],
+      ],
+    },
+    'popkindom-nether': {
+      name: 'PopkinDom Nether',
+      description: 'Пользовательские возможности уникального Незера.',
+      commands: [['/nether', 'Открыть информацию и доступные действия Незера.']],
+    },
+    'popkindom-tab': {
+      name: 'PopkinDom TAB',
+      description: 'Оформление TAB работает автоматически.',
+      commands: [],
+    },
+    'popkindom-titles': {
+      name: 'PopkinDom Titles',
+      description: 'Просмотр коллекции и выбор доступного титула.',
+      commands: [
+        ['/titles', 'Открыть коллекцию титулов.'], ['/title', 'Альтернативная команда коллекции.'], ['/титулы', 'Русская команда коллекции.'],
+      ],
+    },
+    'popkindom-promo': {
+      name: 'PopkinDom Promo',
+      description: 'Активация промокодов и получение наград.',
+      commands: [['/promo <код>', 'Активировать промокод.'], ['/promo', 'Посмотреть подсказку по промокодам.']],
+    },
+  };
+
+  let lastTrigger = null;
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('plugin-modal-open');
+    window.setTimeout(() => { modal.hidden = true; }, 180);
+    lastTrigger?.focus();
+  }
+
+  function openModal(card) {
+    const plugin = plugins[card.dataset.pluginCommands];
+    if (!plugin) return;
+    lastTrigger = card;
+    title.textContent = plugin.name;
+    description.textContent = plugin.description;
+    list.innerHTML = plugin.commands.length
+      ? plugin.commands.map(([command, help]) => `<div class="plugin-command-row"><code>${escapeHtml(command)}</code><span>${escapeHtml(help)}</span></div>`).join('')
+      : '<div class="plugin-command-empty"><i data-lucide="info"></i><span>У плагина нет команд для обычного игрока — он работает автоматически.</span></div>';
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('plugin-modal-open');
+    requestAnimationFrame(() => modal.classList.add('open'));
+    modal.querySelector('.plugin-command-close')?.focus();
+    refreshLucideIcons();
+  }
+
+  document.querySelectorAll('[data-plugin-commands]').forEach((card) => {
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-haspopup', 'dialog');
+    card.addEventListener('click', () => openModal(card));
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openModal(card);
+      }
+    });
+  });
+  modal.querySelectorAll('[data-plugin-modal-close]').forEach((control) => control.addEventListener('click', closeModal));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !modal.hidden) closeModal();
+  });
+})();
+
 
 /* ===== Копирование Discord на странице команды ===== */
 document.querySelectorAll("[data-copy]").forEach((button) => {
