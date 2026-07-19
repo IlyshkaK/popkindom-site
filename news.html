@@ -6,7 +6,6 @@
   <title>Новости - PopkinDom</title>
   <link rel="stylesheet" href="style.css?v=nav-align-news" />
   <link rel="stylesheet" href="cms-support.css?v=2" />
-  <link rel="stylesheet" href="/support-widget.css?v=7" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
   <link rel="dns-prefetch" href="//unpkg.com" />
@@ -53,7 +52,7 @@
         <span class="about-kicker"><i data-lucide="newspaper"></i> Лента проекта</span>
         <h1>Новости</h1>
         <p>Здесь появляются важные объявления, обновления сервера, события сезона и информация о технических работах.</p>
-        <div class="admin-extra-actions" id="newsAdminControls" hidden>
+        <div class="admin-extra-actions" id="newsAdminControls" hidden style="display:none">
           <a class="admin-mini-btn" href="/admin-news"><i data-lucide="square-pen"></i> Управление новостями</a>
         </div>
       </div>
@@ -77,13 +76,15 @@
       if (!response.ok) return;
       const data = await response.json();
       const role = String(data?.user?.role || '').toLowerCase();
-	  if (!['admin', 'spec.admin'].includes(role)) return;
+      if (!['admin', 'spec.admin', 'owner'].includes(role)) return;
       const controls = document.getElementById('newsAdminControls');
-      if (controls) controls.hidden = false;
+      if (controls) {
+        controls.hidden = false;
+        controls.style.display = 'flex';
+      }
       if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 2.4 } });
     } catch {}
   })();
 </script>
-<script src="/support-widget.js?v=7"></script>
 </body>
 </html>

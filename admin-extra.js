@@ -118,59 +118,6 @@ async function initAdminNewsCms() {
   });
 }
 
-async function loadSupportTickets() {
-  const list = document.getElementById('adminSupportList');
-  if (!list) return;
-  try {
-    const data = await adminExtraRequest('/api/admin/support');
-    const tickets = Array.isArray(data.tickets) ? data.tickets : [];
-    if (!tickets.length) {
-      list.innerHTML = '<p class="admin-extra-empty">Обращений пока нет.</p>';
-      return;
-    }
-    list.innerHTML = tickets.map((ticket) => `
-      <article class="admin-extra-ticket">
-        <div class="admin-extra-ticket-head">
-          <b>#${ticket.id} · ${adminExtraEscape(ticket.subject)}</b>
-          <span>${adminExtraEscape(ticket.status)} · ${adminExtraDate(ticket.createdAt)}</span>
-        </div>
-        <p>${adminExtraEscape(ticket.message)}</p>
-        <small>Игрок: ${adminExtraEscape(ticket.username || 'Гость')} · TG: ${ticket.telegramUsername ? '@' + adminExtraEscape(ticket.telegramUsername) : 'не указан'} · Контакт: ${adminExtraEscape(ticket.contact || 'не указан')}</small>
-        ${ticket.adminReply ? `<blockquote>${adminExtraEscape(ticket.adminReply)}</blockquote>` : ''}
-        <div class="admin-extra-ticket-actions">
-          <select data-ticket-status="${ticket.id}">
-            ${['OPEN', 'IN_PROGRESS', 'ANSWERED', 'CLOSED'].map((status) => `<option value="${status}" ${ticket.status === status ? 'selected' : ''}>${status}</option>`).join('')}
-          </select>
-          <input type="text" placeholder="Ответ / заметка" data-ticket-reply="${ticket.id}">
-          <button type="button" class="admin-mini-btn" data-ticket-save="${ticket.id}">Сохранить</button>
-        </div>
-      </article>
-    `).join('');
-  } catch (error) {
-    list.innerHTML = `<p class="admin-extra-empty">${adminExtraEscape(error.message)}</p>`;
-  }
-}
-
-function initAdminSupport() {
-  const list = document.getElementById('adminSupportList');
-  if (!list) return;
-  loadSupportTickets();
-  document.getElementById('adminSupportRefresh')?.addEventListener('click', loadSupportTickets);
-  document.addEventListener('click', async (event) => {
-    const button = event.target.closest('[data-ticket-save]');
-    if (!button) return;
-    const id = Number(button.dataset.ticketSave || 0);
-    const status = document.querySelector(`[data-ticket-status="${id}"]`)?.value || 'IN_PROGRESS';
-    const reply = document.querySelector(`[data-ticket-reply="${id}"]`)?.value || '';
-    try {
-      await adminExtraRequest('/api/admin/support', { method: 'POST', body: JSON.stringify({ id, status, reply }) });
-      await loadSupportTickets();
-    } catch (error) {
-      alert(error.message);
-    }
-  });
-}
-
 function waitForAdminDashboard(callback, attempts = 0) {
   const dashboard = document.getElementById('adminDashboard');
   if (!dashboard) return;
@@ -183,6 +130,5 @@ function waitForAdminDashboard(callback, attempts = 0) {
 
 waitForAdminDashboard(() => {
   initAdminNewsCms();
-  initAdminSupport();
   if (window.refreshLucideIcons) window.refreshLucideIcons();
 });
