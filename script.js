@@ -193,7 +193,7 @@ async function apiRequest(url, options = {}) {
 
 let loadMePromise = null;
 let loadMeMode = null;
-const ME_CACHE_KEY = "pd_me_summary_cache_v2";
+const ME_CACHE_KEY = "pd_me_summary_cache_v3";
 const ME_CACHE_TTL = 7000;
 
 function isAccountPage() {

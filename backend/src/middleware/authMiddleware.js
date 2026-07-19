@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
+const pool = require("../database/pool");
 const { normalizeRole } = require("../utils/roles");
 
-function authRequired(req, res, next) {
+async function authRequired(req, res, next) {
   try {
     const header = req.headers.authorization;
     const bearerToken = header && header.startsWith("Bearer ")
@@ -20,15 +21,30 @@ function authRequired(req, res, next) {
     }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const result = await pool.query(
+      `SELECT id, username, role FROM pd_users WHERE id = $1 LIMIT 1`,
+      [payload.id]
+    );
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(401).json({
+        ok: false,
+        message: "Пользователь не найден",
+      });
+    }
 
     req.user = {
-      id: payload.id,
-      nickname: payload.nickname,
-      role: normalizeRole(payload.role),
+      id: user.id,
+      nickname: user.username || payload.nickname,
+      role: normalizeRole(user.role),
     };
 
     next();
   } catch (error) {
+    if (!error?.name?.startsWith("JsonWebToken") && error?.name !== "TokenExpiredError") {
+      return next(error);
+    }
     return res.status(401).json({
       ok: false,
       message: "Сессия недействительна",
