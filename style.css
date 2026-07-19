@@ -7952,6 +7952,72 @@ html, body { max-width: 100%; overflow-x: hidden; }
   box-shadow: 0 18px 42px rgba(0,0,0,.32), 0 0 22px rgba(126,226,60,.10);
 }
 
+.server-plugin-grid .plugin-command-card {
+  cursor: pointer;
+  position: relative;
+}
+
+.server-plugin-grid .plugin-command-card::after {
+  content: "Команды";
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  padding: 4px 8px;
+  border: 1px solid rgba(115, 255, 48, .28);
+  border-radius: 999px;
+  color: #83ff49;
+  background: rgba(61, 145, 26, .12);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: .2s ease;
+}
+
+.server-plugin-grid .plugin-command-card:hover::after,
+.server-plugin-grid .plugin-command-card:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.server-plugin-grid .plugin-command-card:focus-visible {
+  outline: 2px solid #74ff37;
+  outline-offset: 3px;
+}
+
+.plugin-command-modal[hidden] { display: none; }
+.plugin-command-modal { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; padding: 24px; }
+.plugin-command-backdrop { position: absolute; inset: 0; background: rgba(0, 5, 3, .78); backdrop-filter: blur(9px); opacity: 0; transition: opacity .18s ease; }
+.plugin-command-dialog {
+  position: relative; z-index: 1; width: min(680px, 100%); max-height: min(760px, calc(100vh - 48px)); overflow: auto;
+  padding: 30px; border: 1px solid rgba(112, 255, 47, .28); border-radius: 22px;
+  background: linear-gradient(145deg, rgba(10, 25, 15, .98), rgba(2, 9, 6, .99));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .68), inset 0 1px rgba(255, 255, 255, .04);
+  opacity: 0; transform: translateY(14px) scale(.98); transition: .2s ease;
+}
+.plugin-command-modal.open .plugin-command-backdrop { opacity: 1; }
+.plugin-command-modal.open .plugin-command-dialog { opacity: 1; transform: none; }
+.plugin-command-dialog h2 { margin: 17px 44px 8px 0; color: #fff; font-size: clamp(25px, 4vw, 38px); }
+.plugin-command-dialog > p { margin: 0 0 22px; color: #aebcaf; line-height: 1.55; }
+.plugin-command-close { position: absolute; top: 18px; right: 18px; display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; color: #fff; background: rgba(255,255,255,.05); cursor: pointer; }
+.plugin-command-close:hover { color: #7dff43; border-color: rgba(113,255,48,.4); background: rgba(83,174,38,.14); }
+.plugin-command-close svg { width: 20px; height: 20px; }
+.plugin-command-list { display: grid; gap: 10px; }
+.plugin-command-row { display: grid; grid-template-columns: minmax(180px, .75fr) 1.25fr; gap: 16px; align-items: center; padding: 14px 15px; border: 1px solid rgba(255,255,255,.08); border-radius: 13px; background: rgba(255,255,255,.025); }
+.plugin-command-row code { color: #84ff4a; font: 800 14px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }
+.plugin-command-row span { color: #c3cdc4; font-size: 13px; line-height: 1.45; }
+.plugin-command-empty { display: flex; align-items: center; gap: 12px; padding: 18px; border: 1px solid rgba(113,255,48,.17); border-radius: 14px; color: #cbd6cc; background: rgba(84,174,39,.07); }
+.plugin-command-empty svg { flex: 0 0 auto; width: 21px; color: #7dff43; }
+body.plugin-modal-open { overflow: hidden; }
+
+@media (max-width: 620px) {
+  .plugin-command-dialog { padding: 24px 18px 20px; border-radius: 18px; }
+  .plugin-command-row { grid-template-columns: 1fr; gap: 6px; }
+  .server-plugin-grid .plugin-command-card::after { opacity: 1; transform: none; }
+}
+
 .server-plugin-grid svg {
   width: 34px;
   height: 34px;
