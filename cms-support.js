@@ -1,4 +1,4 @@
-/* PopkinDom CMS News + Support frontend */
+/* PopkinDom CMS News frontend */
 (function () {
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -92,39 +92,6 @@
       list.innerHTML = `<article class="rule-panel-v2 news-panel"><p>${escapeHtml(error.message)}</p></article>`;
     }
     if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 2.4 } });
-  }
-
-  async function initSupportForm() {
-    const form = $('#supportForm');
-    if (!form) return;
-    const message = $('#supportMessage');
-    let user = null;
-    try {
-      const me = await api('/api/me?summary=1');
-      user = me.user || null;
-      const username = $('#supportUsername');
-      if (username && user?.username) username.value = user.username;
-    } catch {}
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      setMessage(message, 'Отправляем обращение…', '');
-      const payload = {
-        username: $('#supportUsername')?.value?.trim(),
-        telegramUsername: $('#supportTelegram')?.value?.trim(),
-        contact: $('#supportContact')?.value?.trim(),
-        subject: $('#supportSubject')?.value?.trim(),
-        message: $('#supportText')?.value?.trim()
-      };
-      try {
-        const data = await api('/api/support', { method: 'POST', body: JSON.stringify(payload) });
-        setMessage(message, `${data.message || 'Обращение отправлено.'} Номер: #${data.ticketId}`, 'success');
-        form.reset();
-        if (user?.username && $('#supportUsername')) $('#supportUsername').value = user.username;
-      } catch (error) {
-        setMessage(message, error.message, 'error');
-      }
-    });
   }
 
   let cmsEditingId = 0;
@@ -237,79 +204,8 @@
     });
   }
 
-  function statusLabel(status) {
-    const value = String(status || 'OPEN').toUpperCase();
-    const map = { OPEN: 'Открыто', IN_PROGRESS: 'В работе', ANSWERED: 'Отвечено', CLOSED: 'Закрыто' };
-    return map[value] || value;
-  }
-
-  function renderTicket(ticket) {
-    const status = String(ticket.status || 'OPEN').toLowerCase();
-    return `
-      <article class="admin-extra-ticket" data-ticket-id="${ticket.id}">
-        <div class="admin-extra-ticket-head">
-          <div>
-            <b>#${ticket.id} · ${escapeHtml(ticket.subject)}</b>
-            <span>${escapeHtml(ticket.username || 'Гость')} · ${ticket.telegramUsername ? '@' + escapeHtml(ticket.telegramUsername) : 'Telegram не указан'} · ${formatDate(ticket.createdAt)}</span>
-          </div>
-          <span class="support-pill ${status}">${statusLabel(ticket.status)}</span>
-        </div>
-        <p>${escapeHtml(ticket.message).replace(/\n/g, '<br>')}</p>
-        ${ticket.adminReply ? `<blockquote>${escapeHtml(ticket.adminReply).replace(/\n/g, '<br>')}<small>${escapeHtml(ticket.answeredBy || '')} · ${formatDate(ticket.answeredAt)}</small></blockquote>` : ''}
-        <div class="admin-extra-ticket-actions">
-          <select data-ticket-status>
-            ${['OPEN','IN_PROGRESS','ANSWERED','CLOSED'].map((item) => `<option value="${item}" ${item === ticket.status ? 'selected' : ''}>${statusLabel(item)}</option>`).join('')}
-          </select>
-          <input data-ticket-reply type="text" placeholder="Ответ / заметка администрации" />
-          <button type="button" class="admin-mini-btn" data-ticket-save><i data-lucide="save"></i> Сохранить</button>
-        </div>
-      </article>`;
-  }
-
-  async function loadTickets() {
-    const list = $('#supportTicketsList');
-    if (!list) return;
-    const filter = $('#supportStatusFilter')?.value || 'ALL';
-    list.innerHTML = '<div class="admin-extra-empty">Загрузка обращений…</div>';
-    try {
-      const data = await api(`/api/admin/support?status=${encodeURIComponent(filter)}`);
-      const items = Array.isArray(data.tickets) ? data.tickets : [];
-      list.innerHTML = items.length ? items.map(renderTicket).join('') : '<div class="admin-extra-empty">Обращений пока нет.</div>';
-      if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 2.4 } });
-    } catch (error) {
-      list.innerHTML = `<div class="admin-extra-empty">${escapeHtml(error.message)}</div>`;
-    }
-  }
-
-  async function initSupportAdmin() {
-    const list = $('#supportTicketsList');
-    if (!list) return;
-    await requireFullAdmin();
-    const message = $('#supportAdminMessage');
-    await loadTickets();
-    $('#supportStatusFilter')?.addEventListener('change', loadTickets);
-    $('#supportTicketsRefresh')?.addEventListener('click', loadTickets);
-    list.addEventListener('click', async (event) => {
-      const btn = event.target.closest('[data-ticket-save]');
-      if (!btn) return;
-      const card = btn.closest('[data-ticket-id]');
-      const id = Number(card?.dataset.ticketId || 0);
-      const status = $('[data-ticket-status]', card)?.value || 'IN_PROGRESS';
-      const reply = $('[data-ticket-reply]', card)?.value?.trim() || '';
-      try {
-        const data = await api('/api/admin/support', { method: 'POST', body: JSON.stringify({ id, status, reply }) });
-        setMessage(message, data.message || 'Обращение обновлено.', 'success');
-        await loadTickets();
-      } catch (error) {
-        setMessage(message, error.message, 'error');
-      }
-    });
-  }
-
   document.addEventListener('DOMContentLoaded', () => {
     initPublicNews();
-    initSupportForm();
     initCmsAdmin();
-    initSupportAdmin();
   });
 })();

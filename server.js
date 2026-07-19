@@ -22,30 +22,6 @@ app.use((req, res, next) => {
 
 registerBackendRoutes(app);
 
-app.get(['/support', '/support.html'], (req, res) => {
-  res.redirect(302, '/index?support=1');
-});
-
-function injectSupportWidget(html) {
-  let result = html;
-
-  if (!result.includes('/support-widget.css')) {
-    result = result.replace(
-      '</head>',
-      '  <link rel="stylesheet" href="/support-widget.css?v=1" />\n</head>'
-    );
-  }
-
-  if (!result.includes('/support-widget.js')) {
-    result = result.replace(
-      '</body>',
-      '  <script src="/support-widget.js?v=1"></script>\n</body>'
-    );
-  }
-
-  return result;
-}
-
 function resolveHtmlFile(requestPath) {
   const cleanPath = decodeURIComponent(requestPath.split('?')[0]);
   const normalized = path.posix.normalize(cleanPath).replace(/^\/+/, '');
@@ -80,7 +56,7 @@ app.use((req, res, next) => {
 
   fs.readFile(htmlFile, 'utf8', (error, html) => {
     if (error) return next(error);
-    res.type('html').send(injectSupportWidget(html));
+    res.type('html').send(html);
   });
 });
 
@@ -93,7 +69,7 @@ app.use((req, res, next) => {
   const indexFile = path.join(SITE_ROOT, 'index.html');
   fs.readFile(indexFile, 'utf8', (error, html) => {
     if (error) return next(error);
-    res.type('html').send(injectSupportWidget(html));
+    res.type('html').send(html);
   });
 });
 
