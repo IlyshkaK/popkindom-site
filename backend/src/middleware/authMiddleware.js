@@ -22,7 +22,18 @@ async function authRequired(req, res, next) {
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const result = await pool.query(
-      `SELECT id, username, role FROM pd_users WHERE id = $1 LIMIT 1`,
+      `
+      SELECT
+        u.id,
+        u.username,
+        u.role,
+        t.standard_title
+      FROM pd_users u
+      LEFT JOIN players p ON p.auth_user_id = u.id
+      LEFT JOIN pd_player_titles t ON t.player_uuid = p.uuid::uuid
+      WHERE u.id = $1
+      LIMIT 1
+      `,
       [payload.id]
     );
     const user = result.rows[0];
@@ -34,10 +45,16 @@ async function authRequired(req, res, next) {
       });
     }
 
+    const effectiveRole = normalizeRole(user.standard_title || user.role);
+
+    if (effectiveRole !== normalizeRole(user.role)) {
+      await pool.query(`UPDATE pd_users SET role = $1 WHERE id = $2`, [effectiveRole, user.id]);
+    }
+
     req.user = {
       id: user.id,
       nickname: user.username || payload.nickname,
-      role: normalizeRole(user.role),
+      role: effectiveRole,
     };
 
     next();
