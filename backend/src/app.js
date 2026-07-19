@@ -11,6 +11,7 @@ const titlesRoutes = require("./routes/titlesRoutes");
 const pinRoutes = require("./routes/pinRoutes");
 const securityRoutes = require("./routes/securityRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const { hasRoleAtLeast } = require("./utils/roles");
 
 const publicNewsHandler = require("../routes/news/news");
 const adminNewsHandler = require("../routes/admin/news-cms");
@@ -80,12 +81,10 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/top", topRoutes);
 
 app.get("/api/admin-status", authRequired, (req, res) => {
-  const role = String(req.user?.role || "").toUpperCase();
-
   res.json({
     ok: true,
     user: req.user,
-    hasAccess: ["MODERATOR", "ADMIN", "OWNER"].includes(role),
+    hasAccess: hasRoleAtLeast(req.user?.role, "moderator"),
   });
 });
 

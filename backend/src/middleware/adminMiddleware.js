@@ -1,7 +1,9 @@
+const { hasRoleAtLeast } = require("../utils/roles");
+
 function adminRequired(req, res, next) {
   const role = req.user?.role;
 
-  if (role !== "ADMIN" && role !== "OWNER") {
+  if (!hasRoleAtLeast(role, "admin")) {
     return res.status(403).json({
       ok: false,
       message: "Недостаточно прав",

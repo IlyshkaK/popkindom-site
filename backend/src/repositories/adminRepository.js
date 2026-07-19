@@ -1,4 +1,5 @@
 const pool = require("../database/pool");
+const { normalizeRole } = require("../utils/roles");
 
 async function findUserById(userId) {
   const result = await pool.query(
@@ -26,7 +27,7 @@ async function countOnline() {
 }
 
 async function countAdmins() {
-  const r = await pool.query(`SELECT COUNT(*)::int AS count FROM pd_users WHERE role IN ('ADMIN','OWNER')`);
+  const r = await pool.query(`SELECT COUNT(*)::int AS count FROM pd_users WHERE LOWER(role) IN ('admin','spec.admin','owner')`);
   return r.rows[0]?.count || 0;
 }
 
@@ -494,7 +495,7 @@ async function insertSiteAction(action, username, usernameLower, reason, executo
       (action, player_name, player_name_lower, reason, executor_name, executor_role, target_role, expires_at, processed)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, FALSE)
     `,
-    [action, username, usernameLower, reason, executorName, executorRole, targetRole || "PLAYER", expiresAt]
+    [action, username, usernameLower, reason, executorName, normalizeRole(executorRole), normalizeRole(targetRole), expiresAt]
   );
 }
 

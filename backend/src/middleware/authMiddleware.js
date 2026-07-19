@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { normalizeRole } = require("../utils/roles");
 
 function authRequired(req, res, next) {
   try {
@@ -23,7 +24,7 @@ function authRequired(req, res, next) {
     req.user = {
       id: payload.id,
       nickname: payload.nickname,
-      role: payload.role,
+      role: normalizeRole(payload.role),
     };
 
     next();

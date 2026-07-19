@@ -76,8 +76,8 @@ async function createWebUser(username, usernameLower, passwordHash, ip) {
   const result = await pool.query(
     `
     INSERT INTO pd_users
-      (username, username_lower, password_hash, registered_from, last_ip, last_web_login)
-    VALUES ($1, $2, $3, 'WEB', $4, CURRENT_TIMESTAMP)
+      (username, username_lower, password_hash, role, registered_from, last_ip, last_web_login)
+    VALUES ($1, $2, $3, 'default', 'WEB', $4, CURRENT_TIMESTAMP)
     RETURNING
       id,
       username AS nickname,

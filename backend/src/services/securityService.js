@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const securityRepository = require("../repositories/securityRepository");
+const { normalizeRole } = require("../utils/roles");
 
 function securityPayload(security) {
   return {
@@ -7,7 +8,7 @@ function securityPayload(security) {
       id: security.id,
       username: security.nickname,
       nickname: security.nickname,
-      role: security.role,
+      role: normalizeRole(security.role),
       hasPin: Boolean(security.pin_hash),
       autoLoginEnabled: security.auto_login_enabled,
       adminPanelEnabled: security.admin_panel_enabled,

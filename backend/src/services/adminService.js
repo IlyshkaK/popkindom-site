@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const adminRepository = require("../repositories/adminRepository");
+const { parseRole, normalizeRole, hasRoleAtLeast } = require("../utils/roles");
 
 const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS || 10);
 
@@ -13,19 +14,19 @@ const FULL_ADMIN_ACTIONS = new Set([
   "BAN", "TEMP_BAN", "MUTE", "TEMP_MUTE", "UNBAN", "UNMUTE", "KICK",
   "WHITELIST_REMOVE", "RESET_PASSWORD", "RESET_PIN", "PRIVATE_MESSAGE"
 ]);
-const OWNER_ACTIONS = new Set(["SET_ROLE"]);
-const ALLOWED_ROLES = new Set(["PLAYER", "MODERATOR", "ADMIN", "OWNER"]);
+const SPEC_ADMIN_ACTIONS = new Set(["SET_ROLE"]);
+const ALLOWED_ROLES = new Set(["default", "moderator", "admin", "spec.admin"]);
 
 function isAdminRole(user) {
-  return ["MODERATOR", "ADMIN", "OWNER"].includes(String(user?.role || "").toUpperCase());
+  return hasRoleAtLeast(user?.role, "moderator");
 }
 
 function isFullAdminRole(user) {
-  return ["ADMIN", "OWNER"].includes(String(user?.role || "").toUpperCase());
+  return hasRoleAtLeast(user?.role, "admin");
 }
 
-function isOwnerRole(user) {
-  return String(user?.role || "").toUpperCase() === "OWNER";
+function isSpecAdminRole(user) {
+  return normalizeRole(user?.role) === "spec.admin";
 }
 
 function publicUser(user) {
@@ -33,30 +34,20 @@ function publicUser(user) {
     id: user.id,
     username: user.username,
     nickname: user.username,
-    role: user.role,
+    role: normalizeRole(user.role),
     autoLoginEnabled: user.auto_login_enabled,
     adminPanelEnabled: user.admin_panel_enabled,
     hasPin: Boolean(user.pin_hash),
   };
 }
 
-function normalizeRole(raw) {
-  const value = String(raw || "").trim().toUpperCase();
-  if (ALLOWED_ROLES.has(value)) return value;
-  if (value === "ИГРОК") return "PLAYER";
-  if (value === "МОДЕРАТОР") return "MODERATOR";
-  if (value === "АДМИНИСТРАТОР") return "ADMIN";
-  if (value === "ВЛАДЕЛЕЦ") return "OWNER";
-  return null;
-}
-
 function canActOnTargetRole(executorRoleRaw, targetRoleRaw) {
-  const executorRole = normalizeRole(executorRoleRaw) || "PLAYER";
-  const targetRole = normalizeRole(targetRoleRaw) || "PLAYER";
+  const executorRole = normalizeRole(executorRoleRaw);
+  const targetRole = normalizeRole(targetRoleRaw);
 
-  if (executorRole === "OWNER") return true;
-  if (executorRole === "ADMIN") return ["PLAYER", "MODERATOR"].includes(targetRole);
-  if (executorRole === "MODERATOR") return targetRole === "PLAYER";
+  if (executorRole === "spec.admin") return true;
+  if (executorRole === "admin") return ["default", "moderator"].includes(targetRole);
+  if (executorRole === "moderator") return targetRole === "default";
   return false;
 }
 
@@ -117,7 +108,7 @@ async function getOverview(admin) {
   return {
     admin: {
       username: admin.username,
-      role: admin.role,
+      role: normalizeRole(admin.role),
     },
     cards: {
       usersCount,
@@ -130,7 +121,7 @@ async function getOverview(admin) {
 
 async function getPlayers(search) {
   const players = await adminRepository.findPlayers(search);
-  return { players };
+  return { players: players.map((player) => ({ ...player, role: normalizeRole(player.role) })) };
 }
 
 async function getPlayerDetails(username) {
@@ -159,6 +150,7 @@ async function getPlayerDetails(username) {
 
   const mergedPlayer = {
     ...player,
+    role: normalizeRole(player.role),
     stats,
     player_stats: stats,
     blocks_total: blocksTotal,
@@ -206,7 +198,7 @@ async function runPlayerAction(admin, body) {
   const reason = String(body.reason || "").trim() || "Действие выполнено через админ-панель сайта";
   const durationRaw = String(body.duration || "").trim();
   const messageText = String(body.message || body.privateMessage || "").trim();
-  const newRole = normalizeRole(body.role || body.newRole);
+  const newRole = parseRole(body.role || body.newRole);
 
   if (!/^[a-zA-Z0-9_]{3,16}$/.test(username)) {
     return { ok: false, status: 400, message: "Некорректный ник игрока." };
@@ -216,9 +208,9 @@ async function runPlayerAction(admin, body) {
     return { ok: false, status: 400, message: "Неизвестное действие." };
   }
 
-  const adminRole = String(admin.role || "").toUpperCase();
+  const adminRole = normalizeRole(admin.role);
 
-  if (adminRole === "MODERATOR" && !MODERATOR_ACTIONS.has(action)) {
+  if (adminRole === "moderator" && !MODERATOR_ACTIONS.has(action)) {
     return {
       ok: false,
       status: 403,
@@ -226,12 +218,12 @@ async function runPlayerAction(admin, body) {
     };
   }
 
-  if (["ADMIN", "OWNER"].includes(adminRole) && !FULL_ADMIN_ACTIONS.has(action) && !OWNER_ACTIONS.has(action)) {
+  if (["admin", "spec.admin"].includes(adminRole) && !FULL_ADMIN_ACTIONS.has(action) && !SPEC_ADMIN_ACTIONS.has(action)) {
     return { ok: false, status: 403, message: "Недостаточно прав для этого действия." };
   }
 
-  if (OWNER_ACTIONS.has(action) && !isOwnerRole(admin)) {
-    return { ok: false, status: 403, message: "Выдавать роли может только OWNER." };
+  if (SPEC_ADMIN_ACTIONS.has(action) && !isSpecAdminRole(admin)) {
+    return { ok: false, status: 403, message: "Выдавать роли может только спец. администратор." };
   }
 
   const targetUser = await adminRepository.findTargetUser(usernameLower);
@@ -248,18 +240,18 @@ async function runPlayerAction(admin, body) {
   }
 
   if (!canActOnTargetRole(adminRole, targetUser.role)) {
-    if (adminRole === "ADMIN") {
-      return { ok: false, status: 403, message: "ADMIN может работать только с MODERATOR и PLAYER." };
+    if (adminRole === "admin") {
+      return { ok: false, status: 403, message: "Администратор может работать только с moderator и default." };
     }
-    if (adminRole === "MODERATOR") {
-      return { ok: false, status: 403, message: "MODERATOR может работать только с PLAYER." };
+    if (adminRole === "moderator") {
+      return { ok: false, status: 403, message: "Модератор может работать только с default." };
     }
     return { ok: false, status: 403, message: "Недостаточно прав для выбранного игрока." };
   }
 
   if (action === "SET_ROLE") {
     if (!newRole || !ALLOWED_ROLES.has(newRole)) {
-      return { ok: false, status: 400, message: "Выберите корректную роль: PLAYER, MODERATOR, ADMIN или OWNER." };
+      return { ok: false, status: 400, message: "Выберите корректную роль: default, moderator, admin или spec.admin." };
     }
 
     await adminRepository.updateRole(usernameLower, newRole);
@@ -276,7 +268,7 @@ async function runPlayerAction(admin, body) {
 
   if (action === "RESET_PASSWORD") {
     if (!isFullAdminRole(admin)) {
-      return { ok: false, status: 403, message: "Сброс пароля доступен только ADMIN и OWNER." };
+      return { ok: false, status: 403, message: "Сброс пароля доступен только admin и spec.admin." };
     }
 
     const tempPassword = generateTempPassword();
@@ -297,7 +289,7 @@ async function runPlayerAction(admin, body) {
 
   if (action === "RESET_PIN") {
     if (!isFullAdminRole(admin)) {
-      return { ok: false, status: 403, message: "Сброс PIN доступен только ADMIN и OWNER." };
+      return { ok: false, status: 403, message: "Сброс PIN доступен только admin и spec.admin." };
     }
 
     await adminRepository.resetPin(usernameLower);
@@ -410,7 +402,7 @@ async function runPlayerAction(admin, body) {
 
 async function getWhitelistRequests(admin) {
   if (!isFullAdminRole(admin)) {
-    return { ok: false, status: 403, message: "Whitelist доступен только ADMIN и OWNER." };
+    return { ok: false, status: 403, message: "Whitelist доступен только admin и spec.admin." };
   }
 
   const requests = await adminRepository.findWhitelistRequests();
@@ -419,7 +411,7 @@ async function getWhitelistRequests(admin) {
 
 async function reviewWhitelistRequest(admin, body) {
   if (!isFullAdminRole(admin)) {
-    return { ok: false, status: 403, message: "Whitelist доступен только ADMIN и OWNER." };
+    return { ok: false, status: 403, message: "Whitelist доступен только admin и spec.admin." };
   }
 
   const id = Number(body.id);
