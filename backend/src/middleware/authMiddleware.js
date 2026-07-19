@@ -27,10 +27,19 @@ async function authRequired(req, res, next) {
         u.id,
         u.username,
         u.role,
-        t.standard_title
+        (
+          SELECT t.standard_title
+          FROM pd_player_titles t
+          LEFT JOIN players p ON p.uuid::uuid = t.player_uuid
+          WHERE p.auth_user_id = u.id
+             OR LOWER(p.nickname) = LOWER(u.username)
+             OR LOWER(t.player_name) = LOWER(u.username)
+          ORDER BY
+            CASE WHEN p.auth_user_id = u.id THEN 0 ELSE 1 END,
+            t.updated_at DESC NULLS LAST
+          LIMIT 1
+        ) AS standard_title
       FROM pd_users u
-      LEFT JOIN players p ON p.auth_user_id = u.id
-      LEFT JOIN pd_player_titles t ON t.player_uuid = p.uuid::uuid
       WHERE u.id = $1
       LIMIT 1
       `,
