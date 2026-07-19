@@ -323,16 +323,17 @@ async function refreshAdminVisibility() {
     return false;
   }
 
+  const allowedRoles = new Set(["MODERATOR", "ADMIN", "OWNER"]);
+  let hasAccess = allowedRoles.has(normalizeAdminRole(currentUser.role));
+
   try {
-    const status = await apiRequest("/api/admin-status");
-    if (status.user?.role) currentUser.role = status.user.role;
-    const hasAccess = status.hasAccess === true;
-    document.body.classList.toggle("is-admin", hasAccess);
-    return hasAccess;
-  } catch {
-    document.body.classList.remove("is-admin");
-    return false;
-  }
+    const titles = await apiRequest("/api/account/titles");
+    if (titles.role) currentUser.role = titles.role;
+    hasAccess = allowedRoles.has(normalizeAdminRole(titles.role || currentUser.role));
+  } catch {}
+
+  document.body.classList.toggle("is-admin", hasAccess);
+  return hasAccess;
 }
 
 const authMenuBtn = document.getElementById("authMenuBtn");
